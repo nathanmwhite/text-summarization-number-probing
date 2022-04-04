@@ -18,6 +18,8 @@ tokenizer = PegasusTokenizer.from_pretrained(model_name)
 
 model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
 
+# TODO: implement Addition and Decoding models
+
 # TODO: update hidden_dim value
 class MaxProbingModel(torch.nn.Module):
     def __init__(self, embedding_model):
