@@ -60,9 +60,11 @@ if __name__ == '__main__':
     # This choice of loss mirrors Wallace et al's (2019) code.
     # From the original paper:
     # "We use the negative log-likelihood of the maximum number as the loss function."
+    # PyTorch's CrossEntropyLoss applies softmax with the negative log-likelihood, as described in the paper.
     loss_fn = torch.nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.SGD(mpm.parameters(), lr=0.01, momentum=0.5) # hyperparameters per Wallace et al. (2019) code
+    # hyperparameters per Wallace et al. (2019) code
+    optimizer = torch.optim.SGD(mpm.parameters(), lr=0.01, momentum=0.5)
     
     EPOCHS = 10
     
