@@ -47,6 +47,7 @@ data_range = np.asarray(range(sample_min, sample_max + 1))
 # 1. they shuffled and split based on the integer numbers, or
 # 2. they shuffled and split based on string representations (unlikely because Gaussian wouldn't work then)
 # I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
+#  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
 np.random.shuffle(data_range)
 split = math.floor(data_range.size * 0.8)
 training_pool = data_range[:split]
