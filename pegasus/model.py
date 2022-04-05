@@ -8,15 +8,7 @@ __copyright__ = "Copyright © 2022 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@my.jcu.edu.au"
 
-
-from transformers import PegasusForConditionalGeneration, PegasusTokenizer
 import torch
-
-model_name = "google/pegasus-xsum"
-device = "cuda" if torch.cuda.is_available() else "cpu"
-tokenizer = PegasusTokenizer.from_pretrained(model_name)
-
-model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
 
 # TODO: implement Addition and Decoding models
 
@@ -30,6 +22,7 @@ class MaxProbingModel(torch.nn.Module):
         bilstm_input_dim = self.embedding_model.model.encoder.layer_norm.normalized_shape[0]
         hidden_dim = 5 
         
+        # TODO: determine improved implementation of h0 and c0
         self.h0 = torch.randn(2, 5, 5)
         self.c0 = torch.randn(2, 5, 5)
         
