@@ -34,31 +34,65 @@ import numpy as np
 #   an integer range, putting 80% into train and 20% into test. Next, we enumerate all possible pairs of
 #   numbers in the two respective splits. When using large ranges such as [0,999], we sub-sample a random 10% of the training and test pairs.
 
-# Sample script based on Wallace et al. paper
-# TODO: rewrite according to best practices
+# TODO: Implement Addition and Decoding data generation
+
+# TODO: for List Maximum, convert to strings and enable integer/float/negative/words representations
+# TODO: for List Maximum, generate correct answers for training and test sets
+
 sample_max = 99
 sample_min = 0
 num_train_examples = 100000
 num_test_examples = 10000
 
-data_range = np.asarray(range(sample_min, sample_max + 1))
+datapoint_length = 5
 
-# the definition from Wallace et al. could mean:
-# 1. they shuffled and split based on the integer numbers, or
-# 2. they shuffled and split based on string representations (unlikely because Gaussian wouldn't work then)
-# I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
-#  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
-np.random.shuffle(data_range)
-split = math.floor(data_range.size * 0.8)
-training_pool = data_range[:split]
-test_pool = data_range[split:]
+def generate_pools(sample_min, sample_max):
+    # the definition from Wallace et al. could mean:
+    # 1. they shuffled and split based on the integer numbers, or
+    # 2. they shuffled and split based on string representations (unlikely because Gaussian wouldn't work then)
+    # I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
+    #  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
+    data_range = np.asarray(range(sample_min, sample_max + 1))
 
-sample_random_integer = np.random.choice(training_pool)
-gaussian_sample = np.random.normal(scale=(sample_max - sample_min) * 0.01)
-add_result = sample_random_integer + gaussian_sample
-nearest_value = training_pool[np.argmin(np.abs(training_pool - add_result))]
+    np.random.shuffle(data_range)
+    split = math.floor(data_range.size * 0.8)
+    training_pool = data_range[:split]
+    test_pool = data_range[split:]
+    
+    return training_pool, test_pool
+
+def sample_gaussian(pool, sample_min, sample_max):
+    sample_random_integer = np.random.choice(pool)
+    gaussian_sample = np.random.normal(scale=(sample_max - sample_min) * 0.01)
+    add_result = sample_random_integer + gaussian_sample
+    nearest_value = pool[np.argmin(np.abs(pool - add_result))]
+    
+    return nearest_value
+
+def generation_loop(pool, sample_min, sample_max, num_examples, datapoint_length):
+    assembled_data = []
+    for i in range(num_examples):
+        datapoint = []
+        for j in range(datapoint_length):
+            value = sample_gaussian(pool, sample_min, sample_max)
+            while value in datapoint:
+                value = sample_gaussian(pool, sample_min, sample_max)
+            datapoint.append(value)
+        assembled_data.append(datapoint)
+    
+    return assembled_data
+
 # their description does not specify what happens to the obtained value via the Gaussian process
-
-# TODO: Gaussian sampling function
-def sample_gaussian(upper_bound):
-    pass
+# their code shows that the Gaussian is run five times per data point and appended
+# this code follows the description in Wallace et al. (2019); their code has additional complications
+#  and behavior not justified by their description
+def generate_data(sample_min, sample_max, num_training_examples, num_test_examples, datapoint_length):
+    training_pool, test_pool = generate_pools(sample_min, sample_max)
+    
+    training_data = generation_loop(training_pool, sample_min, sample_max, num_training_examples, datapoint_length)
+    
+    test_data = generation_loop(test_pool, sample_min, sample_max, num_test_examples, datapoint_length)
+    
+    return training_data, test_data
+        
+    
