@@ -39,12 +39,12 @@ import numpy as np
 # TODO: for List Maximum, convert to strings and enable integer/float/negative/words representations
 # TODO: for List Maximum, generate correct answers for training and test sets
 
-sample_max = 99
-sample_min = 0
-num_train_examples = 100000
-num_test_examples = 10000
+#sample_max = 99
+#sample_min = 0
+#num_train_examples = 100000
+#num_test_examples = 10000
 
-datapoint_length = 5
+#datapoint_length = 5
 
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
