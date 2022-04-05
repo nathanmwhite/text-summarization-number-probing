@@ -49,6 +49,10 @@ class MaxProbingModel(torch.nn.Module):
         # From Wallace et al. (2019):
         # "...a weight matrix and softmax function assign a probability to each index using the model’s hidden state."
         logits = self.linear(hidden_vectors[1][0]).squeeze(-1)
+        
+        # TODO: review choice to use log_softmax here,
+        #  as pytorch's CrossEntropyLoss implicitly applies softmax and log itself
+        #  This will especially need to be revisited once code for metrics is written.
         y_pred = F.log_softmax(logits, dim=1)
         
         return y_pred
