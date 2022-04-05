@@ -45,7 +45,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             logging.info(loss_message)
             continuing_loss = 0.0
             
-    return prior_loss
+    return batch_loss
 
 # to implement: calculate metrics
 if __name__ == '__main__':
