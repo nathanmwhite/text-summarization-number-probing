@@ -46,10 +46,9 @@ class MaxProbingModel(torch.nn.Module):
         hidden_vectors = self.bilstm(embeddings)
         # .size is a method, not a property (unlike tensorflow shape)
         # hidden_vectors[0] has size [1, 5, 10]
-        # I have chosen cell_state as input here;
-        #  the actual final output for the bilstm does not represent
-        #   the individual words and it has the wrong size
-        logits = self.linear(hidden_vectors[1][1]).squeeze(-1)
+        # From Wallace et al. (2019):
+        # "...a weight matrix and softmax function assign a probability to each index using the model’s hidden state."
+        logits = self.linear(hidden_vectors[1][0]).squeeze(-1)
         y_pred = F.log_softmax(logits, dim=1)
         
         return y_pred
