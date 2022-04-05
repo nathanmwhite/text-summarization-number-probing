@@ -46,52 +46,52 @@ num_test_examples = 10000
 
 datapoint_length = 5
 
-def generate_pools(sample_min, sample_max):
-    # the definition from Wallace et al. could mean:
-    # 1. they shuffled and split based on the integer numbers, or
-    # 2. they shuffled and split based on string representations (unlikely because Gaussian wouldn't work then)
-    # I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
-    #  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
-    data_range = np.asarray(range(sample_min, sample_max + 1))
-
-    np.random.shuffle(data_range)
-    split = math.floor(data_range.size * 0.8)
-    training_pool = data_range[:split]
-    test_pool = data_range[split:]
-    
-    return training_pool, test_pool
-
-def sample_gaussian(pool, sample_min, sample_max):
-    sample_random_integer = np.random.choice(pool)
-    gaussian_sample = np.random.normal(scale=(sample_max - sample_min) * 0.01)
-    add_result = sample_random_integer + gaussian_sample
-    nearest_value = pool[np.argmin(np.abs(pool - add_result))]
-    
-    return nearest_value
-
-def generation_loop(pool, sample_min, sample_max, num_examples, datapoint_length):
-    assembled_data = []
-    for i in range(num_examples):
-        datapoint = []
-        for j in range(datapoint_length):
-            value = sample_gaussian(pool, sample_min, sample_max)
-            while value in datapoint:
-                value = sample_gaussian(pool, sample_min, sample_max)
-            datapoint.append(value)
-        assembled_data.append(datapoint)
-    
-    return assembled_data
-
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
 # this code follows the description in Wallace et al. (2019); their code has additional complications
 #  and behavior not justified by their description
 def generate_data(sample_min, sample_max, num_training_examples, num_test_examples, datapoint_length):
-    training_pool, test_pool = generate_pools(sample_min, sample_max)
+    def generate_pools():
+        # the definition from Wallace et al. could mean:
+        # 1. they shuffled and split based on the integer numbers, or
+        # 2. they shuffled and split based on string representations (unlikely because Gaussian wouldn't work then)
+        # I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
+        #  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
+        data_range = np.asarray(range(sample_min, sample_max + 1))
+
+        np.random.shuffle(data_range)
+        split = math.floor(data_range.size * 0.8)
+        training_pool = data_range[:split]
+        test_pool = data_range[split:]
+
+        return training_pool, test_pool
+
+    def sample_gaussian(pool):
+        sample_random_integer = np.random.choice(pool)
+        gaussian_sample = np.random.normal(scale=(sample_max - sample_min) * 0.01)
+        add_result = sample_random_integer + gaussian_sample
+        nearest_value = pool[np.argmin(np.abs(pool - add_result))]
+
+        return nearest_value
+
+    def generation_loop(pool, num_examples):
+        assembled_data = []
+        for i in range(num_examples):
+            datapoint = []
+            for j in range(datapoint_length):
+                value = sample_gaussian(pool)
+                while value in datapoint:
+                    value = sample_gaussian(pool)
+                datapoint.append(value)
+            assembled_data.append(datapoint)
+
+        return assembled_data
+
+    training_pool, test_pool = generate_pools()
     
-    training_data = generation_loop(training_pool, sample_min, sample_max, num_training_examples, datapoint_length)
+    training_data = generation_loop(training_pool, num_training_examples)
     
-    test_data = generation_loop(test_pool, sample_min, sample_max, num_test_examples, datapoint_length)
+    test_data = generation_loop(test_pool, num_test_examples)
     
     return training_data, test_data
         
