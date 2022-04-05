@@ -6,7 +6,7 @@ __copyright__ = "Copyright © 2022 Nathan M. White"
 
 # author
 __author__ = "Nathan M. White"
-__author_email__ = "nathan.white1@my.jcu.edu.au"
+__author_email__ = "nathan.white1@jcu.edu.au"
 
 import torch
 
