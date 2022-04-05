@@ -57,6 +57,9 @@ if __name__ == '__main__':
     
     mpm = MaxProbingModel(pegasus_model).to(device)
     
+    # This choice of loss mirrors Wallace et al's (2019) code.
+    # From the original paper:
+    # "We use the negative log-likelihood of the maximum number as the loss function."
     loss_fn = torch.nn.CrossEntropyLoss()
 
     optimizer = torch.optim.SGD(mpm.parameters(), lr=0.01, momentum=0.5) # hyperparameters per Wallace et al. (2019) code
