@@ -10,6 +10,8 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 
 import math
 
+import num2words
+
 import numpy as np
 
 from torch.utils.data import Dataset
@@ -56,7 +58,8 @@ def generate_data(sample_min: int,
                   sample_max: int, 
                   num_training_examples: int, 
                   num_test_examples: int, 
-                  datapoint_length: int=5):
+                  datapoint_length: int=5,
+                  use_word_format: bool=False):
     """
     generate_data : Function that generates training and test data for the List Maximum 
         task specified in Wallace et al. (2019).
@@ -65,6 +68,9 @@ def generate_data(sample_min: int,
     @param num_training_examples (int) : Number of training examples to generate
     @param num_test_examples (int) : Number of test examples to generate
     @param datapoint_length (int) : Number of elements in each datapoint
+    @param use_word_format (bool) : Indicates whether to convert an integer into:
+        word representation such as 37 --> "thirty-seven" (True), or
+        keep as integer representation in a string as in 37 --> "37" (False)
     returns : four Numpy Arrays of np.int32 :
         1. training inputs
         2. training outputs
@@ -121,6 +127,11 @@ def generate_data(sample_min: int,
     
     test_targets = np.argmax(test_data_numpy, axis=1)
     
-    return training_data_numpy, training_targets, test_data_numpy, test_targets
-        
+    if use_word_format:
+        training_data_strings = np.array([[num2words(n) for n in line] for line in training_data])
+        test_data_strings = np.array([[num2words(n) for n in line] for line in test_data])
+    else:
+        training_data_strings = np.array([[str(n) for n in line] for line in training_data])
+        test_data_strings = np.array([[str(n) for n in line] for line in test_data])
     
+    return training_data_strings, training_targets, test_data_strings, test_targets
