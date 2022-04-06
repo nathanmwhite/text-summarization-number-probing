@@ -141,9 +141,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     test_data_numpy = np.array(test_data)
     
-    training_targets = torch.Tensor(np.argmax(training_data_numpy, axis=1), dtype=torch.int16)
+    training_targets = torch.tensor(np.argmax(training_data_numpy, axis=1), dtype=torch.int16)
     
-    test_targets = torch.Tensor(np.argmax(test_data_numpy, axis=1), dtype=torch.int16)
+    test_targets = torch.tensor(np.argmax(test_data_numpy, axis=1), dtype=torch.int16)
     
     # Convert to string format
     if use_word_format:
