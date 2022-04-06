@@ -154,6 +154,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_data_strings = [[str(n) for n in line] for line in test_data]
         
     # Tokenize via tokenizer
+    # TODO: revise the current list comprehension to a more efficient implementation
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
     training_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in training_data_strings]
     test_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in test_data_strings]
