@@ -16,7 +16,7 @@ import numpy as np
 
 from torch.utils.data import Dataset
 
-from tranformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizer
 
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
