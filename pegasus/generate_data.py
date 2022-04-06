@@ -50,7 +50,21 @@ import numpy as np
 # their code shows that the Gaussian is run five times per data point and appended
 # this code follows the description in Wallace et al. (2019); their code has additional complications
 #  and behavior not justified by their description
-def generate_data(sample_min, sample_max, num_training_examples, num_test_examples, datapoint_length):
+def generate_data(sample_min: int, 
+                  sample_max: int, 
+                  num_training_examples: int, 
+                  num_test_examples: int, 
+                  datapoint_length: int=5):
+    """
+    generate_data : Function that generates training and test data for the List Maximum 
+        task specified in Wallace et al. (2019).
+    @param sample_min (int) : Minimum of range to sample
+    @param sample_max (int) : Maximum of range to sample
+    @param num_training_examples (int) : Number of training examples to generate
+    @param num_test_examples (int) : Number of test examples to generate
+    @param datapoint_length (int) : Number of elements in each datapoint
+    returns : two List[List (int)], the first containing training examples, the second test examples
+    """
     def generate_pools():
         # the definition from Wallace et al. could mean:
         # 1. they shuffled and split based on the integer numbers, or
