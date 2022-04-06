@@ -1,5 +1,5 @@
 num2words==0.5.10
 numpy==1.22.3
 sentencepiece==0.1.96
-torch==1.11.0
+torch==1.11.0+cu113
 transformers==4.17.0
