@@ -12,6 +12,8 @@ import math
 
 import numpy as np
 
+from torch.utils.data import Dataset
+
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
 # "We first pick a range (we vary the range in our experiments) and randomly shuffle the integers over it. We then split
@@ -63,7 +65,11 @@ def generate_data(sample_min: int,
     @param num_training_examples (int) : Number of training examples to generate
     @param num_test_examples (int) : Number of test examples to generate
     @param datapoint_length (int) : Number of elements in each datapoint
-    returns : two List[List (int)], the first containing training examples, the second test examples
+    returns : four Numpy Arrays of np.int32 :
+        1. training inputs
+        2. training outputs
+        3. test inputs
+        4. test outputs
     """
     def generate_pools():
         # the definition from Wallace et al. could mean:
@@ -107,6 +113,14 @@ def generate_data(sample_min: int,
     
     test_data = generation_loop(test_pool, num_test_examples)
     
-    return training_data, test_data
+    training_data_numpy = np.array(training_data)
+    
+    test_data_numpy = np.array(test_data)
+    
+    training_targets = np.argmax(training_data_numpy, axis=1)
+    
+    test_targets = np.argmax(test_data_numpy, axis=1)
+    
+    return training_data, training_targets, test_data, test_targets
         
     
