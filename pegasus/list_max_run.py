@@ -17,6 +17,8 @@ logging.basicConfig(filename='pegasus_max_number.log', level=logging.INFO)
 import torch
 from torch.utils.data import DataLoader
 
+from transformers import PegasusTokenizer, PegasusForConditionalGeneration
+
 from model import MaxProbingModel
 from generate_data import generate_data
 
