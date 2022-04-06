@@ -62,6 +62,10 @@ if __name__ == '__main__':
     n_training_examples = 1000
     n_test_examples = 100
     
+    phase_message = 'Begin generating dataset.'
+    print(phase_message)
+    logging.info(phase_message)
+    
     training_dataset, test_dataset = generate_data(tokenizer,
                                                    sample_min,
                                                    sample_max,
@@ -71,9 +75,17 @@ if __name__ == '__main__':
     training_dataloader = DataLoader(training_dataset, batch_size=64, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
     
+    phase_message = 'Completed generating dataset.'
+    print(phase_message)
+    logging.info(phase_message)
+    
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
     
     mpm = MaxProbingModel(pegasus_model).to(device)
+
+    phase_message = 'Model set up.'
+    print(phase_message)
+    logging.info(phase_message)
     
     # This choice of loss mirrors Wallace et al's (2019) code.
     # From the original paper:
@@ -98,11 +110,11 @@ if __name__ == '__main__':
         logging.info(epoch_message)
 
         # Make sure gradient tracking is on, and do a pass over the data
-        model.train(True)
+        mpm.train(True)
         avg_loss = train_epoch(epoch_number, training_dataloader, mpm, loss_fn, optimizer)
         
         model_path = 'model_{}_{}'.format(timestamp, epoch_number)
-        torch.save(model.state_dict(), model_path)
+        torch.save(mpm.state_dict(), model_path)
 
         epoch_number += 1
         
