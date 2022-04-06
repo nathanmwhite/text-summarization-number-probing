@@ -51,9 +51,18 @@ from tranformers import PreTrainedTokenizer
 
 #datapoint_length = 5
 
+# TODO: test dataset implementation
 # Define custom Dataset
 class ListMaxDataset(Dataset):
-  pass
+    def __init__(self, input_data, output_data):
+        self._inputs = input_data
+        self._outputs = output_data
+        
+    def __len__(self):
+        return len(self._outputs)
+    
+    def __getitem__(self, idx):
+        return self._inputs[idx], self._outputs[idx]
 
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
