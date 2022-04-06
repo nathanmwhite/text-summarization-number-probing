@@ -15,9 +15,10 @@ import logging
 logging.basicConfig(filename='pegasus_max_number.log', level=logging.INFO)
 
 import torch
+from torch.utils.data import DataLoader
 
 from model import MaxProbingModel
-# TODO: implement and import data generation code here
+from generate_data import generate_data
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
@@ -53,6 +54,21 @@ if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer = PegasusTokenizer.from_pretrained(model_name)
 
+    sample_min = 0
+    sample_max = 99
+    
+    n_training_examples = 1000
+    n_test_examples = 100
+    
+    training_dataset, test_dataset = generate_data(tokenizer,
+                                                   sample_min,
+                                                   sample_max,
+                                                   n_training_examples,
+                                                   n_test_examples)
+    
+    training_dataloader = DataLoader(training_dataset, batch_size=64, shuffle=True)
+    test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+    
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
     
     mpm = MaxProbingModel(pegasus_model).to(device)
@@ -60,7 +76,7 @@ if __name__ == '__main__':
     # This choice of loss mirrors Wallace et al's (2019) code.
     # From the original paper:
     # "We use the negative log-likelihood of the maximum number as the loss function."
-    # PyTorch's CrossEntropyLoss applies softmax with the negative log-likelihood, as described in the paper.
+    # PyTorch's CrossEntropyLoss applies softmax along with the negative log-likelihood, as described in the paper.
     loss_fn = torch.nn.CrossEntropyLoss()
 
     # hyperparameters per Wallace et al. (2019) code
@@ -81,9 +97,11 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         model.train(True)
-        avg_loss = train_one_epoch(epoch_number)
+        avg_loss = train_epoch(epoch_number, training_dataloader, mpm, loss_fn, optimizer)
         
         model_path = 'model_{}_{}'.format(timestamp, epoch_number)
         torch.save(model.state_dict(), model_path)
 
         epoch_number += 1
+        
+# TODO: implement testing and metrics
