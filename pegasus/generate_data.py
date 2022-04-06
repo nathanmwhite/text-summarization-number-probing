@@ -151,8 +151,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_data_strings = [[str(n) for n in line] for line in test_data]
         
     # Tokenize via tokenizer
-    training_data_tokenized = [tokenizer(' '.join(line)) for line in training_data_strings]
-    test_data_tokenized = [tokenizer(' '.join(line)) for line in test_data_strings]
+    # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
+    training_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt") for line in training_data_strings]
+    test_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt") for line in test_data_strings]
     
     # Store in a Dataset object
     training_dataset = ListMaxDataset(training_data_tokenized, training_targets)
