@@ -69,6 +69,7 @@ class ListMaxDataset(Dataset):
 # this code follows the description in Wallace et al. (2019); their code has additional complications
 #  and behavior not justified by their description
 def generate_data(tokenizer: PreTrainedTokenizer,
+                  device: str,
                   sample_min: int, 
                   sample_max: int, 
                   num_training_examples: int, 
@@ -79,6 +80,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     generate_data : Function that generates training and test data for the List Maximum 
         task specified in Wallace et al. (2019).
     @param tokenizer (transformers.PreTrainedTokenizer) : Tokenizer to use in dataset generation
+    @param device (str) : either "cpu" or "cuda"
     @param sample_min (int) : Minimum of range to sample
     @param sample_max (int) : Maximum of range to sample
     @param num_training_examples (int) : Number of training examples to generate
@@ -138,9 +140,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     test_data_numpy = np.array(test_data)
     
-    training_targets = np.argmax(training_data_numpy, axis=1)
+    training_targets = torch.Tensor(np.argmax(training_data_numpy, axis=1), dtype=torch.int16)
     
-    test_targets = np.argmax(test_data_numpy, axis=1)
+    test_targets = torch.Tensor(np.argmax(test_data_numpy, axis=1), dtype=torch.int16)
     
     # Convert to string format
     if use_word_format:
@@ -152,8 +154,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         
     # Tokenize via tokenizer
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
-    training_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt") for line in training_data_strings]
-    test_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt") for line in test_data_strings]
+    training_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in training_data_strings]
+    test_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in test_data_strings]
     
     # Store in a Dataset object
     training_dataset = ListMaxDataset(training_data_tokenized, training_targets)
