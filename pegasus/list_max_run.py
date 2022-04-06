@@ -67,6 +67,7 @@ if __name__ == '__main__':
     logging.info(phase_message)
     
     training_dataset, test_dataset = generate_data(tokenizer,
+                                                   device,
                                                    sample_min,
                                                    sample_max,
                                                    n_training_examples,
