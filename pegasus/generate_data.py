@@ -155,6 +155,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         
     # Tokenize via tokenizer
     # TODO: revise the current list comprehension to a more efficient implementation
+    # TODO: The current implementation is throwing an error during the training stage:
+    #   File "/home/nathan/python_workspace/number_probing/lib/python3.8/site-packages/transformers/models/pegasus/modeling_pegasus.py",
+    #   line 98, in _expand_mask 
+    #   bsz, src_len = mask.size()
+    #   ValueError: too many values to unpack (expected 2)
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
     training_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in training_data_strings]
     test_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in test_data_strings]
