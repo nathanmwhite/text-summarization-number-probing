@@ -16,6 +16,8 @@ import numpy as np
 
 from torch.utils.data import Dataset
 
+from tranformers import PreTrainedTokenizer
+
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
 # "We first pick a range (we vary the range in our experiments) and randomly shuffle the integers over it. We then split
@@ -40,8 +42,7 @@ from torch.utils.data import Dataset
 
 # TODO: Implement Addition and Decoding data generation
 
-# TODO: for List Maximum, convert to strings and enable integer/float/negative/words representations
-# TODO: for List Maximum, generate correct answers for training and test sets
+# TODO: for List Maximum, enable float/negative representations
 
 #sample_max = 99
 #sample_min = 0
@@ -50,11 +51,16 @@ from torch.utils.data import Dataset
 
 #datapoint_length = 5
 
+# Define custom Dataset
+class ListMaxDataset(Dataset):
+  pass
+
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
 # this code follows the description in Wallace et al. (2019); their code has additional complications
 #  and behavior not justified by their description
-def generate_data(sample_min: int, 
+def generate_data(tokenizer: PreTrainedTokenizer,
+                  sample_min: int, 
                   sample_max: int, 
                   num_training_examples: int, 
                   num_test_examples: int, 
@@ -63,6 +69,7 @@ def generate_data(sample_min: int,
     """
     generate_data : Function that generates training and test data for the List Maximum 
         task specified in Wallace et al. (2019).
+    @param tokenizer (transformers.PreTrainedTokenizer) : Tokenizer to use in dataset generation
     @param sample_min (int) : Minimum of range to sample
     @param sample_max (int) : Maximum of range to sample
     @param num_training_examples (int) : Number of training examples to generate
@@ -113,12 +120,15 @@ def generate_data(sample_min: int,
 
         return assembled_data
 
+    # Generate pools from which to draw example values
     training_pool, test_pool = generate_pools()
     
+    # Generate example values
     training_data = generation_loop(training_pool, num_training_examples)
     
     test_data = generation_loop(test_pool, num_test_examples)
     
+    # Convert to Numpy arrays and generate target values
     training_data_numpy = np.array(training_data)
     
     test_data_numpy = np.array(test_data)
@@ -127,11 +137,19 @@ def generate_data(sample_min: int,
     
     test_targets = np.argmax(test_data_numpy, axis=1)
     
+    # Convert to string format
     if use_word_format:
-        training_data_strings = np.array([[num2words(n) for n in line] for line in training_data])
-        test_data_strings = np.array([[num2words(n) for n in line] for line in test_data])
+        training_data_strings = [[num2words(n) for n in line] for line in training_data]
+        test_data_strings = [[num2words(n) for n in line] for line in test_data]
     else:
-        training_data_strings = np.array([[str(n) for n in line] for line in training_data])
-        test_data_strings = np.array([[str(n) for n in line] for line in test_data])
+        training_data_strings = [[str(n) for n in line] for line in training_data]
+        test_data_strings = [[str(n) for n in line] for line in test_data]
+        
+    # Tokenize via tokenizer
+    training_data_tokenized = [tokenizer(' '.join(line)) for line in training_data_strings]
+    test_data_tokenized = [tokenizer(' '.join(line)) for line in test_data_strings]
+    
+    # Store in a Dataset object
+    
     
     return training_data_strings, training_targets, test_data_strings, test_targets
