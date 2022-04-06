@@ -87,11 +87,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param use_word_format (bool) : Indicates whether to convert an integer into:
         word representation such as 37 --> "thirty-seven" (True), or
         keep as integer representation in a string as in 37 --> "37" (False)
-    returns : four Numpy Arrays of np.int32 :
-        1. training inputs
-        2. training outputs
-        3. test inputs
-        4. test outputs
+    returns : two ListMaxDatasets: training, test datasets
     """
     def generate_pools():
         # the definition from Wallace et al. could mean:
@@ -159,6 +155,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     test_data_tokenized = [tokenizer(' '.join(line)) for line in test_data_strings]
     
     # Store in a Dataset object
+    training_dataset = ListMaxDataset(training_data_tokenized, training_targets)
+    test_dataset = ListMaxDataset(test_data_tokenized, test_targets)
     
-    
-    return training_data_strings, training_targets, test_data_strings, test_targets
+    return training_dataset, test_dataset
