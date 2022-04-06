@@ -14,6 +14,7 @@ import num2words
 
 import numpy as np
 
+import torch
 from torch.utils.data import Dataset
 
 from transformers import PreTrainedTokenizer
