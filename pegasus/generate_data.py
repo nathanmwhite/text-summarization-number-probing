@@ -121,6 +121,6 @@ def generate_data(sample_min: int,
     
     test_targets = np.argmax(test_data_numpy, axis=1)
     
-    return training_data, training_targets, test_data, test_targets
+    return training_data_numpy, training_targets, test_data_numpy, test_targets
         
     
