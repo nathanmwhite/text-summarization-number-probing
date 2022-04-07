@@ -66,8 +66,9 @@ class ListMaxDataset(Dataset):
         input_ids = self._inputs['input_ids'][idx]
         attention_mask = self._inputs['attention_mask'][idx]
         _output = self._outputs[idx]
+        decoder_input_ids = [0, 1] # 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
         
-        _inputs = {'input_ids': input_ids, 'attention_mask': attention_mask}
+        _inputs = {'input_ids': input_ids, 'attention_mask': attention_mask, 'decoder_input_ids': decoder_input_ids}
         
         return _inputs, _output
 
