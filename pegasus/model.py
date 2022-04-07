@@ -53,6 +53,6 @@ class MaxProbingModel(torch.nn.Module):
         # TODO: review choice to use log_softmax here,
         #  as pytorch's CrossEntropyLoss implicitly applies softmax and log itself
         #  This will especially need to be revisited once code for metrics is written.
-        y_pred = F.log_softmax(logits, dim=1)
+        y_pred = torch.nn.functional.log_softmax(logits, dim=1)
         
         return y_pred
