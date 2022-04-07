@@ -55,8 +55,9 @@ from transformers import PreTrainedTokenizer
 # TODO: test dataset implementation
 # Define custom Dataset
 class ListMaxDataset(Dataset):
-    def __init__(self, input_data, output_data):
+    def __init__(self, input_data, decoder_input_data, output_data):
         self._inputs = input_data
+        self._decoder_inputs = decoder_input_data
         self._outputs = output_data
         
     def __len__(self):
@@ -65,9 +66,9 @@ class ListMaxDataset(Dataset):
     def __getitem__(self, idx):
         input_ids = self._inputs['input_ids'][idx]
         attention_mask = self._inputs['attention_mask'][idx]
+        decoder_input_ids = self._decoder_inputs[idx]
         _output = self._outputs[idx]
-        decoder_input_ids = [0, 1] # 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
-        
+
         _inputs = {'input_ids': input_ids, 'attention_mask': attention_mask, 'decoder_input_ids': decoder_input_ids}
         
         return _inputs, _output
@@ -161,18 +162,16 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_data_strings = [[str(n) for n in line] for line in test_data]
         
     # Tokenize via tokenizer
-    # TODO: revise the current list comprehension to a more efficient implementation
-    # TODO: The current implementation is throwing an error during the training stage:
-    #   File "/home/nathan/python_workspace/number_probing/lib/python3.8/site-packages/transformers/models/pegasus/modeling_pegasus.py",
-    #   line 98, in _expand_mask 
-    #   bsz, src_len = mask.size()
-    #   ValueError: too many values to unpack (expected 2)
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
     training_data_tokenized = tokenizer([' '.join(line) for line in training_data_strings], return_tensors="pt").to(device)
     test_data_tokenized = tokenizer([' '.join(line) for line in test_data_strings], return_tensors="pt").to(device)
     
+    # decoder_inputs: 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
+    training_decoder_inputs = torch.tensor([0,1]).repeat(num_training_examples, 1).to(device)
+    test_decoder_inputs = torch.tensor([0,1]).repeat(num_test_examples, 1).to(device)
+    
     # Store in a Dataset object
-    training_dataset = ListMaxDataset(training_data_tokenized, training_targets)
-    test_dataset = ListMaxDataset(test_data_tokenized, test_targets)
+    training_dataset = ListMaxDataset(training_data_tokenized, training_decoder_inputs, training_targets)
+    test_dataset = ListMaxDataset(test_data_tokenized, test_decoder_inputs, test_targets)
     
     return training_dataset, test_dataset
