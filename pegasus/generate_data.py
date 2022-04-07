@@ -63,7 +63,13 @@ class ListMaxDataset(Dataset):
         return len(self._outputs)
     
     def __getitem__(self, idx):
-        return self._inputs[idx], self._outputs[idx]
+        input_ids = self._inputs['input_ids'][idx]
+        attention_mask = self._inputs['attention_mask'][idx]
+        _output = self._outputs[idx]
+        
+        _inputs = {'input_ids': input_ids, 'attention_mask': attention_mask}
+        
+        return _inputs, _output
 
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
@@ -161,8 +167,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     #   bsz, src_len = mask.size()
     #   ValueError: too many values to unpack (expected 2)
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
-    training_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in training_data_strings]
-    test_data_tokenized = [tokenizer(' '.join(line), return_tensors="pt").to(device) for line in test_data_strings]
+    training_data_tokenized = tokenizer([' '.join(line) for line in training_data_strings], return_tensors="pt").to(device)
+    test_data_tokenized = tokenizer([' '.join(line) for line in test_data_strings], return_tensors="pt").to(device)
     
     # Store in a Dataset object
     training_dataset = ListMaxDataset(training_data_tokenized, training_targets)
