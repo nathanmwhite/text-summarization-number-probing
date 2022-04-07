@@ -54,6 +54,13 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             
     return batch_loss
 
+def report_phase(message):
+    current_timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    formatted_message = '{timestamp} | {message}'.format(timestamp=current_timestamp,
+                                                         message=message)
+    print(formatted_message)
+    logging.info(formatted_message)
+
 # to implement: calculate metrics
 if __name__ == '__main__':
     model_name = "google/pegasus-xsum"
@@ -67,8 +74,7 @@ if __name__ == '__main__':
     n_test_examples = 100
     
     phase_message = 'Begin generating dataset.'
-    print(phase_message)
-    logging.info(phase_message)
+    report_phase(phase_message)
     
     training_dataset, test_dataset = generate_data(tokenizer,
                                                    device,
@@ -81,16 +87,14 @@ if __name__ == '__main__':
     test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
     
     phase_message = 'Completed generating dataset.'
-    print(phase_message)
-    logging.info(phase_message)
+    report_phase(phase_message)
     
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
     
     mpm = MaxProbingModel(pegasus_model).to(device)
 
     phase_message = 'Model set up.'
-    print(phase_message)
-    logging.info(phase_message)
+    report_phase(phase_message)
     
     # This choice of loss mirrors Wallace et al's (2019) code.
     # From the original paper:
@@ -103,16 +107,14 @@ if __name__ == '__main__':
     
     EPOCHS = 10
     
-    current_timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-    timestamp_message = '{timestamp} | Begin training'.format(timestamp=current_timestamp)
-    print(timestamp_message)
-    logging.info(timestamp_message)
+    phase_message = 'Begin training.'
+    report_phase(phase_message)
+    
     epoch_number = 0
     
     for epoch in range(EPOCHS):
         epoch_message = 'Epoch {n}:'.format(n=epoch_number + 1)
-        print(epoch_message)
-        logging.info(epoch_message)
+        report_phase(epoch_message)
 
         # Make sure gradient tracking is on, and do a pass over the data
         mpm.train(True)
