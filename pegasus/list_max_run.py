@@ -33,6 +33,10 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         outputs = model(inputs)
         
+        # testing only
+        print('Outputs size:', outputs.size())
+        print('Labels size:', labels.size())
+        
         loss = loss_function(outputs, labels)
         
         loss.backward()
