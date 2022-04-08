@@ -18,4 +18,4 @@ def accuracy(y_true, y_pred):
     """
     argmax_true = argmax(y_true)
     argmax_pred = argmax(y_pred)
-    return accuracy_score(argmax_true, argmax_pred)
+    return accuracy_score(argmax_true.detach().numpy(), argmax_pred.detach().numpy())
