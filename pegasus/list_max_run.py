@@ -19,6 +19,8 @@ logging.basicConfig(filename='pegasus_max_number.log', level=logging.INFO)
 import torch
 from torch.utils.data import DataLoader
 
+from torchmetrics import Accuracy
+
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from model import MaxProbingModel
@@ -29,6 +31,8 @@ from metrics import accuracy
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
     continuing_loss = 0.0
+    
+    accuracy = Accuracy()
     
     for i, data_batch in enumerate(training_data_loader):
         inputs, labels = data_batch
@@ -45,7 +49,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         loss.backward()
         
-        batch_accuracy = accuracy(labels, outputs)
+        batch_accuracy = accuracy(outputs, labels)
         
         optimizer.step()
         
@@ -62,7 +66,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             logging.info(accuracy_message)
             continuing_loss = 0.0
             
-    return batch_loss, continuing_loss
+    return batch_loss, continuing_loss, accuracy.compute()
 
 
 def report_phase(message):
@@ -147,7 +151,7 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         mpm.train(True)
-        avg_loss, continuing_loss = train_epoch(epoch_number,
+        avg_loss, continuing_loss, acc = train_epoch(epoch_number,
                                                 training_dataloader,
                                                 mpm,
                                                 loss_fn, 
@@ -156,6 +160,8 @@ if __name__ == '__main__':
         phase_message = f"End of epoch average batch loss: {avg_loss}"
         report_phase(phase_message)
         phase_message = f"End of epoch last loss: {continuing_loss}"
+        report_phase(phase_message)
+        phase_message = f"Epoch accuracy: {acc}"
         report_phase(phase_message)
         
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
