@@ -53,6 +53,7 @@ from transformers import PreTrainedTokenizer
 
 #datapoint_length = 5
 
+
 # TODO: test dataset implementation
 # Define custom Dataset
 class ListMaxDataset(Dataset):
@@ -70,14 +71,18 @@ class ListMaxDataset(Dataset):
         decoder_input_ids = self._decoder_inputs[idx]
         _output = self._outputs[idx]
 
-        _inputs = {'input_ids': input_ids, 'attention_mask': attention_mask, 'decoder_input_ids': decoder_input_ids}
+        _inputs = {'input_ids': input_ids, 
+                   'attention_mask': attention_mask, 
+                   'decoder_input_ids': decoder_input_ids}
         
         return _inputs, _output
 
+    
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
 # this code follows the description in Wallace et al. (2019); their code has additional complications
 #  and behavior not justified by their description
+# TODO: revisit and reorganize training and test data processing into unified approach
 def generate_data(tokenizer: PreTrainedTokenizer,
                   device: str,
                   sample_min: int, 
@@ -87,18 +92,22 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   datapoint_length: int=5,
                   use_word_format: bool=False):
     """
-    generate_data : Function that generates training and test data for the List Maximum 
-        task specified in Wallace et al. (2019).
-    @param tokenizer (transformers.PreTrainedTokenizer) : Tokenizer to use in dataset generation
+    generate_data : Function that generates training and test data for  
+        the List Maximum task specified in Wallace et al. (2019).
+    @param tokenizer (transformers.PreTrainedTokenizer) : Tokenizer to 
+        use in dataset generation
     @param device (str) : either "cpu" or "cuda"
     @param sample_min (int) : Minimum of range to sample
     @param sample_max (int) : Maximum of range to sample
-    @param num_training_examples (int) : Number of training examples to generate
+    @param num_training_examples (int) : Number of training examples to 
+        generate
     @param num_test_examples (int) : Number of test examples to generate
     @param datapoint_length (int) : Number of elements in each datapoint
-    @param use_word_format (bool) : Indicates whether to convert an integer into:
-        word representation such as 37 --> "thirty-seven" (True), or
-        keep as integer representation in a string as in 37 --> "37" (False)
+    @param use_word_format (bool) : Indicates whether to convert an 
+        integer into:
+            word representation such as 37 --> "thirty-seven" (True), or
+            keep as integer representation in a string as in 37 --> "37"
+             (False)
     returns : two ListMaxDatasets: training, test datasets
     """
     def generate_pools():
@@ -118,7 +127,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
     def sample_gaussian(pool):
         sample_random_integer = np.random.choice(pool)
-        gaussian_sample = np.random.normal(scale=(sample_max - sample_min) * 0.01)
+        scale = (sample_max - sample_min) * 0.01
+        gaussian_sample = np.random.normal(scale=scale)
         add_result = sample_random_integer + gaussian_sample
         nearest_value = pool[np.argmin(np.abs(pool - add_result))]
 
@@ -152,29 +162,53 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     # indices for one_hot must be dtype torch.int64
     # targets with class probabilities must be a floating type
-    training_targets = one_hot(torch.as_tensor(np.argmax(training_data_numpy, axis=1), dtype=torch.int64), datapoint_length).to(torch.float32).to(device)
+    train_tensor = torch.as_tensor(np.argmax(training_data_numpy, axis=1),
+                                   dtype=torch.int64)
+    training_targets = one_hot(train_tensor, datapoint_length)
+    training_targets = training_targets.to(torch.float32).to(device)
     
-    test_targets = one_hot(torch.as_tensor(np.argmax(test_data_numpy, axis=1), dtype=torch.int64), datapoint_length).to(torch.float32).to(device)
+    test_tensor = torch.as_tensor(np.argmax(test_data_numpy, axis=1),
+                                  dtype=torch.int64)
+    test_targets = one_hot(test_tensor, datapoint_length)
+    test_targets = test_targets.to(torch.float32).to(device)
     
     # Convert to string format
     if use_word_format:
-        training_data_strings = [[num2words(n) for n in line] for line in training_data]
-        test_data_strings = [[num2words(n) for n in line] for line in test_data]
+        training_data_strings = [[num2words(n) for n in line]
+                                 for line in training_data]
+        test_data_strings = [[num2words(n) for n in line] 
+                             for line in test_data]
     else:
-        training_data_strings = [[str(n) for n in line] for line in training_data]
-        test_data_strings = [[str(n) for n in line] for line in test_data]
+        training_data_strings = [[str(n) for n in line] 
+                                 for line in training_data]
+        test_data_strings = [[str(n) for n in line] 
+                             for line in test_data]
         
     # Tokenize via tokenizer
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
-    training_data_tokenized = tokenizer([' '.join(line) for line in training_data_strings], return_tensors="pt").to(device)
-    test_data_tokenized = tokenizer([' '.join(line) for line in test_data_strings], return_tensors="pt").to(device)
+    joined_training_data = [' '.join(line) for line in training_data_strings]
+    training_data_tokenized = tokenizer(joined_training_data,
+                                        return_tensors="pt").to(device)
+    
+    joined_test_data = [' '.join(line) for line in test_data_strings]
+    test_data_tokenized = tokenizer(joined_test_data, 
+                                    return_tensors="pt").to(device)
     
     # decoder_inputs: 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
-    training_decoder_inputs = torch.tensor([0,1]).repeat(num_training_examples, 1).to(device)
-    test_decoder_inputs = torch.tensor([0,1]).repeat(num_test_examples, 1).to(device)
+    training_decoder_inputs = torch.tensor([0,1]).repeat(num_training_examples, 
+                                                         1)
+    training_decoder_inputs = training_decoder_inputs.to(device)
+    
+    test_decoder_inputs = torch.tensor([0,1]).repeat(num_test_examples, 
+                                                     1)
+    test_decoder_inputs = test_decoder_inputs.to(device)
     
     # Store in a Dataset object
-    training_dataset = ListMaxDataset(training_data_tokenized, training_decoder_inputs, training_targets)
-    test_dataset = ListMaxDataset(test_data_tokenized, test_decoder_inputs, test_targets)
+    training_dataset = ListMaxDataset(training_data_tokenized, 
+                                      training_decoder_inputs, 
+                                      training_targets)
+    test_dataset = ListMaxDataset(test_data_tokenized, 
+                                  test_decoder_inputs, 
+                                  test_targets)
     
     return training_dataset, test_dataset
