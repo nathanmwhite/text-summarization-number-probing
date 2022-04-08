@@ -16,6 +16,6 @@ def accuracy(y_true, y_pred):
     """
     accuracy : calculates basic accuracy 
     """
-    argmax_true = torch.argmax(true)
-    argmax_pred = torch.argmax(pred)
+    argmax_true = argmax(true)
+    argmax_pred = argmax(pred)
     return accuracy_score(argmax_true, argmax_pred)
