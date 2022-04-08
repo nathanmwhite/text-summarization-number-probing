@@ -9,3 +9,4 @@ Beyond these, several additional number probing tests will be supported.
 TODO:
 1. Add Decoding and Addition model implementations to model.py.
 2. Add test set evaluation with metrics.
+3. Add code to protect against clashing command-line arguments.
