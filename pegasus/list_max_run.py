@@ -8,6 +8,8 @@ __copyright__ = "Copyright © 2022 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+import argparse
+
 from datetime import datetime
 
 import logging
@@ -63,6 +65,10 @@ def report_phase(message):
 
 # to implement: calculate metrics
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--training_examples', type=int)
+    args = parser.parse_args()
+    
     model_name = "google/pegasus-xsum"
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer = PegasusTokenizer.from_pretrained(model_name)
@@ -70,7 +76,10 @@ if __name__ == '__main__':
     sample_min = 0
     sample_max = 99
     
-    n_training_examples = 1000
+    if args.training_examples:
+        n_training_examples = args.training_examples
+    else:
+        n_training_examples = 1000
     n_test_examples = 100
     
     phase_message = 'Begin generating dataset.'
