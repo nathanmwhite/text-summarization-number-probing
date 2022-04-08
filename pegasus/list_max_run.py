@@ -25,7 +25,6 @@ from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from model import MaxProbingModel
 from generate_data import generate_data
-from metrics import accuracy
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
@@ -81,7 +80,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
 
 def evaluate(model, eval_dataloader):
     model.eval()
-    acc = Accuracy()
+    accuracy = Accuracy()
     
     for i, data_point in enumerate(eval_dataloader):
         inputs, labels = data_point
