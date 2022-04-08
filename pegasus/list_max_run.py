@@ -79,6 +79,26 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     return batch_loss, continuing_loss, accuracy.compute()
 
 
+def evaluation(model, eval_dataloader):
+    model.eval()
+    acc = Accuracy()
+    
+    for i, data_point in enumerate(eval_dataloader):
+        inputs, labels = data_point
+        
+        output = model(inputs)
+        
+        label_int_tensor = torch.argmax(labels, axis=-1)
+        
+        # torchmetrics implementation requires transfer to CPU
+        labels_cpu = label_int_tensor.to("cpu")
+        outputs_cpu = output.to("cpu")
+        
+        _ = accuracy(outputs_cpu, labels_cpu)
+        
+    return accuracy.compute()
+
+
 def report_phase(message):
     timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
     formatted_message = f"{timestamp} | {message}"
@@ -180,4 +200,11 @@ if __name__ == '__main__':
 
         epoch_number += 1
         
-# TODO: implement testing and metrics
+    # testing and metrics
+    message = 'Training finished.'
+    report_phase(message)
+    message = 'Begin evaluation.'
+    report_phase(message)
+    accuracy = evaluate(mpm, test_dataloader)
+    message = f"Test accuracy: {accuracy}"
+    report_phase(message)
