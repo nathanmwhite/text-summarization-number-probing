@@ -15,6 +15,7 @@ import num2words
 import numpy as np
 
 import torch
+from torch.nn.functional import one_hot
 from torch.utils.data import Dataset
 
 from transformers import PreTrainedTokenizer
@@ -149,9 +150,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     test_data_numpy = np.array(test_data)
     
-    training_targets = torch.tensor(np.argmax(training_data_numpy, axis=1), dtype=torch.int16)
+    training_targets = one_hot(torch.tensor(np.argmax(training_data_numpy, axis=1), dtype=torch.int16), datapoint_length).to(device)
     
-    test_targets = torch.tensor(np.argmax(test_data_numpy, axis=1), dtype=torch.int16)
+    test_targets = one_hot(torch.tensor(np.argmax(test_data_numpy, axis=1), dtype=torch.int16), datapoint_length).to(device)
     
     # Convert to string format
     if use_word_format:
