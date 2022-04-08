@@ -52,7 +52,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             logging.info(loss_message)
             continuing_loss = 0.0
             
-    return batch_loss
+    return batch_loss, continuing_loss
 
 def report_phase(message):
     current_timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
@@ -118,7 +118,12 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         mpm.train(True)
-        avg_loss = train_epoch(epoch_number, training_dataloader, mpm, loss_fn, optimizer)
+        avg_loss, continuing_loss = train_epoch(epoch_number, training_dataloader, mpm, loss_fn, optimizer)
+        
+        phase_message = f"End of epoch average batch loss: {avg_loss}"
+        report_phase(phase_message)
+        phase_message = f"End of epoch last loss: {continuing_loss}"
+        report_phase(phase_message)
         
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         model_path = f"model_{timestamp}_{epoch_number}"
