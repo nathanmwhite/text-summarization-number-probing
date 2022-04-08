@@ -49,7 +49,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         loss.backward()
         
-        label_int_tensor = torch.argmax(labels, axis=-1).to(device)
+        label_int_tensor = torch.argmax(labels, axis=-1)
         
         batch_accuracy = accuracy(outputs, label_int_tensor)
         
