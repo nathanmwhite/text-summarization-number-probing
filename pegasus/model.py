@@ -12,6 +12,7 @@ import torch
 
 # TODO: implement Addition and Decoding models
 
+
 # TODO: update hidden_dim value
 class MaxProbingModel(torch.nn.Module):
     def __init__(self, embedding_model):
@@ -19,16 +20,20 @@ class MaxProbingModel(torch.nn.Module):
         
         self.embedding_model = embedding_model
         
-        bilstm_input_dim = self.embedding_model.model.encoder.layer_norm.normalized_shape[0]
+        encoder = self.embedding_model.model.encoder
+        bilstm_input_dim = encoder.layer_norm.normalized_shape[0]
         hidden_dim = 5 
         
         # TODO: determine improved implementation of h0 and c0
-        #  decision: no need: just use torch's default
-        # Wallace et al.'s code indicates that they feed the output of the bilstm directly into linear
+        #     decision: no need: just use torch's default
+        # Wallace et al.'s code indicates that they feed the 
+        #     output of the bilstm directly into linear
+        # deprecated:
         #self.h0 = torch.randn(2, 5, 5)
         #self.c0 = torch.randn(2, 5, 5)
         
-        # batch_first to enable easy passing to linear layer, which requires batch_dim first
+        # batch_first to enable easy passing to linear layer, which 
+        #     requires batch_dim first
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
                                     num_layers = 1,
@@ -36,7 +41,8 @@ class MaxProbingModel(torch.nn.Module):
                                     batch_first=True)
         
         # hidden_dim*2 because input is from a bidirectional LSTM
-        # output 1 is from the orig code, and produces exactly one output per word
+        # output 1 is from the orig code, and produces exactly one 
+        #     output per word
         self.linear = torch.nn.Linear(in_features=hidden_dim*2, 
                                       out_features=1) 
         
@@ -54,15 +60,21 @@ class MaxProbingModel(torch.nn.Module):
         # .size is a method, not a property (unlike tensorflow shape)
         # hidden_vectors[0] has size [1, 5, 10]
         # From Wallace et al. (2019):
-        # "...a weight matrix and softmax function assign a probability to each index using the model’s hidden state."
-        #  this is ambiguous between the embedding model and the probing model
-        #  as well as between the model output versus the actual hidden states of the model
-        # likewise, they do not specify h0 or c0 in their code, and do not feed any into the bilstm
+        # "...a weight matrix and softmax function assign a probability
+        #     to each index using the model’s hidden state."
+        #  this is ambiguous between the embedding model and the probing
+        #     model 
+        #  as well as between the model output versus the actual hidden 
+        #      states of the model
+        # likewise, they do not specify h0 or c0 in their code, and do 
+        #     not feed any into the bilstm
         logits = self.linear(hidden_vectors[0]).squeeze(-1)
         
         # TODO: review choice to use log_softmax here,
-        #  as pytorch's CrossEntropyLoss implicitly applies softmax and log itself
-        #  This will especially need to be revisited once code for metrics is written.
+        #  as pytorch's CrossEntropyLoss implicitly applies softmax and
+        #      log itself
+        #  This will especially need to be revisited once code for 
+        #      metrics is written.
         y_pred = torch.nn.functional.log_softmax(logits, dim=1)
         
         return y_pred
