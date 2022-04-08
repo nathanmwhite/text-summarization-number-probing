@@ -120,7 +120,7 @@ if __name__ == '__main__':
         mpm.train(True)
         avg_loss = train_epoch(epoch_number, training_dataloader, mpm, loss_fn, optimizer)
         
-        timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         model_path = f"model_{timestamp}_{epoch_number}"
         torch.save(mpm.state_dict(), model_path)
 
