@@ -96,6 +96,9 @@ if __name__ == '__main__':
         sample_min = args.sample_min_int
         sample_max = args.sample_max_int
     
+    # temporary test
+    print(type(sample_min))
+    
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
     
