@@ -194,11 +194,13 @@ if __name__ == '__main__':
         phase_message = f"Epoch accuracy: {acc}"
         report_phase(phase_message)
         
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        model_path = f"model_{timestamp}_{epoch_number}"
-        torch.save(mpm.state_dict(), model_path)
-
         epoch_number += 1
+        
+    # temporary: save last version of model
+    # TODO: reimplement to save best version
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    model_path = f"model_{timestamp}_{epoch_number}"
+    torch.save(mpm.state_dict(), model_path)
         
     # testing and metrics
     message = 'Training finished.'
