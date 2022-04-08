@@ -89,15 +89,12 @@ if __name__ == '__main__':
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer = PegasusTokenizer.from_pretrained(model_name)
 
-    if float:
+    if args.float:
         sample_min = args.sample_min_float
         sample_max = args.sample_max_float
     else:
         sample_min = args.sample_min_int
         sample_max = args.sample_max_int
-    
-    # temporary test
-    print(type(sample_min))
     
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
