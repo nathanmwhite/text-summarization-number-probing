@@ -32,7 +32,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
     continuing_loss = 0.0
     
-    accuracy = Accuracy()
+    accuracy = Accuracy(num_classes=5)
     
     for i, data_batch in enumerate(training_data_loader):
         inputs, labels = data_batch
@@ -49,7 +49,9 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         loss.backward()
         
-        batch_accuracy = accuracy(outputs, labels)
+        label_int_tensor = torch.argmax(labels, axis=-1).to(device)
+        
+        batch_accuracy = accuracy(outputs, label_int_tensor)
         
         optimizer.step()
         
