@@ -113,7 +113,7 @@ if __name__ == '__main__':
     epoch_number = 0
     
     for epoch in range(EPOCHS):
-        epoch_message = 'Epoch {n}:'.format(n=epoch_number + 1)
+        epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
         report_phase(epoch_message)
 
         # Make sure gradient tracking is on, and do a pass over the data
