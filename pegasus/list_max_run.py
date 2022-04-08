@@ -79,7 +79,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     return batch_loss, continuing_loss, accuracy.compute()
 
 
-def evaluation(model, eval_dataloader):
+def evaluate(model, eval_dataloader):
     model.eval()
     acc = Accuracy()
     
