@@ -23,15 +23,22 @@ class MaxProbingModel(torch.nn.Module):
         hidden_dim = 5 
         
         # TODO: determine improved implementation of h0 and c0
-        self.h0 = torch.randn(2, 5, 5)
-        self.c0 = torch.randn(2, 5, 5)
+        #  decision: no need: just use torch's default
+        # Wallace et al.'s code indicates that they feed the output of the bilstm directly into linear
+        #self.h0 = torch.randn(2, 5, 5)
+        #self.c0 = torch.randn(2, 5, 5)
         
+        # batch_first to enable easy passing to linear layer, which requires batch_dim first
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
                                     num_layers = 1,
-                                    bidirectional=True)
-        self.linear = torch.nn.Linear(in_features=hidden_dim, 
-                                      out_features=1) # 1 is from the orig code
+                                    bidirectional=True,
+                                    batch_first=True)
+        
+        # hidden_dim*2 because input is from a bidirectional LSTM
+        # output 1 is from the orig code, and produces exactly one output per word
+        self.linear = torch.nn.Linear(in_features=hidden_dim*2, 
+                                      out_features=1) 
         
     def forward(self, input_text):
         forward = self.embedding_model.model.forward(**input_text)
@@ -48,7 +55,10 @@ class MaxProbingModel(torch.nn.Module):
         # hidden_vectors[0] has size [1, 5, 10]
         # From Wallace et al. (2019):
         # "...a weight matrix and softmax function assign a probability to each index using the model’s hidden state."
-        logits = self.linear(hidden_vectors[1][0]).squeeze(-1)
+        #  this is ambiguous between the embedding model and the probing model
+        #  as well as between the model output versus the actual hidden states of the model
+        # likewise, they do not specify h0 or c0 in their code, and do not feed any into the bilstm
+        logits = self.linear(hidden_vectors[0]).squeeze(-1)
         
         # TODO: review choice to use log_softmax here,
         #  as pytorch's CrossEntropyLoss implicitly applies softmax and log itself
