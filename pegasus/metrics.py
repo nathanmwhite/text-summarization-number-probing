@@ -16,6 +16,6 @@ def accuracy(y_true, y_pred):
     """
     accuracy : calculates basic accuracy 
     """
-    argmax_true = argmax(true)
-    argmax_pred = argmax(pred)
+    argmax_true = argmax(y_true)
+    argmax_pred = argmax(y_pred)
     return accuracy_score(argmax_true, argmax_pred)
