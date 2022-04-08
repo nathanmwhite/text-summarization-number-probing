@@ -50,7 +50,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         if i % 250 == 249:
             batch_loss = continuing_loss / 250
-            loss_message = '-- Batch {n} loss: {loss}'.format(n = i + 1, loss = batch_loss)
+            n = i + 1
+            loss_message = f"-- Batch {n} loss: {batch_loss}"
             print(loss_message)
             logging.info(loss_message)
             continuing_loss = 0.0
@@ -59,9 +60,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
 
 
 def report_phase(message):
-    current_timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-    formatted_message = '{timestamp} | {message}'.format(timestamp=current_timestamp,
-                                                         message=message)
+    timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    formatted_message = f"{timestamp} | {message}"
     print(formatted_message)
     logging.info(formatted_message)
 
@@ -96,21 +96,23 @@ if __name__ == '__main__':
     phase_message = 'Begin generating dataset.'
     report_phase(phase_message)
     
-    training_dataset, test_dataset = generate_data(tokenizer,
-                                                   device,
-                                                   sample_min,
-                                                   sample_max,
-                                                   n_training_examples,
-                                                   n_test_examples,
-                                                   use_word_format=args.use_words)
+    training_dataset, test_dataset = generate_data(
+        tokenizer, device, sample_min, sample_max,
+        n_training_examples, n_test_examples,
+        use_word_format=args.use_words)
     
-    training_dataloader = DataLoader(training_dataset, batch_size=64, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+    training_dataloader = DataLoader(training_dataset, 
+                                     batch_size=64, 
+                                     shuffle=True)
+    test_dataloader = DataLoader(test_dataset, 
+                                 batch_size=1, 
+                                 shuffle=True)
     
     phase_message = 'Completed generating dataset.'
     report_phase(phase_message)
     
-    pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name).to(device)
+    pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+    pegasus_model = pegasus_model.to(device)
     
     mpm = MaxProbingModel(pegasus_model).to(device)
 
@@ -139,7 +141,11 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         mpm.train(True)
-        avg_loss, continuing_loss = train_epoch(epoch_number, training_dataloader, mpm, loss_fn, optimizer)
+        avg_loss, continuing_loss = train_epoch(epoch_number,
+                                                training_dataloader,
+                                                mpm,
+                                                loss_fn, 
+                                                optimizer)
         
         phase_message = f"End of epoch average batch loss: {avg_loss}"
         report_phase(phase_message)
