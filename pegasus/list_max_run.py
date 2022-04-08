@@ -52,10 +52,14 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         label_int_tensor = torch.argmax(labels, axis=-1)
         
         # testing only
-        print(label_int_tensor.device)
-        print(outputs.device)
+        #print(label_int_tensor.device)
+        #print(outputs.device)
         
-        batch_accuracy = accuracy(outputs, label_int_tensor)
+        # torchmetrics implementation requires transfer to CPU
+        labels_cpu = label_int_tensor.to("cpu")
+        outputs_cpu = outputs.to("cpu")
+        
+        batch_accuracy = accuracy(outputs_cpu, labels_cpu)
         
         optimizer.step()
         
