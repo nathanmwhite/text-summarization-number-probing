@@ -24,6 +24,7 @@ from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 from model import MaxProbingModel
 from generate_data import generate_data
 
+
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
     continuing_loss = 0.0
@@ -56,6 +57,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             
     return batch_loss, continuing_loss
 
+
 def report_phase(message):
     current_timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
     formatted_message = '{timestamp} | {message}'.format(timestamp=current_timestamp,
@@ -63,6 +65,7 @@ def report_phase(message):
     print(formatted_message)
     logging.info(formatted_message)
 
+    
 # to implement: calculate metrics
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
