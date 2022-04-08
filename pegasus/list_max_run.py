@@ -66,21 +66,29 @@ def report_phase(message):
 # to implement: calculate metrics
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--training_examples', type=int)
+    parser.add_argument('--training_examples', type=int, default=1000)
+    parser.add_argument('--test_examples', type=int, default=100)
+    parser.add_argument('--sample_min_int', type=int, default=0)
+    parser.add_argument('--sample_max_int', type=int, default=99)
+    parser.add_argument('--sample_min_float', type=float, default=0.0)
+    parser.add_argument('--sample_max_float', type=float, default=99.9)
+    parser.add_argument('--float', type=bool, default=False)
+    parser.add_argument('--use_words', type=bool, default=False)
     args = parser.parse_args()
     
     model_name = "google/pegasus-xsum"
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer = PegasusTokenizer.from_pretrained(model_name)
 
-    sample_min = 0
-    sample_max = 99
-    
-    if args.training_examples:
-        n_training_examples = args.training_examples
+    if float:
+        sample_min = args.sample_min_float
+        sample_max = args.sample_max_float
     else:
-        n_training_examples = 1000
-    n_test_examples = 100
+        sample_min = args.sample_min_int
+        sample_max = args.sample_max_int
+    
+    n_training_examples = args.training_examples
+    n_test_examples = args.test_examples
     
     phase_message = 'Begin generating dataset.'
     report_phase(phase_message)
@@ -90,7 +98,8 @@ if __name__ == '__main__':
                                                    sample_min,
                                                    sample_max,
                                                    n_training_examples,
-                                                   n_test_examples)
+                                                   n_test_examples,
+                                                   use_word_format=args.use_words)
     
     training_dataloader = DataLoader(training_dataset, batch_size=64, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
