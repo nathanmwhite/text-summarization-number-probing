@@ -91,6 +91,8 @@ if __name__ == '__main__':
     parser.add_argument('--sample_max_float', type=float, default=99.9)
     parser.add_argument('--float', type=bool, default=False)
     parser.add_argument('--use_words', type=bool, default=False)
+    parser.add_argument('--lr', type=float, default=0.01)
+    parser.add_argument('--momentum', type=float, default=0.5)
     args = parser.parse_args()
     
     model_name = "google/pegasus-xsum"
@@ -138,7 +140,7 @@ if __name__ == '__main__':
     # hyperparameters per Wallace et al. (2019) code
     # TODO: learning rate is too big after epoch 35 or so
     # need to implement a LR scheduler
-    optimizer = torch.optim.SGD(dm.parameters(), lr=0.01, momentum=0.5)
+    optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
     
     EPOCHS = 100
     
