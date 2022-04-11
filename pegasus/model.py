@@ -143,12 +143,13 @@ class AdditionModel(torch.nn.Module):
                                               torch.nn.ReLU(),
                                               self.linear_3)
 
+    # TODO: test dimensionality of the following
     def forward(self, input_text):
         forward = self.embedding_model.model.forward(**input_text)
         encoder_state = forward.encoder_last_hidden_state
 
         embeddings = encoder_state.detach()[:, :-1]
-        
+
         embeddings_concat = torch.flatten(embeddings, start_dim=1)
 
         y_pred = self.sequential(embeddings_concat).squeeze(-1)
