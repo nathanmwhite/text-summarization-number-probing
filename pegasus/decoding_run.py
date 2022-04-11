@@ -77,7 +77,7 @@ def evaluate(model, loss_function, eval_dataloader):
         
         output = model(inputs)
         
-        loss = loss_function(outputs, labels)
+        loss = loss_function(output, labels)
         
         total_loss += loss.item()
         
@@ -139,6 +139,8 @@ if __name__ == '__main__':
     loss_fn = torch.nn.MSELoss()
     
     # hyperparameters per Wallace et al. (2019) code
+    # TODO: learning rate is too big after epoch 35 or so
+    # need to implement a LR scheduler
     optimizer = torch.optim.SGD(dm.parameters(), lr=0.01, momentum=0.5)
     
     EPOCHS = 100
