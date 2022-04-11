@@ -115,3 +115,42 @@ class DecodingModel(torch.nn.Module):
         y_pred = self.sequential(embeddings).squeeze(-1)
 
         return y_pred
+    
+    
+class AdditionModel(torch.nn.Module):
+    def __init__(self, embedding_model):
+        super(AdditionModel, self).__init__()
+
+        self.embedding_model = embedding_model
+
+        encoder = self.embedding_model.model.encoder
+        input_dim = encoder.layer_norm.normalized_shape[0]
+        hidden_dim = 50
+
+        # their description suggests ReLU at every layer,
+        #  though their implementation only has it for first two,
+        #  with no activation for the third
+        # they fail to specify their hidden_dim anywhere
+        self.linear_1 = torch.nn.Linear(in_features=input_dim,
+                                        out_features=hidden_dim)
+        self.linear_2 = torch.nn.Linear(in_features=hidden_dim,
+                                        out_features=hidden_dim)
+        self.linear_3 = torch.nn.Linear(in_features=hidden_dim,
+                                        out_features=1)
+        self.sequential = torch.nn.Sequential(self.linear_1,
+                                              torch.nn.ReLU(),
+                                              self.linear_2,
+                                              torch.nn.ReLU(),
+                                              self.linear_3)
+
+    def forward(self, input_text):
+        forward = self.embedding_model.model.forward(**input_text)
+        encoder_state = forward.encoder_last_hidden_state
+
+        embeddings = encoder_state.detach()[:, :-1]
+        
+        embeddings_concat = torch.cat(embeddings, axis=0)
+
+        y_pred = self.sequential(embeddings_concat).squeeze(-1)
+
+        return y_pred
