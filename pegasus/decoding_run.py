@@ -179,7 +179,7 @@ if __name__ == '__main__':
     report_phase(message)
     message = 'Begin evaluation.'
     report_phase(message)
-    mse = evaluate(dm, test_dataloader)
+    mse = evaluate(dm, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
     message = f"Test RMSE: {rmse}"
     report_phase(message)
