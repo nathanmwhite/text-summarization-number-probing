@@ -43,6 +43,9 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         #print('Outputs size:', outputs.size())
         #print('Labels size:', labels.size())
         
+        # TODO: troubleshoot here
+        # Using a target size (torch.Size([64])) that is different
+        #     to the input size (torch.Size([64, 2])).
         loss = loss_function(outputs, labels)
         
         loss.backward()
