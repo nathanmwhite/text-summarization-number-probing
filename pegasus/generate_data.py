@@ -161,15 +161,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     # TODO: implement training_data generation for Decoder, which should be one number at a time
     training_data = generation_loop(training_pool, num_training_examples)
     
-    # TODO: test the following
-    if task == 'ListMax':
-        test_data = generation_loop(test_pool, num_test_examples)
-    elif task == 'Decoding':
-        test_data = training_data
-    elif task == 'Addition':
-        test_data = np.sum(np.asarray(training_data), axis=-1)
-    else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", or "Addition"')
+    test_data = generation_loop(test_pool, num_test_examples)
     
     # Convert to Numpy arrays and generate target values
     training_data_numpy = np.array(training_data)
@@ -178,15 +170,23 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     # indices for one_hot must be dtype torch.int64
     # targets with class probabilities must be a floating type
-    train_tensor = torch.as_tensor(np.argmax(training_data_numpy, axis=1),
-                                   dtype=torch.int64)
-    training_targets = one_hot(train_tensor, datapoint_length)
-    training_targets = training_targets.to(torch.float32).to(device)
-    
-    test_tensor = torch.as_tensor(np.argmax(test_data_numpy, axis=1),
-                                  dtype=torch.int64)
-    test_targets = one_hot(test_tensor, datapoint_length)
-    test_targets = test_targets.to(torch.float32).to(device)
+    if task == 'ListMax':
+        train_tensor = torch.as_tensor(np.argmax(training_data_numpy, axis=1),
+                                       dtype=torch.int64)
+        training_targets = one_hot(train_tensor, datapoint_length)
+        training_targets = training_targets.to(torch.float32).to(device)
+
+        test_tensor = torch.as_tensor(np.argmax(test_data_numpy, axis=1),
+                                      dtype=torch.int64)
+        test_targets = one_hot(test_tensor, datapoint_length)
+        test_targets = test_targets.to(torch.float32).to(device)
+    elif task == 'Decoding':
+        training_targets = training_data_numpy
+        test_targets = test_data_numpy
+    elif task == 'Addition':
+        training_targets = np.sum(training_data_numpy, axis=-1)
+    else:
+        raise ValueError('Task should be one of "ListMax", "Decoding", or "Addition"')    
     
     # Convert to string format
     if use_word_format:
