@@ -141,7 +141,7 @@ if __name__ == '__main__':
     # hyperparameters per Wallace et al. (2019) code
     optimizer = torch.optim.SGD(dm.parameters(), lr=0.01, momentum=0.5)
     
-    EPOCHS = 10
+    EPOCHS = 100
     
     phase_message = 'Begin training.'
     report_phase(phase_message)
