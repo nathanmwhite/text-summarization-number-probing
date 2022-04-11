@@ -82,7 +82,7 @@ class MaxProbingModel(torch.nn.Module):
     
 class DecodingModel(torch.nn.Module):
     def __init__(self, embedding_model):
-        super(MaxProbingModel, self).__init__()
+        super(DecodingModel, self).__init__()
 
         self.embedding_model = embedding_model
 
