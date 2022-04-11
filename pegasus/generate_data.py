@@ -87,7 +87,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   sample_min: int, 
                   sample_max: int, 
                   num_training_examples: int, 
-                  num_test_examples: int, 
+                  num_test_examples: int,
+                  task: str,
                   datapoint_length: int=5,
                   use_word_format: bool=False):
     """
@@ -101,6 +102,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param num_training_examples (int) : Number of training examples to 
         generate
     @param num_test_examples (int) : Number of test examples to generate
+    @param task (str) : Task to generate data for from among:
+        ListMax, Decoding, Addition
     @param datapoint_length (int) : Number of elements in each datapoint
     @param use_word_format (bool) : Indicates whether to convert an 
         integer into:
@@ -146,13 +149,27 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
         return assembled_data
 
+    if task == 'Decoder':
+        datapoint_length = 1
+    elif task == 'Addition':
+        datapoint_length = 2
+    
     # Generate pools from which to draw example values
     training_pool, test_pool = generate_pools()
     
     # Generate example values
+    # TODO: implement training_data generation for Decoder, which should be one number at a time
     training_data = generation_loop(training_pool, num_training_examples)
     
-    test_data = generation_loop(test_pool, num_test_examples)
+    # TODO: test the following
+    if task == 'ListMax':
+        test_data = generation_loop(test_pool, num_test_examples)
+    elif task == 'Decoding':
+        test_data = training_data
+    elif task == 'Addition':
+        test_data = np.sum(np.asarray(training_data), axis=-1)
+    else:
+        raise ValueError('Task should be one of "ListMax", "Decoding", or "Addition"')
     
     # Convert to Numpy arrays and generate target values
     training_data_numpy = np.array(training_data)
@@ -180,7 +197,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     else:
         training_data_strings = [[str(n) for n in line] 
                                  for line in training_data]
-        test_data_strings = [[str(n) for n in line] 
+        test_data_strings = [[str(n) for n in line]
                              for line in test_data]
         
     # Tokenize via tokenizer
