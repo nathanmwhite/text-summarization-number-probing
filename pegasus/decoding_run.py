@@ -16,6 +16,8 @@ import logging
 
 logging.basicConfig(filename='pegasus_decoding_number.log', level=logging.INFO)
 
+import math
+
 import torch
 from torch.utils.data import DataLoader
 
@@ -177,6 +179,7 @@ if __name__ == '__main__':
     report_phase(message)
     message = 'Begin evaluation.'
     report_phase(message)
-    accuracy = evaluate(dm, test_dataloader)
-    message = f"Test accuracy: {accuracy}"
+    mse = evaluate(dm, test_dataloader)
+    rmse = math.sqrt(mse)
+    message = f"Test RMSE: {rmse}"
     report_phase(message)
