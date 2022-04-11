@@ -112,7 +112,7 @@ if __name__ == '__main__':
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
-        n_training_examples, n_test_examples, 'Decoding'
+        n_training_examples, n_test_examples, 'Decoding',
         use_word_format=args.use_words)
     
     training_dataloader = DataLoader(training_dataset, 
