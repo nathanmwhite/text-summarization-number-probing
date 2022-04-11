@@ -124,7 +124,7 @@ class AdditionModel(torch.nn.Module):
         self.embedding_model = embedding_model
 
         encoder = self.embedding_model.model.encoder
-        input_dim = encoder.layer_norm.normalized_shape[0]
+        input_dim = encoder.layer_norm.normalized_shape[0] * 2
         hidden_dim = 50
 
         # their description suggests ReLU at every layer,
@@ -149,7 +149,7 @@ class AdditionModel(torch.nn.Module):
 
         embeddings = encoder_state.detach()[:, :-1]
         
-        embeddings_concat = torch.flatten(embeddings)
+        embeddings_concat = torch.flatten(embeddings, start_dim=1)
 
         y_pred = self.sequential(embeddings_concat).squeeze(-1)
 
