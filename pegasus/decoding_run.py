@@ -59,9 +59,6 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             loss_message = f"-- Batch {n} loss: {batch_loss}"
             print(loss_message)
             logging.info(loss_message)
-            accuracy_message = f"-- Batch {n} accuracy: {batch_accuracy}"
-            print(accuracy_message)
-            logging.info(accuracy_message)
             continuing_loss = 0.0
             
     return batch_loss, continuing_loss, total_loss
