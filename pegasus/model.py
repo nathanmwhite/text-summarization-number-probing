@@ -149,7 +149,7 @@ class AdditionModel(torch.nn.Module):
 
         embeddings = encoder_state.detach()[:, :-1]
         
-        embeddings_concat = torch.cat(embeddings, axis=0)
+        embeddings_concat = torch.flatten(embeddings)
 
         y_pred = self.sequential(embeddings_concat).squeeze(-1)
 
