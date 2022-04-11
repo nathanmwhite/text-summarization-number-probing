@@ -54,9 +54,8 @@ from transformers import PreTrainedTokenizer
 #datapoint_length = 5
 
 
-# TODO: test dataset implementation
 # Define custom Dataset
-class ListMaxDataset(Dataset):
+class ProbingDataset(Dataset):
     def __init__(self, input_data, decoder_input_data, output_data):
         self._inputs = input_data
         self._decoder_inputs = decoder_input_data
@@ -204,10 +203,10 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     test_decoder_inputs = test_decoder_inputs.to(device)
     
     # Store in a Dataset object
-    training_dataset = ListMaxDataset(training_data_tokenized, 
+    training_dataset = ProbingDataset(training_data_tokenized, 
                                       training_decoder_inputs, 
                                       training_targets)
-    test_dataset = ListMaxDataset(test_data_tokenized, 
+    test_dataset = ProbingDataset(test_data_tokenized, 
                                   test_decoder_inputs, 
                                   test_targets)
     
