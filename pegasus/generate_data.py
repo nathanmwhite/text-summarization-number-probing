@@ -181,10 +181,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_targets = one_hot(test_tensor, datapoint_length)
         test_targets = test_targets.to(torch.float32).to(device)
     elif task == 'Decoding':
-        training_targets = training_data_numpy
-        test_targets = test_data_numpy
+        training_targets = training_data_numpy.to(torch.float32).to(device)
+        test_targets = test_data_numpy.to(torch.float32).to(device)
     elif task == 'Addition':
-        training_targets = np.sum(training_data_numpy, axis=-1)
+        training_tensor = np.sum(training_data_numpy, axis=-1)
+        training_targets = training_tensor.to(torch.float32).to(device)
+        test_tensor = np.sum(test_data_numpy, axis=-1)
+        test_targets = test_tensor.to(torch.float32).to(device)
     else:
         raise ValueError('Task should be one of "ListMax", "Decoding", or "Addition"')    
     
