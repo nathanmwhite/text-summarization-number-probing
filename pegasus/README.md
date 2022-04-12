@@ -8,4 +8,4 @@ Beyond these, several additional number probing tests will be supported.
 
 TODO:
 1. Add code to protect against clashing command-line arguments.
-2. Add protections against exploding gradients.
+2. Add protections against exploding gradients. Changing hyperparameters may be enough in this case, with monitoring for infinity/nan issues.
