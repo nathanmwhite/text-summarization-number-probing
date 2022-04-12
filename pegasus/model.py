@@ -8,13 +8,20 @@ __copyright__ = "Copyright © 2022 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+from datetime import datetime
+
 import logging
 
 logging.basicConfig(filename='model.log', level=logging.INFO)
 
 import torch
 
-from list_max_run import report_phase
+
+def report_phase(message):
+    timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    formatted_message = f"{timestamp} | {message}"
+    print(formatted_message)
+    logging.info(formatted_message)
 
 
 def freeze_module(module, module_type):
