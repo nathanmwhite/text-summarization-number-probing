@@ -25,7 +25,7 @@ from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from generate_data import generate_data
 from list_max_run import report_phase
-from model import DecodingModel
+from model import AdditionModel
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name)
     pegasus_model = pegasus_model.to(device)
     
-    dm = DecodingModel(pegasus_model).to(device)
+    am = AdditionModel(pegasus_model).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     # hyperparameters per Wallace et al. (2019) code
     # TODO: learning rate is too big after epoch 35 or so
     # need to implement a LR scheduler
-    optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
+    optimizer = torch.optim.SGD(am.parameters(), lr=args.lr, momentum=args.momentum)
     
     EPOCHS = args.epochs
     
@@ -158,9 +158,9 @@ if __name__ == '__main__':
         report_phase(epoch_message)
 
         # Make sure gradient tracking is on, and do a pass over the data
-        dm.train(True)
+        am.train(True)
         avg_loss, continuing_loss, total_loss = train_epoch(
-            epoch_number, training_dataloader, dm, loss_fn, optimizer
+            epoch_number, training_dataloader, am, loss_fn, optimizer
         )
         
         phase_message = f"End of epoch average batch loss: {avg_loss}"
@@ -176,14 +176,14 @@ if __name__ == '__main__':
     # TODO: reimplement to save best version
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     model_path = f"model_{timestamp}_{epoch_number}"
-    torch.save(dm.state_dict(), model_path)
+    torch.save(am.state_dict(), model_path)
         
     # testing and metrics
     message = 'Training finished.'
     report_phase(message)
     message = 'Begin evaluation.'
     report_phase(message)
-    mse = evaluate(dm, loss_fn, test_dataloader)
+    mse = evaluate(am, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
     message = f"Test RMSE: {rmse}"
     report_phase(message)
