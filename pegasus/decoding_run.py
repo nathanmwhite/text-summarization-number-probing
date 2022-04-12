@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from generate_data import generate_data
-from model import DecodingModel, report_phase
+from model import DecodingModel, report_phase, freeze_module
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
@@ -91,6 +91,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--freeze_embedder', type=bool, default=False)
     args = parser.parse_args()
     
     model_name = "google/pegasus-xsum"
@@ -126,6 +127,8 @@ if __name__ == '__main__':
     report_phase(phase_message)
     
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+    if args.freeze_embedder:
+        freeze_module(pegasus_model)
     pegasus_model = pegasus_model.to(device)
     
     dm = DecodingModel(pegasus_model).to(device)
@@ -138,7 +141,12 @@ if __name__ == '__main__':
     # hyperparameters per Wallace et al. (2019) code
     # TODO: learning rate is too big after epoch 35 or so
     # need to implement a LR scheduler
-    optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
+    if args.freeze_embedder:
+        optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, dm.parameters()), 
+                                    lr=args.lr, 
+                                    momentum=args.momentum)
+    else:
+        optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
     
     EPOCHS = args.epochs
     
