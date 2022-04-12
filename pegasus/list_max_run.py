@@ -23,7 +23,7 @@ from torchmetrics import Accuracy
 
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
-from model import MaxProbingModel
+from model import MaxProbingModel, report_phase
 from generate_data import generate_data
 
 
@@ -98,14 +98,6 @@ def evaluate(model, eval_dataloader):
     return accuracy.compute()
 
 
-def report_phase(message):
-    timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-    formatted_message = f"{timestamp} | {message}"
-    print(formatted_message)
-    logging.info(formatted_message)
-
-    
-# to implement: calculate metrics
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--training_examples', type=int, default=1000)
