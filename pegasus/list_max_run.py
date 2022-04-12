@@ -21,7 +21,7 @@ from torchmetrics import Accuracy
 
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
-from model import MaxProbingModel, report_phase
+from model import MaxProbingModel, report_phase, freeze_module
 from generate_data import generate_data
 
 
@@ -106,6 +106,10 @@ if __name__ == '__main__':
     parser.add_argument('--sample_max_float', type=float, default=99.9)
     parser.add_argument('--float', type=bool, default=False)
     parser.add_argument('--use_words', type=bool, default=False)
+    parser.add_argument('--lr', type=float, default=0.01)
+    parser.add_argument('--momemtum', type=float, default=0.5)
+    parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--freeze_embedder', type=bool, default=False)
     args = parser.parse_args()
     
     model_name = "google/pegasus-xsum"
@@ -141,6 +145,8 @@ if __name__ == '__main__':
     report_phase(phase_message)
     
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+    if args.freeze_embedder:
+        freeze_module(pegasus_model)
     pegasus_model = pegasus_model.to(device)
     
     mpm = MaxProbingModel(pegasus_model).to(device)
@@ -155,9 +161,12 @@ if __name__ == '__main__':
     loss_fn = torch.nn.CrossEntropyLoss()
 
     # hyperparameters per Wallace et al. (2019) code
-    optimizer = torch.optim.SGD(mpm.parameters(), lr=0.01, momentum=0.5)
+    if args.freeze_embedder:
+        optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, mpm.parameters()), lr=args.lr, momentum=args.momentum)
+    else:
+        optimizer = torch.optim.SGD(mpm.parameters(), lr=args.lr, momentum=args.momentum)
     
-    EPOCHS = 10
+    EPOCHS = args.epochs
     
     phase_message = 'Begin training.'
     report_phase(phase_message)
