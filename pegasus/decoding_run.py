@@ -10,8 +10,6 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 
 import argparse
 
-from datetime import datetime
-
 import logging
 
 logging.basicConfig(filename='pegasus_decoding_number.log', level=logging.INFO)
@@ -24,8 +22,7 @@ from torch.utils.data import DataLoader
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from generate_data import generate_data
-from list_max_run import report_phase
-from model import DecodingModel
+from model import DecodingModel, report_phase
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
