@@ -128,7 +128,7 @@ if __name__ == '__main__':
     
     pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name)
     if args.freeze_embedder:
-        freeze_module(pegasus_model)
+        freeze_module(pegasus_model, 'Pegasus')
     pegasus_model = pegasus_model.to(device)
     
     dm = DecodingModel(pegasus_model).to(device)
