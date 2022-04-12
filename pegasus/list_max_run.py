@@ -25,7 +25,7 @@ from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from model import MaxProbingModel, report_phase, freeze_module
 from generate_data import generate_data
-
+from util import check_arguments
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
@@ -113,6 +113,8 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
     args = parser.parse_args()
+    
+    check_arguments(args)
     
     model_name = "google/pegasus-xsum"
     device = "cuda" if torch.cuda.is_available() else "cpu"
