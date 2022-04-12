@@ -10,6 +10,8 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 
 import argparse
 
+from datetime import datetime
+
 import logging
 
 logging.basicConfig(filename='pegasus_decoding_number.log', level=logging.INFO)
