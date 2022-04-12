@@ -8,21 +8,57 @@ __copyright__ = "Copyright © 2022 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+import logging
+
+logging.basicConfig(filename='model.log', level=logging.INFO)
+
 import torch
 
-# TODO: implement Addition and Decoding models
+from list_max_run import report_phase
 
 
-# TODO: update hidden_dim value
+def freeze_module(module, module_type):
+    def freeze_component(module):
+        for (name, module_) in module.named_children():
+            if name in expandable_layer_types:
+                freeze_component(module_)
+            elif name in operational_layer_types:
+                for param in module_.parameters():
+                    param.requires_grad = False
+                report_phase(f'Parameter {name} frozen.')
+    
+    if module_type == 'Pegasus':
+        # embed_positions may not be necessary
+        operational_layer_types = {'shared',
+                                   'embed_tokens',
+                                   'embed_positions', 
+                                   'k_proj',
+                                   'v_proj',
+                                   'q_proj',
+                                   'out_proj',
+                                   'fc1',
+                                   'fc2',
+                                   'self_attn_layer_norm',
+                                   'final_layer_norm',
+                                   'layer_norm'}
+        expandable_layer_types = {'model',
+                                  'encoder',
+                                  'decoder',
+                                  'layers',
+                                  'self_attn'}
+        
+    freeze_component(module)
+    report_phase(f'Parameter freezing successful.')
+        
+
 class MaxProbingModel(torch.nn.Module):
-    def __init__(self, embedding_model):
+    def __init__(self, embedding_model, hidden_dim=5):
         super(MaxProbingModel, self).__init__()
         
         self.embedding_model = embedding_model
         
         encoder = self.embedding_model.model.encoder
         bilstm_input_dim = encoder.layer_norm.normalized_shape[0]
-        hidden_dim = 5 
         
         # TODO: determine improved implementation of h0 and c0
         #     decision: no need: just use torch's default
