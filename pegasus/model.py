@@ -25,14 +25,14 @@ def report_phase(message):
 
 
 def freeze_module(module, module_type):
-    def freeze_component(module):
-        for (name, module_) in module.named_children():
-            if name in expandable_layer_types:
-                freeze_component(module_)
-            elif name in operational_layer_types:
+    def freeze_component(component):
+        for (name, module_) in component.named_children():
+            if name in operational_layer_types:
                 for param in module_.parameters():
                     param.requires_grad = False
                 report_phase(f'Parameter {name} frozen.')
+            else: # numbered layers, expandable_layer_types
+                freeze_component(module_)
     
     if module_type == 'Pegasus':
         # embed_positions may not be necessary
