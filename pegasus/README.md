@@ -7,6 +7,5 @@ The three basic tasks for number probing (List Maximum, Decoding, Addition) were
 Beyond these, several additional number probing tests will be supported.
 
 TODO:
-1. Add module freezing support.
-2. Add code to protect against clashing command-line arguments.
-3. Add protections against exploding gradients.
+1. Add code to protect against clashing command-line arguments.
+2. Add protections against exploding gradients.
