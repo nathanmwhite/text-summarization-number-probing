@@ -149,7 +149,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
         return assembled_data
 
-    if task == 'Decoder':
+    if task in {'Decoder', 'Percent'}:
         datapoint_length = 1
     elif task == 'Addition':
         datapoint_length = 2
@@ -190,6 +190,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         training_targets = training_tensor.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(np.sum(test_data_numpy, axis=-1))
         test_targets = test_tensor.to(torch.float32).to(device)
+    elif task == 'Percentage':
+        training_tensor = torch.as_tensor(training_) # TODO
     else:
         raise ValueError('Task should be one of "ListMax", "Decoding", or "Addition"')    
     
@@ -204,6 +206,18 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                  for line in training_data]
         test_data_strings = [[str(n) for n in line]
                              for line in test_data]
+        
+    if task == 'Percent':
+        if use_word_format:
+            training_data_strings= [[n + ' percent' for n in line]
+                                    for line in training_data]
+            test_data_strings = [[n + ' percent' for n in line]
+                                 for line in test_data]
+        else:
+            training_data_strings = [[n + '%' for n in line]
+                                     for line in training_data]
+            test_data_strings = [[n + '%' for n in line]
+                                 for line in test_data]
         
     # Tokenize via tokenizer
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
