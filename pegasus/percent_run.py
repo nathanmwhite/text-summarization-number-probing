@@ -95,6 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('--momentum', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
+    parser.add_argument('--basis_points', type=bool, default=False)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -113,12 +114,17 @@ if __name__ == '__main__':
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
     
+    if args.basis_points == True:
+        task = 'Basis_Points'
+    else:
+        task = 'Percent'
+    
     phase_message = 'Begin generating dataset.'
     report_phase(phase_message)
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
-        n_training_examples, n_test_examples, 'Percent',
+        n_training_examples, n_test_examples, task,
         use_word_format=args.use_words)
     
     training_dataloader = DataLoader(training_dataset, 
