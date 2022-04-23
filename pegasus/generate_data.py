@@ -90,7 +90,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   num_test_examples: int,
                   task: str,
                   datapoint_length: int=5,
-                  use_word_format: bool=False):
+                  use_word_format: bool=False,
+                  units_loc: str=None):
     """
     generate_data : Function that generates training and test data for  
         the List Maximum task specified in Wallace et al. (2019).
@@ -103,13 +104,16 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         generate
     @param num_test_examples (int) : Number of test examples to generate
     @param task (str) : Task to generate data for from among:
-        ListMax, Decoding, Addition, Percent, Basis_Points
+        ListMax, Decoding, Addition, Percent, Basis_Points, Units
     @param datapoint_length (int) : Number of elements in each datapoint
     @param use_word_format (bool) : Indicates whether to convert an 
         integer into:
             word representation such as 37 --> "thirty-seven" (True), or
             keep as integer representation in a string as in 37 --> "37"
              (False)
+    @param units_loc (str) : Indicates location of text file containing
+        units as lines, with variants separated by slashes ('/'), where
+        'Units' is task
     returns : two ListMaxDatasets: training, test datasets
     """
     def generate_pools():
@@ -148,8 +152,12 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             assembled_data.append(datapoint)
 
         return assembled_data
+    
+    # TODO: implement this function
+    def generate_randomized_units(units_loc):
+        pass
 
-    if task in ('Decoder', 'Percent', 'Basis_Points'):
+    if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
         datapoint_length = 1
     elif task == 'Addition':
         datapoint_length = 2
@@ -200,8 +208,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_tensor = torch.as_tensor(test_data_numpy * decimal_convert)
         test_targets = test_tensor.to(torch.float32).to(device)
     else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", or "Basis_Points"')    
+        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", or "Units"')    
     
+    # TODO: implement units support here
     # Convert to string format   
     if task in ('Percent', 'Basis Points'):
         if task == 'Percent':
