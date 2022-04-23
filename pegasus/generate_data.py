@@ -149,7 +149,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
         return assembled_data
 
-    if task in {'Decoder', 'Percent'}:
+    if task in ('Decoder', 'Percent'):
         datapoint_length = 1
     elif task == 'Addition':
         datapoint_length = 2
@@ -190,33 +190,37 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         training_targets = training_tensor.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(np.sum(test_data_numpy, axis=-1))
         test_targets = test_tensor.to(torch.float32).to(device)
-    elif task == 'Percentage':
-        training_tensor = torch.as_tensor(training_) # TODO
+    elif task == 'Percent':
+        percent_as_decimal = 0.01
+        training_tensor = torch.as_tensor(training_data_numpy * percent_as_decimal)
+        training_targets = training_tensor.to(torch.float32).to(device)
+        test_tensor = torch.as_tensor(test_data_numpy * percent_as_decimal)
+        test_targets = test_tensor.to(torch.float32).to(device)
     else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", or "Addition"')    
+        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", or "Percent"')    
     
-    # Convert to string format
-    if use_word_format:
-        training_data_strings = [[num2words(n) for n in line]
-                                 for line in training_data]
-        test_data_strings = [[num2words(n) for n in line] 
-                             for line in test_data]
-    else:
-        training_data_strings = [[str(n) for n in line] 
-                                 for line in training_data]
-        test_data_strings = [[str(n) for n in line]
-                             for line in test_data]
-        
+    # Convert to string format   
     if task == 'Percent':
         if use_word_format:
-            training_data_strings= [[n + ' percent' for n in line]
+            training_data_strings= [[num2words(n) + ' percent' for n in line]
                                     for line in training_data]
-            test_data_strings = [[n + ' percent' for n in line]
+            test_data_strings = [[num2words(n) + ' percent' for n in line]
                                  for line in test_data]
         else:
-            training_data_strings = [[n + '%' for n in line]
+            training_data_strings = [[str(n) + '%' for n in line]
                                      for line in training_data]
-            test_data_strings = [[n + '%' for n in line]
+            test_data_strings = [[str(n) + '%' for n in line]
+                                 for line in test_data]
+    else:
+        if use_word_format:
+            training_data_strings = [[num2words(n) for n in line]
+                                     for line in training_data]
+            test_data_strings = [[num2words(n) for n in line] 
+                                 for line in test_data]
+        else:
+            training_data_strings = [[str(n) for n in line] 
+                                     for line in training_data]
+            test_data_strings = [[str(n) for n in line]
                                  for line in test_data]
         
     # Tokenize via tokenizer
