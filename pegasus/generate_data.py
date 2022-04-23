@@ -103,7 +103,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         generate
     @param num_test_examples (int) : Number of test examples to generate
     @param task (str) : Task to generate data for from among:
-        ListMax, Decoding, Addition
+        ListMax, Decoding, Addition, Percent, Basis_Points
     @param datapoint_length (int) : Number of elements in each datapoint
     @param use_word_format (bool) : Indicates whether to convert an 
         integer into:
@@ -149,7 +149,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
         return assembled_data
 
-    if task in ('Decoder', 'Percent'):
+    if task in ('Decoder', 'Percent', 'Basis_Points'):
         datapoint_length = 1
     elif task == 'Addition':
         datapoint_length = 2
@@ -190,26 +190,35 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         training_targets = training_tensor.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(np.sum(test_data_numpy, axis=-1))
         test_targets = test_tensor.to(torch.float32).to(device)
-    elif task == 'Percent':
-        percent_as_decimal = 0.01
-        training_tensor = torch.as_tensor(training_data_numpy * percent_as_decimal)
+    elif task in ('Percent', 'Basis_Points'):
+        if task == 'Percent':
+            decimal_convert = 0.01
+        else: # Basis Points
+            decimal_convert = 0.0001
+        training_tensor = torch.as_tensor(training_data_numpy * decimal_convert)
         training_targets = training_tensor.to(torch.float32).to(device)
-        test_tensor = torch.as_tensor(test_data_numpy * percent_as_decimal)
+        test_tensor = torch.as_tensor(test_data_numpy * decimal_convert)
         test_targets = test_tensor.to(torch.float32).to(device)
     else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", or "Percent"')    
+        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", or "Basis_Points"')    
     
     # Convert to string format   
-    if task == 'Percent':
+    if task in ('Percent', 'Basis Points'):
+        if task == 'Percent':
+            added_term = ' percent'
+            added_symbol = '%'
+        else: # Basis Points
+            added_term = ' basis points'
+            added_symbol = ' basis points'
         if use_word_format:
-            training_data_strings= [[num2words(n) + ' percent' for n in line]
+            training_data_strings= [[num2words(n) + added_term for n in line]
                                     for line in training_data]
-            test_data_strings = [[num2words(n) + ' percent' for n in line]
+            test_data_strings = [[num2words(n) + added_term for n in line]
                                  for line in test_data]
         else:
-            training_data_strings = [[str(n) + '%' for n in line]
+            training_data_strings = [[str(n) + added_symbol for n in line]
                                      for line in training_data]
-            test_data_strings = [[str(n) + '%' for n in line]
+            test_data_strings = [[str(n) + added_symbol for n in line]
                                  for line in test_data]
     else:
         if use_word_format:
