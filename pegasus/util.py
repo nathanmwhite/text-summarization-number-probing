@@ -22,3 +22,10 @@ def check_arguments(args):
         return ValueError('Argument training_examples has an invalid value. It must be greater than 0.')
     if args.test_examples <= 0:
         return ValueError('Argument test_examples has an invalid value. It must be greater than 0.')
+
+    
+def obtain_units(source_loc):
+    with open(source_loc, 'r') as f:
+        unit_strings = f.readlines()
+    units = (tuple(line.rstrip().split('/')) for line in unit_strings)
+    return units
