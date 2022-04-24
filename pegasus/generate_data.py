@@ -9,6 +9,7 @@ __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
 import math
+import random
 
 import num2words
 
@@ -19,6 +20,8 @@ from torch.nn.functional import one_hot
 from torch.utils.data import Dataset
 
 from transformers import PreTrainedTokenizer
+
+from util import obtain_units
 
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
@@ -140,23 +143,40 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
         return nearest_value
 
-    def generation_loop(pool, num_examples):
+    def sample_unit(units_data, singular=False):
+        # logic: assumes units_data as series of (target_index, singular, plural) forms
+        maximum = len(units_data) - 1
+        idx = random.randint(0, maximum)
+        target_index, singular_form, plural_form = units_data[idx]
+        if singular:
+            return singular_form, target_index
+        else:
+            return plural_form, target_index
+    
+    # TODO: check whether (value, unit) works with data format below
+    # TODO: integrate (value, unit) into string formation process below
+    def generation_loop(pool, num_examples, units=False):
         assembled_data = []
         for i in range(num_examples):
             datapoint = []
             for j in range(datapoint_length):
-                value = sample_gaussian(pool)
-                while value in datapoint:
+                if units:
                     value = sample_gaussian(pool)
-                datapoint.append(value)
+                    while value in datapoint:
+                        value = sample_gaussian(pool)
+                    singular = value == 1
+                    unit = sample_unit(units_data, singular)
+                    datapoint.append((value, unit))
+                else:
+                    value = sample_gaussian(pool)
+                    while value in datapoint:
+                        value = sample_gaussian(pool)
+                    datapoint.append(value)
+                
             assembled_data.append(datapoint)
 
         return assembled_data
-    
-    # TODO: implement this function
-    def generate_randomized_units(units_loc):
-        pass
-
+ 
     if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
         datapoint_length = 1
     elif task == 'Addition':
@@ -164,13 +184,17 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     # Generate pools from which to draw example values
     training_pool, test_pool = generate_pools()
-    
+                                       
     # Generate example values
-    # TODO: implement training_data generation for Decoder, which should be one number at a time
-    training_data = generation_loop(training_pool, num_training_examples)
+    if task == 'Units':
+        units_data = obtain_units(units_loc)
+        training_data = generation_loop(training_pool, num_training_examples, True)
+        test_data = generation_loop(test_pool, num_test_examples, True)
+    else:
+        training_data = generation_loop(training_pool, num_training_examples)
+        test_data = generation_loop(test_pool, num_test_examples)
     
-    test_data = generation_loop(test_pool, num_test_examples)
-    
+    # TODO: fit Units implementation so these next lines have appropriate behavior
     # Convert to Numpy arrays and generate target values
     training_data_numpy = np.array(training_data)
     
