@@ -8,5 +8,5 @@ Beyond these, several additional number probing tests will be supported.
 
 TODO:
 1. Add protections against exploding gradients. Changing hyperparameters may be enough in this case, with monitoring for infinity/nan issues.
-2. Test argument checking.
-3. Revisit local/relative import method to prevent future breaks.
+2. Revisit local/relative import method to prevent future breaks.
+3. Test percent, basis points, and units modes.
