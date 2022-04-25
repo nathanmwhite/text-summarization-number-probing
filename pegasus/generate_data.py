@@ -153,20 +153,27 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         else:
             return plural_form, target_index
     
-    # TODO: check whether (value, unit) works with data format below
-    # TODO: integrate (value, unit) into string formation process below
+    # TODO: evaluate whether to tease out two version for the different tasks
     def generation_loop(pool, num_examples, units=False):
         assembled_data = []
+        if units:
+            assembled_units = []
+            assembled_targets = []
         for i in range(num_examples):
             datapoint = []
+            if units:
+                datapoint_units = []
+                datapoint_targets = []
             for j in range(datapoint_length):
                 if units:
                     value = sample_gaussian(pool)
                     while value in datapoint:
                         value = sample_gaussian(pool)
                     singular = value == 1
-                    unit = sample_unit(units_data, singular)
-                    datapoint.append((value, unit))
+                    unit, target_idx = sample_unit(units_data, singular)
+                    datapoint.append(value)
+                    datapoint_units.append(unit)
+                    datapoint_targets.append(target_idx)
                 else:
                     value = sample_gaussian(pool)
                     while value in datapoint:
@@ -174,7 +181,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                     datapoint.append(value)
                 
             assembled_data.append(datapoint)
-
+            if units:
+                assembled_units.append(datapoint_units)
+                assembled_targets.append(datapoint_targets)
+        if units:
+            return assembled_data, assembled_units, assembled_targets
         return assembled_data
  
     if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
@@ -188,17 +199,24 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     # Generate example values
     if task == 'Units':
         units_data = obtain_units(units_loc)
-        training_data = generation_loop(training_pool, num_training_examples, True)
-        test_data = generation_loop(test_pool, num_test_examples, True)
+        training_data, training_units, training_targets = generation_loop(training_pool,
+                                                                          num_training_examples,
+                                                                          units=True)
+        test_data, test_units, test_targets = generation_loop(test_pool,
+                                                              num_test_examples,
+                                                              units=True)
+
+        training_data_numpy = np.array(training_targets)
+        test_data_numpy = np.array(test_targets)
+        
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
-    
-    # TODO: fit Units implementation so these next lines have appropriate behavior
-    # Convert to Numpy arrays and generate target values
-    training_data_numpy = np.array(training_data)
-    
-    test_data_numpy = np.array(test_data)
+        
+        # Convert to Numpy arrays and generate target values
+        training_data_numpy = np.array(training_data)
+
+        test_data_numpy = np.array(test_data)
     
     # indices for one_hot must be dtype torch.int64
     # targets with class probabilities must be a floating type
@@ -218,8 +236,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_tensor = torch.as_tensor(test_data_numpy)
         test_targets = test_tensor.to(torch.float32).to(device)
     elif task == 'Addition':
-        training_tensor = torch.as_tensor(np.sum(training_data_numpy, axis=-1))
-        training_targets = training_tensor.to(torch.float32).to(device)
+        train_tensor = torch.as_tensor(np.sum(training_data_numpy, axis=-1))
+        training_targets = train_tensor.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(np.sum(test_data_numpy, axis=-1))
         test_targets = test_tensor.to(torch.float32).to(device)
     elif task in ('Percent', 'Basis_Points'):
@@ -227,9 +245,15 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             decimal_convert = 0.01
         else: # Basis Points
             decimal_convert = 0.0001
-        training_tensor = torch.as_tensor(training_data_numpy * decimal_convert)
-        training_targets = training_tensor.to(torch.float32).to(device)
+        train_tensor = torch.as_tensor(training_data_numpy * decimal_convert)
+        training_targets = train_tensor.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(test_data_numpy * decimal_convert)
+        test_targets = test_tensor.to(torch.float32).to(device)
+    # TODO: confirm if this can be integrated into Decoding task above
+    elif task == 'Units':
+        train_tensor = torch.as_tensor(training_data_numpy)
+        training_targets = train_tensor.to(torch.float32).to(device)
+        test_tensor = torch.as_tensor(test_data_numpy)
         test_targets = test_tensor.to(torch.float32).to(device)
     else:
         raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", or "Units"')    
@@ -244,7 +268,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             added_term = ' basis points'
             added_symbol = ' basis points'
         if use_word_format:
-            training_data_strings= [[num2words(n) + added_term for n in line]
+            training_data_strings = [[num2words(n) + added_term for n in line]
                                     for line in training_data]
             test_data_strings = [[num2words(n) + added_term for n in line]
                                  for line in test_data]
@@ -253,6 +277,23 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                      for line in training_data]
             test_data_strings = [[str(n) + added_symbol for n in line]
                                  for line in test_data]
+    elif task == 'Units':
+        if use_word_format:
+            train_num_unit_pairs = zip([[num2words(n) for n in line]
+                                        for n in training_data], 
+                                       training_units)
+            test_num_unit_pairs = zip([[num2words(n) for n in line]
+                                       for n in test_data],
+                                      test_units)
+        else:
+            train_num_unit_pairs = zip([[str(n) for n in line]
+                                        for n in training_data],
+                                       training_units)
+            test_num_unit_pairs = zip([[str(n) for n in line]
+                                       for n in test_data],
+                                      test_units)
+        training_data_strings = [[' '.join(n[0] for n in line)] for line in train_num_unit_pairs]
+        test_data_strings = [[' '.join(n[0] for n in line)] for line in test_num_unit_pairs]
     else:
         if use_word_format:
             training_data_strings = [[num2words(n) for n in line]
