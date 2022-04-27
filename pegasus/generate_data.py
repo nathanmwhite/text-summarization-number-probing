@@ -15,6 +15,8 @@ import num2words
 
 import numpy as np
 
+from sklearn.model_selection import train_test_split
+
 import torch
 from torch.nn.functional import one_hot
 from torch.utils.data import Dataset
@@ -81,24 +83,6 @@ class ProbingDataset(Dataset):
         
         return _inputs, _output
 
-# TODO: must handle multiword units with the last containing the unit
-# it will be more advantageous to have this data prepped in advance
-def extract_data(data_loc, units_loc):
-    """
-    extract_data : Function that generates training and test data derived
-        from data sources that contain numbers with units.
-    @param data_loc (str) : Path to data file stored as lines of sentences.
-    @param units_loc (str) : Path to data file stored as lines of units.
-    returns : TODO
-    """
-    units_data = obtain_units(units_loc)
-    
-    with open(data_path, 'r') as f:
-        raw_data = f.readlines()
-    
-    numerics = []
-    unit_categories = []
-    
     
     
 # their description does not specify what happens to the obtained value via the Gaussian process
@@ -115,7 +99,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   task: str,
                   datapoint_length: int=5,
                   use_word_format: bool=False,
-                  units_loc: str=None):
+                  units_loc: str=None,
+                  data_loc: str=None):
     """
     generate_data : Function that generates training and test data for  
         the List Maximum task specified in Wallace et al. (2019).
@@ -128,7 +113,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         generate
     @param num_test_examples (int) : Number of test examples to generate
     @param task (str) : Task to generate data for from among:
-        ListMax, Decoding, Addition, Percent, Basis_Points, Units
+        ListMax, Decoding, Addition, Percent, Basis_Points, Units,
+        Context_Units
     @param datapoint_length (int) : Number of elements in each datapoint
     @param use_word_format (bool) : Indicates whether to convert an 
         integer into:
@@ -138,6 +124,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param units_loc (str) : Indicates location of text file containing
         units as lines, with variants separated by slashes ('/'), where
         'Units' is task
+    @param data_loc (str) : Indicates location of text file containing
+        sentences with numbers and units identified as lines, where
+        'Context_Units' is task
     returns : two ProbingDatasets: training, test datasets
     """
     def generate_pools():
@@ -208,6 +197,29 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         if units:
             return assembled_data, assembled_units, assembled_targets
         return assembled_data
+    
+    # TODO: must handle multiword units with the last containing the unit
+    # it will be more advantageous to have this data prepped in advance
+    def extract_data(data_loc, units_loc):
+        """
+        extract_data : Function that generates training and test data derived
+            from data sources that contain numbers with units.
+        @param data_loc (str) : Path to data file stored as lines of sentences.
+        @param units_loc (str) : Path to data file stored as lines of units.
+        returns : TODO
+        """
+        units_data = obtain_units(units_loc)
+
+        # raw_data is of format [sentence[tab]number[tab]target_unit_idx]
+        with open(data_path, 'r') as f:
+            raw_data = f.readlines()
+
+        data = [tuple(line.rstrip().split('\t')) for line in raw_data]
+
+        sentences, numerals, units = zip(*data)
+        
+        return sentences, numerals, units
+    
  
     if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
         datapoint_length = 1
@@ -229,6 +241,26 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 
         training_data_numpy = np.array(training_targets)
         test_data_numpy = np.array(test_targets)
+    elif task == 'Context_Units':
+        assert(data_loc is not None)
+        assert(units_loc is not None)
+        sentences, numbers, units = extract_data(data_loc, units_loc)
+        # split into train and test sets
+        train_sents, 
+        test_sents, 
+        train_numbers, 
+        test_numbers, 
+        train_units,
+        test_units = train_test_split(sentences, numbers, units, test_size=0.2, random_state=123)
+        
+        sep_token = '<sep>'
+        
+        
+        training_data = [s.split(' ') + [sep_token] + [n] for s, n in zip(train_sents, train_numbers)]
+        test_data = [s.split(' ') + [sep_token] + [n] for s, n in zip(test_sents, test_numbers)]
+        
+        training_data_numpy = np.array(train_units)
+        test_data_numpy = np.array(test_units)
         
     else:
         training_data = generation_loop(training_pool, num_training_examples)
@@ -271,13 +303,15 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_tensor = torch.as_tensor(test_data_numpy * decimal_convert)
         test_targets = test_tensor.to(torch.float32).to(device)
     # TODO: confirm if this can be integrated into Decoding task above
-    elif task == 'Units':
+    elif task in ('Units', 'Context_Units'):
         train_tensor = torch.as_tensor(training_data_numpy)
-        training_targets = train_tensor.to(torch.float32).to(device)
+        training_targets = one_hot(train_tensor, datapoint_length)
+        training_targets = training_targets.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(test_data_numpy)
-        test_targets = test_tensor.to(torch.float32).to(device)
+        test_targets = one_hot(test_tensor, datapoint_length)
+        test_targets = test_targets.to(torch.float32).to(device)
     else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", or "Units"')    
+        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", "Units", or "Context_Units"')    
     
     # TODO: implement units support here
     # Convert to string format   
@@ -313,8 +347,15 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             test_num_unit_pairs = zip([[str(n) for n in line]
                                        for n in test_data],
                                       test_units)
+        # TODO: test and likely remove: this appears duplicated below as 'joined_training_data'
         training_data_strings = [[' '.join(n[0] for n in line)] for line in train_num_unit_pairs]
         test_data_strings = [[' '.join(n[0] for n in line)] for line in test_num_unit_pairs]
+    elif task == 'Context_Units':
+        # use_word_format inappropriate here due to presence of decimals in task
+        train_data_strings = [[str(n) for n in line]
+                              for line in training_data]
+        test_data_strings = [[str(n) for n in line]
+                             for line in test_data]
     else:
         if use_word_format:
             training_data_strings = [[num2words(n) for n in line]
