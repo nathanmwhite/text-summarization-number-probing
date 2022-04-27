@@ -24,7 +24,7 @@ from torch.utils.data import DataLoader
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
 from generate_data import generate_data
-from model import UnitsModel, report_phase, freeze_module
+from model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
 from util import check_arguments
 
 
@@ -95,6 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('--momentum', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
+    parser.add_argument('--context_units', type=bool, default=False)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -121,10 +122,14 @@ if __name__ == '__main__':
     phase_message = 'Begin generating dataset.'
     report_phase(phase_message)
     
+    units_path = "../units_processing/units.txt"
+    data_path = "../units_processing/data.txt"
+    
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, task,
-        use_word_format=args.use_words)
+        use_word_format=args.use_words,
+        units_loc=units_path, data_loc=data_path)
     
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=64, 
@@ -141,7 +146,10 @@ if __name__ == '__main__':
         freeze_module(pegasus_model, 'Pegasus')
     pegasus_model = pegasus_model.to(device)
     
-    dm = UnitsModel(pegasus_model).to(device)
+    if args.context_units:
+        dm = ContextUnitsModel(pegasus_model).to(device)
+    else:
+        dm = UnitsModel(pegasus_model).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
