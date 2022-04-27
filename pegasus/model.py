@@ -235,3 +235,37 @@ class UnitsModel(torch.nn.Module):
         y_pred = self.sequential(embeddings_concat).squeeze(-1)
 
         return y_pred
+
+# TODO : determine more appropriate default hidden_dim value    
+class ContextUnitsModel(torch.nn.Module):
+    def __init__(self, embedding_model, output_dim, hidden_dim=5):
+        super(ContextUnitsModel, self).__init__()
+
+        self.embedding_model = embedding_model
+
+        encoder = self.embedding_model.model.encoder
+        input_dim = encoder.layer_norm.normalized_shape[0]
+
+        self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
+                                    hidden_size = hidden_dim,
+                                    num_layers = 1,
+                                    bidirectional=True,
+                                    batch_first=True)
+        
+        # hidden_dim*2 because input is from a bidirectional LSTM
+        self.linear = torch.nn.Linear(in_features=hidden_dim*2, 
+                                      out_features=output_dim)
+
+    # inputs are of sequence [sentence, sep, number]
+    def forward(self, input_text):
+        forward = self.embedding_model.model.forward(**input_text)
+        encoder_state = forward.encoder_last_hidden_state
+
+        embeddings = encoder_state.detach()[:, :-1]
+
+        hidden_vectors = self.bilstm(embeddings)
+        logits = self.linear(hidden_vectors[0]).squeeze(-1)
+        
+        y_pred = torch.nn.functional.log_softmax(logits, dim=1)
+
+        return y_pred
