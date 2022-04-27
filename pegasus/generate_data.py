@@ -23,6 +23,8 @@ from transformers import PreTrainedTokenizer
 
 from util import obtain_units
 
+from ..units_processing.retrieve_units import is_a_number as isnumeric
+
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
 # "We first pick a range (we vary the range in our experiments) and randomly shuffle the integers over it. We then split
@@ -79,6 +81,25 @@ class ProbingDataset(Dataset):
         
         return _inputs, _output
 
+# TODO: must handle multiword units with the last containing the unit
+# it will be more advantageous to have this data prepped in advance
+def extract_data(data_loc, units_loc):
+    """
+    extract_data : Function that generates training and test data derived
+        from data sources that contain numbers with units.
+    @param data_loc (str) : Path to data file stored as lines of sentences.
+    @param units_loc (str) : Path to data file stored as lines of units.
+    returns : TODO
+    """
+    units_data = obtain_units(units_loc)
+    
+    with open(data_path, 'r') as f:
+        raw_data = f.readlines()
+    
+    numerics = []
+    unit_categories = []
+    
+    
     
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
@@ -117,7 +138,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param units_loc (str) : Indicates location of text file containing
         units as lines, with variants separated by slashes ('/'), where
         'Units' is task
-    returns : two ListMaxDatasets: training, test datasets
+    returns : two ProbingDatasets: training, test datasets
     """
     def generate_pools():
         # the definition from Wallace et al. could mean:
