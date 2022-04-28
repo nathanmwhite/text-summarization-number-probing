@@ -6,3 +6,4 @@ This represents the first step of the larger Hmong Medical Text Summarization pr
 
 This repository contains the following folders:
 1. pegasus : code to run number probing on Pegasus.
+2. units_processing : processing code and text files containing the units for the Units and Context_Units probing tasks.
