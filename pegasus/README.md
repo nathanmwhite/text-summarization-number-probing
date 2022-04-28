@@ -16,6 +16,9 @@ Other planned tasks:
 2. Mixed Numeracy -- This is similar to Decoding in concept, but data containing numerical elements with word-based expansion of large numbers is used, with datapoints such as "16.5 mn" or "16.5 million". These are embedded and fed into a MLP for decoding, with the numerical representation matching the real-world number under a logarithmic scale.
 3. Layers -- This is similar to Decoding in concept and architecture, except that only one Encoding layer derived from the original embedding model is involved, in order to identify which parts of the model are involved in numeracy representation.
 
+Additional considerations:
+1. Changes -- Another possible task is handling changes: "sales increased by 8 % to EUR 155.2 mn" or "operating profit rose to EUR 31.1 mn from EUR 17.1 mn in 2004".
+
 TODO:
 1. Add protections against exploding gradients. Changing hyperparameters may be enough in this case, with monitoring for infinity/nan issues.
 2. Revisit local/relative import method to prevent future breaks.
