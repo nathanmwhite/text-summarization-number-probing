@@ -178,6 +178,7 @@
 154/vantage point/vantage points
 155/staff/staff
 156/power plant/power plants
-157/kronor/kronor
+157/krona/kronor
+157/SEK/SEK
 158/year old/years old
 159/foot/feet
