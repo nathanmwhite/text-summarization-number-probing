@@ -114,7 +114,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param num_test_examples (int) : Number of test examples to generate
     @param task (str) : Task to generate data for from among:
         ListMax, Decoding, Addition, Percent, Basis_Points, Units,
-        Context_Units
+        Context_Units, Ranges
     @param datapoint_length (int) : Number of elements in each datapoint
     @param use_word_format (bool) : Indicates whether to convert an 
         integer into:
@@ -223,7 +223,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
  
     if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
         datapoint_length = 1
-    elif task == 'Addition':
+    elif task in ('Addition', 'Ranges'):
         datapoint_length = 2
     
     # Generate pools from which to draw example values
@@ -261,7 +261,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         
         training_data_numpy = np.array(train_units)
         test_data_numpy = np.array(test_units)
-        
+    elif task == 'Ranges':
+        pass # TODO
+    
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
