@@ -4,6 +4,7 @@
 3/euro/euro
 3/eur/eur
 3/EUR/EUR
+3/euro/euros
 4/ton/tons
 4/tonne/tonnes
 5/share/shares
@@ -115,3 +116,68 @@
 94/flight/flights
 95/passenger/passengers
 96/lawmaker/lawmakers
+97/loader crane/loader cranes
+98/service area/service areas
+99/tanker/tankers
+100/TEU/TEUs
+101/sales office/sales offices
+102/language/languages
+103/transaction/transactions
+104/asset management expert/asset management experts
+105/basis point/basis points
+106/biscuit carton/biscuit cartons
+107/cargo unit/cargo units
+108/cash register/cash registers
+109/building site/building sites
+110/custom designed elevator/custom designed elevators
+111/customer company/customer companies
+112/customised elevator/customised elevators
+113/forest machine/forest machines
+114/debenture bond/debenture bonds
+115/ERP system/ERP systems
+116/city/cities
+117/tablet computer/tablet computers
+118/discount store/discount stores
+119/e-mail account/e-mail accounts
+120/price target/price targets
+121/firm order/firm orders
+122/floor square meter/floor square meters
+123/harvester head/harvester heads
+124/holiday home/holiday homes
+125/initial public offering/initial public offerings
+126/job cut/job cuts
+127/kroon par value bond/kroon par value bonds
+128/actor/actors
+129/local newspaper/local newspapers
+130/manufacturing unit/manufacturing units
+131/metric ton/metric tons
+132/minute/minutes
+133/stock/stocks
+134/client/clients
+135/paper machine/paper machines
+136/staffer/staffers
+137/substation/substations
+138/nonbinding commitment/nonbinding commitments
+139/payroll client/payroll clients
+140/productional employee/productional employees
+141/log house/log houses
+142/rental outlet/rental outlets
+143/research community/research communities
+144/return/returns
+145/service location/service locations
+146/short ton/short tons
+147/small local brewery/small local breweries
+148/special event/special events
+149/state/states
+150/station/stations
+151/stock option/stock options
+152/suction anchor/suction anchors
+153/surveillance camera/surveillance cameras
+154/tabloid page/tabloid pages
+155/unquoted company/unquoted companies
+156/vantage point/vantage points
+157/staff/staff
+158/power plant/power plants
+159/kronor/kronor
+160/year old/years old
+161/foot/feet
