@@ -36,6 +36,7 @@
 23/a.m./a.m.
 23/am/am
 24/point/points
+24/pt/pts
 25/result/results
 26/cubic meter/cubic meters
 26/cubic metre/cubic metres
@@ -59,6 +60,7 @@
 40/bps/bps
 41/sq. ft./sq. ft.
 41/square foot/square feet
+41/sq ft/sq ft
 42/day/days
 43/megawatt/megawatts
 43/MW/MW
@@ -75,6 +77,8 @@
 53/mm/mm
 54/degree/degrees
 55/skr/skr
+55/SEK/SEK
+55/krona/kronor
 56/MB/MB
 56/megabyte/megabytes
 57/teacher/teachers
@@ -178,7 +182,14 @@
 154/vantage point/vantage points
 155/staff/staff
 156/power plant/power plants
-157/krona/kronor
-157/SEK/SEK
-158/year old/years old
-159/foot/feet
+157/year old/years old
+158/foot/feet
+159/litas/litas
+160/GHz/GHz
+161/TWh/TWh
+162/kilogram/kilograms
+163/network/networks
+164/ore/ores
+165/piece/pieces
+166/GW/GW
+167/decaliter/decaliters
