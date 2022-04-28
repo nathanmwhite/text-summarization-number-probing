@@ -32,6 +32,7 @@
 22/square metre/square metres
 22/m2/m2
 22/sq m/sq m
+22/floor square meter/floor square meters
 23/a.m./a.m.
 23/am/am
 24/point/points
@@ -141,43 +142,42 @@
 119/e-mail account/e-mail accounts
 120/price target/price targets
 121/firm order/firm orders
-122/floor square meter/floor square meters
-123/harvester head/harvester heads
-124/holiday home/holiday homes
-125/initial public offering/initial public offerings
-126/job cut/job cuts
-127/kroon par value bond/kroon par value bonds
-128/actor/actors
-129/local newspaper/local newspapers
-130/manufacturing unit/manufacturing units
-131/metric ton/metric tons
-132/minute/minutes
-133/stock/stocks
-134/client/clients
-135/paper machine/paper machines
-136/staffer/staffers
-137/substation/substations
-138/nonbinding commitment/nonbinding commitments
-139/payroll client/payroll clients
-140/productional employee/productional employees
-141/log house/log houses
-142/rental outlet/rental outlets
-143/research community/research communities
-144/return/returns
-145/service location/service locations
-146/short ton/short tons
-147/small local brewery/small local breweries
-148/special event/special events
-149/state/states
-150/station/stations
-151/stock option/stock options
-152/suction anchor/suction anchors
-153/surveillance camera/surveillance cameras
-154/tabloid page/tabloid pages
-155/unquoted company/unquoted companies
-156/vantage point/vantage points
-157/staff/staff
-158/power plant/power plants
-159/kronor/kronor
-160/year old/years old
-161/foot/feet
+122/harvester head/harvester heads
+123/holiday home/holiday homes
+124/initial public offering/initial public offerings
+125/job cut/job cuts
+126/kroon par value bond/kroon par value bonds
+127/actor/actors
+128/local newspaper/local newspapers
+129/manufacturing unit/manufacturing units
+130/metric ton/metric tons
+131/minute/minutes
+132/stock/stocks
+133/client/clients
+134/paper machine/paper machines
+135/staffer/staffers
+136/substation/substations
+137/nonbinding commitment/nonbinding commitments
+138/payroll client/payroll clients
+139/productional employee/productional employees
+140/log house/log houses
+141/rental outlet/rental outlets
+142/research community/research communities
+143/return/returns
+144/service location/service locations
+145/short ton/short tons
+146/small local brewery/small local breweries
+147/special event/special events
+148/state/states
+149/station/stations
+150/stock option/stock options
+151/suction anchor/suction anchors
+152/surveillance camera/surveillance cameras
+153/tabloid page/tabloid pages
+154/unquoted company/unquoted companies
+155/vantage point/vantage points
+156/staff/staff
+157/power plant/power plants
+158/kronor/kronor
+159/year old/years old
+160/foot/feet
