@@ -56,6 +56,67 @@ def freeze_module(module, module_type):
         
     freeze_component(module)
     report_phase(f'Parameter freezing successful.')
+    
+    
+def layers_generator(embedding_model):
+    for layer in embedding_model.model.encoder.layers:
+        yield layer
+        
+# the current default is Pegasus
+# TODO: restructure to handle other model types
+# TODO: for Pegasus, it may be easier just to replace all elements in encoder
+#    with just the one layer
+# class LayerProbingModel(torch.nn.Module):
+#     def __init__(self, embedding_model, hidden_dim=50, layer_idx=0):
+#         super(LayerProbingModel, self).__init__()
+        
+#         self.embed_tokens = embedding_model.embed_tokens
+#         self.embed_positions = embedding_model.embed_positions
+#         self.embed_scale = embedding_model.embed_scale
+#         self.dropout = embedding_model.dropout
+#         self.training = embedding_model.training
+        
+#         self.actionable_layer = embedding_model.encoder.layers[layer_idx]
+
+#         self.linear_1 = torch.nn.Linear(in_features=input_dim,
+#                                         out_features=hidden_dim)
+#         self.linear_2 = torch.nn.Linear(in_features=hidden_dim,
+#                                         out_features=hidden_dim)
+#         self.linear_3 = torch.nn.Linear(in_features=hidden_dim,
+#                                         out_features=1)
+#         self.sequential = torch.nn.Sequential(self.linear_1,
+#                                               torch.nn.ReLU(),
+#                                               self.linear_2,
+#                                               torch.nn.ReLU(),
+#                                               self.linear_3)
+        
+#     def forward(self, input_text):
+        
+#         # This is based on the original implementation in Transformers
+#         if not 'inputs_embeds' in input_text.keys():
+#             inputs_embeds = self.embed_tokens(input_text['input_ids']) * self.embed_scale
+#         else:
+#             inputs_embeds = input_text['inputs_embeds']
+            
+#         if input_ids is not None:
+#             input_shape = input_ids.size()
+#             input_ids = input_ids.view(-1, input_shape[-1])
+        
+#         embed_pos = self.embed_positions(input_shape)
+
+#         hidden_states = inputs_embeds + embed_pos
+
+#         hidden_states = F.dropout(hidden_states, p=self.dropout, training=self.training)
+            
+            
+#         forward = self.embedding_model.model.forward(**input_text)
+#         encoder_state = forward.encoder_last_hidden_state
+
+#         embeddings = encoder_state.detach()[:, :-1]
+
+#         y_pred = self.sequential(embeddings).squeeze(-1)
+
+#         return y_pred
         
 
 class MaxProbingModel(torch.nn.Module):
