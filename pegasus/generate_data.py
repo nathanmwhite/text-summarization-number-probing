@@ -114,7 +114,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param num_test_examples (int) : Number of test examples to generate
     @param task (str) : Task to generate data for from among:
         ListMax, Decoding, Addition, Percent, Basis_Points, Units,
-        Context_Units, Ranges
+        Context_Units, Ranges, Orders
     @param datapoint_length (int) : Number of elements in each datapoint
     @param use_word_format (bool) : Indicates whether to convert an 
         integer into:
@@ -164,21 +164,25 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             return plural_form, target_index
     
     # TODO: evaluate whether to tease out two version for the different tasks
-    def generation_loop(pool, num_examples, units=False, ranges=False):
-        assert(units == False or ranges == False)
+    def generation_loop(pool, num_examples, units=False, ranges=False, orders=False):
+        assert(units == False or ranges == False or orders == False)
         assembled_data = []
         if units:
             assembled_units = []
             assembled_targets = []
         elif ranges:
             assembled_range_terms = []
+        elif orders:
+            assembled_orders = []
         for i in range(num_examples):
             datapoint = []
             if units:
                 datapoint_units = []
                 datapoint_targets = []
             elif ranges:
-                assembled_range_terms.append(sample_range_terms(range_terms))
+                assembled_range_terms.append(sample_terms(range_terms))
+            elif orders:
+                assembled_orders.append(sample_terms(order_terms))
             for j in range(datapoint_length):
                 if units:
                     value = sample_gaussian(pool)
@@ -203,6 +207,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             return assembled_data, assembled_units, assembled_targets
         elif ranges:
             return assembled_data, assembled_range_terms
+        elif orders:
+            return assembled_data, assembled_orders
         return assembled_data
     
     # TODO: must handle multiword units with the last containing the unit
@@ -228,12 +234,12 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         return sentences, numerals, units
     
     
-    def sample_range_terms(range_terms):
-        idx = np.random.randint(len(range_terms))
-        return range_terms[idx]
+    def sample_terms(terms):
+        idx = np.random.randint(len(terms))
+        return terms[idx]
     
  
-    if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
+    if task in ('Decoder', 'Percent', 'Basis_Points', 'Units', 'Orders'):
         datapoint_length = 1
     elif task in ('Addition', 'Ranges'):
         datapoint_length = 2
@@ -286,6 +292,31 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         training_data_numpy = np.array(training_data)
 
         test_data_numpy = np.array(test_data)
+    elif task == 'Orders': # TODO: review order terms
+        order_terms = ('thousand', 'K', 'million', 'mln', 'mn', 'm', 'crore', 'billion', 'bn', 'bln', 'trillion')
+        order_dict = {'thousand': math.log(1e3),
+                      'K': math.log(1e3),
+                      'million': math.log(1e6),
+                      'mln': math.log(1e6),
+                      'mn': math.log(1e6),
+                      'm': math.log(1e6),
+                      'crore': math.log(1e7),
+                      'billion': math.log(1e9),
+                      'bn': math.log(1e9),
+                      'bln': math.log(1e9),
+                      'trillion': math.log(1e12)}
+        training_data, training_order_terms = generation_loop(training_pool,
+                                                              num_training_examples,
+                                                              orders=True)
+        test_data, test_order_terms = generation_loop(test_pool,
+                                                      num_test_examples,
+                                                      orders=True)
+        # Convert to Numpy arrays and generate target values
+        training_data_numpy = np.array(training_data)
+        training_order_numpy = np.array([[order_dict[term]] for term in training_order_terms])
+
+        test_data_numpy = np.array(test_data)
+        test_order_numpy = np.array([[order_dict[term]] for term in test_order_terms])
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
@@ -339,8 +370,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         training_targets = training_targets.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(test_data_numpy)
         test_targets = test_targets.to(torch.float32).to(device)
+    elif task == 'Orders': # TODO: ensure that broadcasting occurs on the correct axis
+        train_tensor = torch.as_tensor(np.log(training_data_numpy) + training_order_numpy)
+        training_targets = train_tensor.to(torch.float32).to(device)
+        test_tensor = torch.as_tensor(np.log(test_data_numpy) + test_order_numpy)
+        test_targets = test_tensor.to(torch.float32).to(device)
     else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", "Units", "Context_Units", or "Ranges"')    
+        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", "Units", "Context_Units", "Ranges", or "Orders"')    
     
     # TODO: implement units support here
     # Convert to string format   
@@ -390,6 +426,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         # TODO: review whether to change this
         training_data_strings = [[n[1].format(a=n[0][0], b=n[0][1])] for n in zip(training_data, training_range_terms)]
         test_data_strings = [[n[1].format(a=n[0][0], b=n[0][1])] for n in zip(test_data, test_range_terms)]
+    elif task == 'Orders':
+        if use_word_format:
+            training_data_strings = [[' '.join(num2words(n[0]), n[1])] for n in zip(training_data, training_order_terms)]
+            test_data_strings = [[' '.join(num2words(n[0]), n[1])] for n in zip(test_data, test_order_terms)]
+        else:
+            training_data_strings = [[' '.join(str(n[0]), n[1])] for n in zip(training_data, training_order_terms)]
+            test_data_strings = [[' '.join(str(n[0]), n[1])] for n in zip(test_data, test_order_terms)]
     else:
         if use_word_format:
             training_data_strings = [[num2words(n) for n in line]
