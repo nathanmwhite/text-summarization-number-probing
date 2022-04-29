@@ -164,16 +164,21 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             return plural_form, target_index
     
     # TODO: evaluate whether to tease out two version for the different tasks
-    def generation_loop(pool, num_examples, units=False):
+    def generation_loop(pool, num_examples, units=False, ranges=False):
+        assert(units == False or ranges == False)
         assembled_data = []
         if units:
             assembled_units = []
             assembled_targets = []
+        elif ranges:
+            assembled_range_terms = []
         for i in range(num_examples):
             datapoint = []
             if units:
                 datapoint_units = []
                 datapoint_targets = []
+            elif ranges:
+                assembled_range_terms.append(sample_range_terms(range_terms))
             for j in range(datapoint_length):
                 if units:
                     value = sample_gaussian(pool)
@@ -196,6 +201,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                 assembled_targets.append(datapoint_targets)
         if units:
             return assembled_data, assembled_units, assembled_targets
+        elif ranges:
+            return assembled_data, assembled_range_terms
         return assembled_data
     
     # TODO: must handle multiword units with the last containing the unit
@@ -219,6 +226,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         sentences, numerals, units = zip(*data)
         
         return sentences, numerals, units
+    
+    
+    def sample_range_terms(range_terms):
+        idx = np.random.randint(len(range_terms))
+        return range_terms[idx]
     
  
     if task in ('Decoder', 'Percent', 'Basis_Points', 'Units'):
@@ -262,8 +274,18 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         training_data_numpy = np.array(train_units)
         test_data_numpy = np.array(test_units)
     elif task == 'Ranges':
-        pass # TODO
-    
+        range_terms = ('{a}-{b}', '{a} to {b}', 'from {a} to {b}', 'from {a}-{b}')
+        training_data, training_range_terms = generation_loop(training_pool, 
+                                                              num_training_examples,
+                                                              ranges=True)
+        test_data, test_range_terms = generation_loop(test_pool, 
+                                                      num_test_examples,
+                                                      ranges=True)
+        
+        # Convert to Numpy arrays and generate target values
+        training_data_numpy = np.array(training_data)
+
+        test_data_numpy = np.array(test_data)
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
@@ -312,8 +334,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_tensor = torch.as_tensor(test_data_numpy)
         test_targets = one_hot(test_tensor, datapoint_length)
         test_targets = test_targets.to(torch.float32).to(device)
+    elif task == 'Ranges': # TODO: ensure that target data with final dimension (:,2) works
+        train_tensor = torch.as_tensor(training_data_numpy)
+        training_targets = training_targets.to(torch.float32).to(device)
+        test_tensor = torch.as_tensor(test_data_numpy)
+        test_targets = test_targets.to(torch.float32).to(device)
     else:
-        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", "Units", or "Context_Units"')    
+        raise ValueError('Task should be one of "ListMax", "Decoding", "Addition", "Percent", "Basis_Points", "Units", "Context_Units", or "Ranges"')    
     
     # TODO: implement units support here
     # Convert to string format   
@@ -354,10 +381,15 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_data_strings = [[' '.join(n[0] for n in line)] for line in test_num_unit_pairs]
     elif task == 'Context_Units':
         # use_word_format inappropriate here due to presence of decimals in task
-        train_data_strings = [[str(n) for n in line]
+        training_data_strings = [[str(n) for n in line]
                               for line in training_data]
         test_data_strings = [[str(n) for n in line]
                              for line in test_data]
+    elif task == 'Ranges':
+        # use_word_format inappropriate here due to possibility of hyphenation
+        # TODO: review whether to change this
+        training_data_strings = [[n[1].format(a=n[0][0], b=n[0][1])] for n in zip(training_data, training_range_terms)]
+        test_data_strings = [[n[1].format(a=n[0][0], b=n[0][1])] for n in zip(test_data, test_range_terms)]
     else:
         if use_word_format:
             training_data_strings = [[num2words(n) for n in line]
