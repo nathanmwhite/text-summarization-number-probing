@@ -269,3 +269,53 @@ class ContextUnitsModel(torch.nn.Module):
         y_pred = torch.nn.functional.log_softmax(logits, dim=1)
 
         return y_pred
+
+# TODO: test
+# TODO: especially test Siamese structure
+# TODO: revisit: BiLSTM may be more appropriate
+# TODO: this has variable length input by nature;
+#    check to ensure this works given in the inputs
+class RangeModel(torch.nn.Module):
+    def __init__(self, embedding_model, hidden_dim=5):
+        super(RangeModel, self).__init__()
+        
+        self.embedding_model = embedding_model
+        
+        encoder = self.embedding_model.model.encoder
+        input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        hidden_dim = 50
+        
+        self.joined_linear = torch.nn.Linear(in_features=input_dim,
+                                             out_features=hidden_dim)
+        self.joined_sequential = torch.nn.Sequential(self.joined_linear,
+                                                     torch.nn.ReLU)
+        
+        self.linear_left_1 = torch.nn.Linear(in_features=hidden_dim,
+                                             out_features=hidden_dim)
+        self.linear_left_2 = torch.nn.Linear(in_features=hidden_dim,
+                                             out_features=1)
+        self.left_sequential = torch.nn.Sequential(self.linear_left_1,
+                                                   torch.nn.ReLU,
+                                                   self.linear_left_2)
+        
+        self.linear_right_1 = torch.nn.Linear(in_features=hidden_dim,
+                                              out_features=hidden_dim)
+        self.linear_right_2 = torch.nn.Linear(in_features=hidden_dim,
+                                              out_features=1)
+        self.right_sequential = torch.nn.Sequential(self.linear_right_1,
+                                                    torch.nn.ReLU,
+                                                    self.linear_right_2)
+        
+    def forward(self, input_text):
+        forward = self.embedding_model.model.forward(**input_text)
+        encoder_state = forward.encoder_last_hidden_state
+        
+        embeddings = encoder_state.detach()[:, :-1]
+        
+        embeddings_concat = torch.flatten(embeddings, start_dim=1)
+        
+        joined_out = self.joined_sequential(embeddings_concat)
+        y_pred_1 = self.left_sequential(joined_out).squeeze(-1)
+        y_pred_2 = self.right_sequential(joined_out).squeeze(-1)
+        
+        return y_pred_1, y_pred_2
