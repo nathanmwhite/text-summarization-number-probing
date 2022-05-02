@@ -16,6 +16,8 @@ logging.basicConfig(filename='model.log', level=logging.INFO)
 
 import torch
 
+from transformers import PegasusForConditionalGeneration, T5ForConditionalGeneration
+
 
 def report_phase(message):
     timestamp = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
@@ -53,6 +55,28 @@ def freeze_module(module, module_type):
                                   'decoder',
                                   'layers',
                                   'self_attn'}
+    elif module_type == 'T5':
+        operational_layer_types = {'shared',
+                                   'embed_tokens',
+                                   'q',
+                                   'k',
+                                   'v', 
+                                   'o', 
+                                   'relative_attention_bias',
+                                   'layer_norm',
+                                   'dropout',
+                                   'wi',
+                                   'wo',
+                                   'lm_head',
+                                   'final_layer_norm'}
+        expandable_layer_types = {'model',
+                                  'encoder', 
+                                  'block', 
+                                  'layer',
+                                  'SelfAttention',
+                                  'DenseReluDense', 
+                                  'decoder', 
+                                  'EncDecAttention'}
         
     freeze_component(module)
     report_phase(f'Parameter freezing successful.')
@@ -125,8 +149,14 @@ class MaxProbingModel(torch.nn.Module):
         
         self.embedding_model = embedding_model
         
-        encoder = self.embedding_model.model.encoder
-        bilstm_input_dim = encoder.layer_norm.normalized_shape[0]
+        if type(self.embedding_model) == PegasusForConditionalGeneration:
+            self.embedding_type = 'Pegasus'
+            encoder = self.embedding_model.model.encoder
+            bilstm_input_dim = encoder.layer_norm.normalized_shape[0]
+        elif type(self.embedding_model) == T5ForConditionalGeneration:
+            self.embedding_type = 'T5'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
         
         # TODO: determine improved implementation of h0 and c0
         #     decision: no need: just use torch's default
@@ -151,7 +181,11 @@ class MaxProbingModel(torch.nn.Module):
                                       out_features=1) 
         
     def forward(self, input_text):
-        forward = self.embedding_model.model.forward(**input_text)
+        if self.embedding_type == 'Pegasus':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        # test for all model types
         encoder_state = forward.encoder_last_hidden_state
         # use torch.Tensor as input, not numpy, otherwise
         #  error will be thrown related to size and 'int'
@@ -190,8 +224,15 @@ class DecodingModel(torch.nn.Module):
 
         self.embedding_model = embedding_model
 
-        encoder = self.embedding_model.model.encoder
-        input_dim = encoder.layer_norm.normalized_shape[0]
+         if type(self.embedding_model) == PegasusForConditionalGeneration:
+            self.embedding_type = 'Pegasus'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layer_norm.normalized_shape[0]
+        elif type(self.embedding_model) == T5ForConditionalGeneration:
+            self.embedding_type = 'T5'
+            encoder = self.embedding_model.encoder
+            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
+        
         hidden_dim = 50
 
         # their description suggests ReLU at every layer,
@@ -211,7 +252,11 @@ class DecodingModel(torch.nn.Module):
                                               self.linear_3)
 
     def forward(self, input_text):
-        forward = self.embedding_model.model.forward(**input_text)
+        if self.embedding_type == 'Pegasus':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+            
         encoder_state = forward.encoder_last_hidden_state
 
         embeddings = encoder_state.detach()[:, :-1]
@@ -227,8 +272,16 @@ class AdditionModel(torch.nn.Module):
 
         self.embedding_model = embedding_model
 
-        encoder = self.embedding_model.model.encoder
-        input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        # TODO: test that T5 input type actually works here
+        if type(self.embedding_model) == PegasusForConditionalGeneration:
+            self.embedding_type = 'Pegasus'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        elif type(self.embedding_model) == T5ForConditionalGeneration:
+            self.embedding_type = 'T5'
+            encoder = self.embedding_model.encoder
+            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+        
         hidden_dim = 50
 
         # their description suggests ReLU at every layer,
@@ -249,7 +302,11 @@ class AdditionModel(torch.nn.Module):
 
     # TODO: test dimensionality of the following
     def forward(self, input_text):
-        forward = self.embedding_model.model.forward(**input_text)
+        if self.embedding_type == 'Pegasus':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        
         encoder_state = forward.encoder_last_hidden_state
 
         embeddings = encoder_state.detach()[:, :-1]
@@ -266,9 +323,16 @@ class UnitsModel(torch.nn.Module):
         super(UnitsModel, self).__init__()
 
         self.embedding_model = embedding_model
-
-        encoder = self.embedding_model.model.encoder
-        input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        
+        if type(self.embedding_model) == PegasusForConditionalGeneration:
+            self.embedding_type = 'Pegasus'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        elif type(self.embedding_model) == T5ForConditionalGeneration:
+            self.embedding_type = 'T5'
+            encoder = self.embedding_model.encoder
+            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+        
         hidden_dim = 50
 
         # they fail to specify their hidden_dim anywhere
@@ -286,7 +350,11 @@ class UnitsModel(torch.nn.Module):
 
     # TODO: test dimensionality of the following
     def forward(self, input_text):
-        forward = self.embedding_model.model.forward(**input_text)
+        if self.embedding_type == 'Pegasus':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+
         encoder_state = forward.encoder_last_hidden_state
 
         embeddings = encoder_state.detach()[:, :-1]
@@ -303,9 +371,15 @@ class ContextUnitsModel(torch.nn.Module):
         super(ContextUnitsModel, self).__init__()
 
         self.embedding_model = embedding_model
-
-        encoder = self.embedding_model.model.encoder
-        input_dim = encoder.layer_norm.normalized_shape[0]
+        
+        if type(self.embedding_model) == PegasusForConditionalGeneration:
+            self.embedding_type = 'Pegasus'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layer_norm.normalized_shape[0]
+        elif type(self.embedding_model) == T5ForConditionalGeneration:
+            self.embedding_type = 'T5'
+            encoder = self.embedding_model.encoder
+            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
 
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
@@ -319,7 +393,11 @@ class ContextUnitsModel(torch.nn.Module):
 
     # inputs are of sequence [sentence, sep, number]
     def forward(self, input_text):
-        forward = self.embedding_model.model.forward(**input_text)
+        if self.embedding_type == 'Pegasus':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+            
         encoder_state = forward.encoder_last_hidden_state
 
         embeddings = encoder_state.detach()[:, :-1]
@@ -342,8 +420,15 @@ class RangeModel(torch.nn.Module):
         
         self.embedding_model = embedding_model
         
-        encoder = self.embedding_model.model.encoder
-        input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        if type(self.embedding_model) == PegasusForConditionalGeneration:
+            self.embedding_type = 'Pegasus'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layer_norm.normalized_shape[0] * 2
+        elif type(self.embedding_model) == T5ForConditionalGeneration:
+            self.embedding_type = 'T5'
+            encoder = self.embedding_model.encoder
+            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+
         hidden_dim = 50
         
         self.joined_linear = torch.nn.Linear(in_features=input_dim,
@@ -368,7 +453,11 @@ class RangeModel(torch.nn.Module):
                                                     self.linear_right_2)
         
     def forward(self, input_text):
-        forward = self.embedding_model.model.forward(**input_text)
+        if self.embedding_type == 'Pegasus':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+            
         encoder_state = forward.encoder_last_hidden_state
         
         embeddings = encoder_state.detach()[:, :-1]
