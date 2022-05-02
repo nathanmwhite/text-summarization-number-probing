@@ -83,6 +83,7 @@ def evaluate(model, loss_function, eval_dataloader):
   
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--embedding_model', type=str, default='Pegasus')
     parser.add_argument('--training_examples', type=int, default=1000)
     parser.add_argument('--test_examples', type=int, default=100)
     parser.add_argument('--sample_min_int', type=int, default=0)
@@ -99,9 +100,10 @@ if __name__ == '__main__':
     
     check_arguments(args)
     
-    model_name = "google/pegasus-xsum"
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer = PegasusTokenizer.from_pretrained(model_name)
+    if args.embedding_model == 'Pegasus':
+        model_name = "google/pegasus-xsum"
+        tokenizer = PegasusTokenizer.from_pretrained(model_name)
 
     if args.float:
         sample_min = args.sample_min_float
@@ -131,12 +133,14 @@ if __name__ == '__main__':
     phase_message = 'Completed generating dataset.'
     report_phase(phase_message)
     
-    pegasus_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+    if args.embedding_model == 'Pegasus'
+        embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+        
     if args.freeze_embedder:
-        freeze_module(pegasus_model, 'Pegasus')
-    pegasus_model = pegasus_model.to(device)
+        freeze_module(embedding_model, 'Pegasus')
+    embedding_model = embedding_model.to(device)
     
-    dm = DecodingModel(pegasus_model).to(device)
+    dm = DecodingModel(embedding_model).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
