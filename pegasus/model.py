@@ -55,7 +55,7 @@ def freeze_module(module, module_type):
                                   'decoder',
                                   'layers',
                                   'self_attn'}
-    elif module_type == 'T5':
+    elif module_type in ('T5', 'SSR'): # referred to as T5 below
         operational_layer_types = {'shared',
                                    'embed_tokens',
                                    'q',
@@ -77,12 +77,7 @@ def freeze_module(module, module_type):
                                   'DenseReluDense', 
                                   'decoder', 
                                   'EncDecAttention'}
-    elif module_type == 'Bart':
-        # expandable components:
-# model, encoder, layers, self_attn, decoder, encoder_attn
-# operational components:
-# shared, embed_tokens, embed_positions, k_proj, v_proj, q_proj, out_proj, self_attn_layer_norm, fc1, fc2, final_layer_norm
-#  layernorm_embedding, encoder_attn_layer_norm, layernorm_embedding, lm_head
+    elif module_type in ('Bart', 'DistilBart'): # referred to as Bart below
         operational_layer_types = {'shared',
                                    'embed_tokens',
                                    'embed_positions',
@@ -205,7 +200,7 @@ class MaxProbingModel(torch.nn.Module):
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             # specific to T5-small; T5-base last is block[11]
-            bilstm_input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
+            bilstm_input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
@@ -294,7 +289,7 @@ class DecodingModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
@@ -356,7 +351,7 @@ class AdditionModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * 2
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
@@ -420,7 +415,7 @@ class UnitsModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * 2
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
@@ -481,7 +476,7 @@ class ContextUnitsModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
@@ -542,7 +537,7 @@ class RangeModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * 2
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
