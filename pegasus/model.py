@@ -103,14 +103,36 @@ def freeze_module(module, module_type):
                                   'self_attn',
                                   'decoder',
                                   'encoder_attn'}
+    elif module_type == 'ProphetNet':
+        operational_layer_types = {'word_embeddings',
+                                   'position_embeddings',
+                                   'embeddings_layer_norm',
+                                   'key_proj',
+                                   'value_proj',
+                                   'query_proj',
+                                   'out_proj',
+                                   'self_attn_layer_norm',
+                                   'intermediate',
+                                   'output',
+                                   'feed_forward_layer_norm',
+                                   'relative_pos_embeddings',
+                                   'cross_attn_layer_norm',
+                                   'lm_head'}
+        expandable_layer_types = {'prophetnet',
+                                  'encoder',
+                                  'layers',
+                                  'self_attn',
+                                  'feed_forward',
+                                  'decoder',
+                                  'cross_attn'}
         
     freeze_component(module)
     report_phase(f'Parameter freezing successful.')
     
     
-def layers_generator(embedding_model):
-    for layer in embedding_model.model.encoder.layers:
-        yield layer
+# def layers_generator(embedding_model):
+#     for layer in embedding_model.model.encoder.layers:
+#         yield layer
         
 # the current default is Pegasus
 # TODO: restructure to handle other model types
@@ -182,11 +204,16 @@ class MaxProbingModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
+            # specific to T5-small
             bilstm_input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             bilstm_input_dim = encoder.layernorm_embedding.normalized_shape[0]
+        elif type(self.embedding_model) == ProphetNetEncoder:
+            self.embedding_type = 'ProphetNet'
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
         
         # TODO: determine improved implementation of h0 and c0
         #     decision: no need: just use torch's default
@@ -215,6 +242,12 @@ class MaxProbingModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
         elif self.embedding_type == 'T5':
             forward = self.embedding_model.forward(**input_text)
+        elif self.embedding_type == 'Bart':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'ProphetNet':
+            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            forward = self.embedding_model.forward(**input_text)
+            
         # test for all model types
         encoder_state = forward.encoder_last_hidden_state
         # use torch.Tensor as input, not numpy, otherwise
@@ -262,6 +295,14 @@ class DecodingModel(torch.nn.Module):
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
+        elif type(self.embedding_model) == BartForConditionalGeneration:
+            self.embedding_type = 'Bart'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layernorm_embedding.normalized_shape[0]
+        elif type(self.embedding_model) == ProphetNetEncoder:
+            self.embedding_type = 'ProphetNet'
+            encoder = self.embedding_model
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
         
         hidden_dim = 50
 
@@ -285,6 +326,11 @@ class DecodingModel(torch.nn.Module):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
         elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        elif self.embedding_type == 'Bart':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'ProphetNet':
+            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             
         encoder_state = forward.encoder_last_hidden_state
@@ -311,6 +357,14 @@ class AdditionModel(torch.nn.Module):
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+        elif type(self.embedding_model) == BartForConditionalGeneration:
+            self.embedding_type = 'Bart'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
+        elif type(self.embedding_model) == ProphetNetEncoder:
+            self.embedding_type = 'ProphetNet'
+            encoder = self.embedding_model
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
         
         hidden_dim = 50
 
@@ -335,6 +389,11 @@ class AdditionModel(torch.nn.Module):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
         elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        elif self.embedding_type == 'Bart':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'ProphetNet':
+            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
         
         encoder_state = forward.encoder_last_hidden_state
@@ -362,6 +421,14 @@ class UnitsModel(torch.nn.Module):
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+        elif type(self.embedding_model) == BartForConditionalGeneration:
+            self.embedding_type = 'Bart'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
+        elif type(self.embedding_model) == ProphetNetEncoder:
+            self.embedding_type = 'ProphetNet'
+            encoder = self.embedding_model
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
         
         hidden_dim = 50
 
@@ -383,6 +450,11 @@ class UnitsModel(torch.nn.Module):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
         elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        elif self.embedding_type == 'Bart':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'ProphetNet':
+            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
 
         encoder_state = forward.encoder_last_hidden_state
@@ -410,6 +482,14 @@ class ContextUnitsModel(torch.nn.Module):
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
+        elif type(self.embedding_model) == BartForConditionalGeneration:
+            self.embedding_type = 'Bart'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layernorm_embedding.normalized_shape[0]
+        elif type(self.embedding_model) == ProphetNetEncoder:
+            self.embedding_type = 'ProphetNet'
+            encoder = self.embedding_model
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
 
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
@@ -426,6 +506,11 @@ class ContextUnitsModel(torch.nn.Module):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
         elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        elif self.embedding_type == 'Bart':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'ProphetNet':
+            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             
         encoder_state = forward.encoder_last_hidden_state
@@ -458,6 +543,14 @@ class RangeModel(torch.nn.Module):
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features * 2
+        elif type(self.embedding_model) == BartForConditionalGeneration:
+            self.embedding_type = 'Bart'
+            encoder = self.embedding_model.model.encoder
+            input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
+        elif type(self.embedding_model) == ProphetNetEncoder:
+            self.embedding_type = 'ProphetNet'
+            encoder = self.embedding_model
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
 
         hidden_dim = 50
         
@@ -486,6 +579,11 @@ class RangeModel(torch.nn.Module):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
         elif self.embedding_type == 'T5':
+            forward = self.embedding_model.forward(**input_text)
+        elif self.embedding_type == 'Bart':
+            forward = self.embedding_model.model.forward(**input_text)
+        elif self.embedding_type == 'ProphetNet':
+            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             
         encoder_state = forward.encoder_last_hidden_state
