@@ -16,7 +16,7 @@ logging.basicConfig(filename='model.log', level=logging.INFO)
 
 import torch
 
-from transformers import PegasusForConditionalGeneration, T5ForConditionalGeneration, BartForConditionalGeneration
+from transformers import PegasusForConditionalGeneration, T5ForConditionalGeneration, BartForConditionalGeneration, ProphetNetEncoder
 
 
 def report_phase(message):
