@@ -204,7 +204,7 @@ class MaxProbingModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            # specific to T5-small
+            # specific to T5-small; T5-base last is block[11]
             bilstm_input_dim = encoder.block[5].layer[1].DenseReluDense.wo.out_features
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
