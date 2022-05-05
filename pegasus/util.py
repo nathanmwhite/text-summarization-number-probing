@@ -61,7 +61,7 @@ def get_tokenizer(model_name):
         tokenizer = PegasusTokenizer.from_pretrained(model_name)
     elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR']):
         tokenizer = T5Tokenizer.from_pretrained(model_name)
-    elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart']:
+    elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart']):
         tokenizer = BartTokenizer.from_pretrained(model_name)
     elif model_name == MODEL_NAME_MAP['ProphetNet']:
         tokenizer = ProphetNetTokenizer.from_pretrained(model_name)
