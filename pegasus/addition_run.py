@@ -17,11 +17,17 @@ import logging
 logging.basicConfig(filename='pegasus_decoding_number.log', level=logging.INFO)
 
 import math
+import os
 
 import torch
 from torch.utils.data import DataLoader
 
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import BartTokenizer, BartForConditionalGeneration
+from transformers import AutoTokenizer, AutoModelForConditionalGeneration
+from s2s_ft.tokenization_unilm import UnilmTokenizer
+from s2s_ft.modeling_decoding import BertConfig, BertForSeq2SeqDecoder
 
 from generate_data import generate_data
 from model import AdditionModel, report_phase, freeze_module
@@ -109,6 +115,25 @@ if __name__ == '__main__':
     if args.embedding_model == 'Pegasus':
         model_name = "google/pegasus-xsum"
         tokenizer = PegasusTokenizer.from_pretrained(model_name)
+    elif args.embedding_model == 'T5':
+        model_name = "t5-base"
+        tokenizer = T5Tokenizer.from_pretrained(model_name)
+    elif args.embedding_model == 'SSR':
+        model_name = "microsoft/ssr-base"
+        tokenizer = T5Tokenizer.from_pretrained(model_name)
+    elif args.embedding_model = 'Bart':
+        model_name = "facebook/bart-base"
+        tokenizer = BartTokenizer.from_pretrained(model_name)
+    elif args.embedding_model = 'DistilBart':
+        model_name = "sshleifer/distilbart-xsum-12-6"
+        tokenizer = BartTokenizer.from_pretrained(model_name)
+    elif args.embedding_model = 'ProphetNet':
+        model_name = "microsoft/prophetnet-large-uncased"
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+    elif args.embedding_model = 'UniLM':
+        model_name = "unilm2-base-uncased"
+        vocab_path = os.path.join('..', model_name, model_name + '-vocab.txt')
+        tokenizer = UnilmTokenizer.from_pretrained(vocab_path)
 
     if args.float:
         sample_min = args.sample_min_float
@@ -140,6 +165,22 @@ if __name__ == '__main__':
     
     if args.embedding_model == 'Pegasus':
         embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+    elif args.embedding_model in ('T5', 'SSR'):
+        embedding_model = T5ForConditionalGeneration.from_pretrained(model_name)
+    elif args.embedding_model in ('Bart', 'DistilBart'):
+        embedding_model = BartForConditionalGeneration.from_pretrained(model_name)
+    elif args.embedding_model == 'ProphetNet':
+        # TODO: test if AutoModelForConditionalGeneration works; 
+        #  default listed is AutoModelForSeq2SeqLM
+        embedding_model = AutoModelForConditionalGeneration.from_pretrained(model_name)
+    elif args.embedding_model == 'UniLM':
+        VOCAB_SIZE = 30522
+        TYPE_VOCAB_SIZE = 2
+        config_ = BertConfig(rel_pos_bins=0, 
+                             vocab_size_or_config_json_file=VOCAB_SIZE, 
+                             type_vocab_size=TYPE_VOCAB_SIZE)
+        model_path = os.path.join('..', model_name)
+        embedding_model = BertForSeq2SeqDecoder.from_pretrained(model_path)
         
     if args.freeze_embedder:
         freeze_module(embedding_model, args.embedding_model)
