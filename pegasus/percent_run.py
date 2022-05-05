@@ -14,8 +14,6 @@ from datetime import datetime
 
 import logging
 
-logging.basicConfig(filename='pegasus_decoding_percent.log', level=logging.INFO)
-
 import math
 
 import torch
@@ -95,9 +93,12 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
     parser.add_argument('--basis_points', type=bool, default=False)
+    parser.add_argument('--log_filename', type=str, default='decoding_percent.log')
     args = parser.parse_args()
     
     check_arguments(args)
+    
+    logging.basicConfig(filename=args.log_filename, level=logging.INFO)
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
