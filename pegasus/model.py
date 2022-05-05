@@ -395,7 +395,7 @@ class DecodingModel(torch.nn.Module):
     
     
 class AdditionModel(torch.nn.Module):
-    def __init__(self, embedding_model):
+    def __init__(self, embedding_model, padded_seq_len=2):
         super(AdditionModel, self).__init__()
 
         self.embedding_model = embedding_model
@@ -404,23 +404,23 @@ class AdditionModel(torch.nn.Module):
         if type(self.embedding_model) == PegasusForConditionalGeneration:
             self.embedding_type = 'Pegasus'
             encoder = self.embedding_model.model.encoder
-            input_dim = encoder.layer_norm.normalized_shape[0] * 2
+            input_dim = encoder.layer_norm.normalized_shape[0] * padded_seq_len
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * 2
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * padded_seq_len
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
-            input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
+            input_dim = encoder.layernorm_embedding.normalized_shape[0] * padded_seq_len
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            input_dim = encoder.layer[11].output.dense.out_features * 2
+            input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
         
         hidden_dim = 50
 
