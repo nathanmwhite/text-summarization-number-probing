@@ -128,7 +128,7 @@ if __name__ == '__main__':
         n_training_examples, n_test_examples, 'Addition',
         use_word_format=args.use_words)
     
-    padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1]
+    padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1
     
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=64, 
