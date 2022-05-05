@@ -327,7 +327,7 @@ class DecodingModel(torch.nn.Module):
 
         self.embedding_model = embedding_model
 
-         if type(self.embedding_model) == PegasusForConditionalGeneration:
+        if type(self.embedding_model) == PegasusForConditionalGeneration:
             self.embedding_type = 'Pegasus'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layer_norm.normalized_shape[0]
