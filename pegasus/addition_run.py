@@ -97,7 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--momentum', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
-    parser.add_argument('--log_filename', type=str, default='decoding_number.log')
+    parser.add_argument('--log_filename', type=str, default='addition.log')
     args = parser.parse_args()
     
     check_arguments(args)
