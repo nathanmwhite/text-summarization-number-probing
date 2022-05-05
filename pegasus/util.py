@@ -39,7 +39,7 @@ def obtain_units(source_loc):
 
 MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'T5': "t5-base",
-                  'SSR': 'microsoft/ssr-base",
+                  'SSR': "microsoft/ssr-base",
                   'Bart': "facebook/bart-base",
                   'Distilbart': "sshleifer/distilbart-xsum-12-6",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
