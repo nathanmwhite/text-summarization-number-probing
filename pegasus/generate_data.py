@@ -23,8 +23,7 @@ from torch.utils.data import Dataset
 
 from transformers import PreTrainedTokenizer
 
-from util import obtain_units
-
+from .util import obtain_units
 from ..units_processing.retrieve_units import is_a_number as isnumeric
 
 # TODO: Methodology from Wallace et al. (2019) for their probes:
