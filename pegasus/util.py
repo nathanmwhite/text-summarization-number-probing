@@ -80,5 +80,5 @@ def get_embedding_model(model_name):
                              vocab_size_or_config_json_file=VOCAB_SIZE, 
                              type_vocab_size=TYPE_VOCAB_SIZE)
         model_path = os.path.join('..', model_name)
-        embedding_model = BertForSeq2SeqDecoder.from_pretrained(model_path)
+        embedding_model = BertForSeq2SeqDecoder.from_pretrained(model_path, config=config_, search_beam_size=2)
     return embedding_model
