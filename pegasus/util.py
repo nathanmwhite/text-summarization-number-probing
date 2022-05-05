@@ -8,6 +8,8 @@ __copyright__ = "Copyright © 2022 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+import os
+
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from transformers import BartTokenizer, BartForConditionalGeneration
