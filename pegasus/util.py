@@ -11,7 +11,7 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from transformers import BartTokenizer, BartForConditionalGeneration
-from transformers import AutoTokenizer, AutoModelForConditionalGeneration
+from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration
 from s2s_ft.tokenization_unilm import UnilmTokenizer
 from s2s_ft.modeling_decoding import BertConfig, BertForSeq2SeqDecoder
 
@@ -61,7 +61,7 @@ def get_tokenizer(model_name):
     elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart']:
         tokenizer = BartTokenizer.from_pretrained(model_name)
     elif model_name == MODEL_NAME_MAP['ProphetNet']:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer = ProphetNetTokenizer.from_pretrained(model_name)
     elif model_name == MODEL_NAME_MAP['UniLM']:
         vocab_path = os.path.join('..', model_name, model_name + '-vocab.txt')
         tokenizer = UnilmTokenizer.from_pretrained(vocab_path)
@@ -77,7 +77,7 @@ def get_embedding_model(model_name):
     elif model_name == MODEL_NAME_MAP['ProphetNet']:
         # TODO: test if AutoModelForConditionalGeneration works; 
         #  default listed is AutoModelForSeq2SeqLM
-        embedding_model = AutoModelForConditionalGeneration.from_pretrained(model_name)
+        embedding_model = ProphetNetForConditionalGeneration.from_pretrained(model_name)
     elif model_name == MODEL_NAME_MAP['UniLM']:
         VOCAB_SIZE = 30522
         TYPE_VOCAB_SIZE = 2
