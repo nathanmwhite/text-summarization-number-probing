@@ -12,8 +12,8 @@ from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from transformers import BartTokenizer, BartForConditionalGeneration
 from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration
-from s2s_ft.tokenization_unilm import UnilmTokenizer
-from s2s_ft.modeling_decoding import BertConfig, BertForSeq2SeqDecoder
+from ..s2s_ft.tokenization_unilm import UnilmTokenizer
+from ..s2s_ft.modeling_decoding import BertConfig, BertForSeq2SeqDecoder
 
 
 def check_arguments(args):
@@ -37,6 +37,7 @@ def obtain_units(source_loc):
     units = (tuple(line.rstrip().split('/')) for line in unit_strings)
     return units
 
+
 MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'T5': "t5-base",
                   'SSR': "microsoft/ssr-base",
@@ -45,6 +46,7 @@ MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
                   'UniLM': "unilm2-base-uncased"}
 
+
 def get_model_name(model_type):
     try:
         name = MODEL_NAME_MAP[model_type]
@@ -52,6 +54,7 @@ def get_model_name(model_type):
         print('Invalid embedding_model specified: {model_type}')
         raise
     return name
+
 
 def get_tokenizer(model_name):
     if model_name == MODEL_NAME_MAP['Pegasus']:
@@ -67,6 +70,7 @@ def get_tokenizer(model_name):
         tokenizer = UnilmTokenizer.from_pretrained(vocab_path)
     return tokenizer
 
+                        
 def get_embedding_model(model_name):
     if model_name == MODEL_NAME_MAP['Pegasus']:
         embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
