@@ -21,11 +21,9 @@ import math
 import torch
 from torch.utils.data import DataLoader
 
-from transformers import PegasusTokenizer, PegasusForConditionalGeneration
-
 from generate_data import generate_data
 from model import RangeModel, report_phase, freeze_module
-from util import check_arguments
+from util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 
 
 class SiameseMSELoss(torch.nn.Module):
@@ -120,9 +118,10 @@ if __name__ == '__main__':
     check_arguments(args)
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    if args.embedding_model == 'Pegasus':
-        model_name = "google/pegasus-xsum"
-        tokenizer = PegasusTokenizer.from_pretrained(model_name)
+
+    model_name = get_model_name(args.embedding_model)
+    
+    tokenizer = get_tokenizer(model_name)
 
     if args.float:
         sample_min = args.sample_min_float
@@ -152,8 +151,8 @@ if __name__ == '__main__':
     phase_message = 'Completed generating dataset.'
     report_phase(phase_message)
     
-    if args.embedding_model == 'Pegasus':
-        embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
+    embedding_model = get_embedding_model(model_name)
+    
     if args.freeze_embedder:
         freeze_module(embedding_model, 'Pegasus')
     embedding_model = embedding_model.to(device)
