@@ -452,7 +452,7 @@ class AdditionModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
-            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            input_text = {k: v for (k, v) in input_text.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'UniLM':
