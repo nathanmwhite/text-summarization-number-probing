@@ -447,12 +447,15 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         
     # Tokenize via tokenizer
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
+    # padding=True since some tokenizers and datasets give varying-length data
     joined_training_data = [' '.join(line) for line in training_data_strings]
     training_data_tokenized = tokenizer(joined_training_data,
+                                        padding=True,
                                         return_tensors="pt").to(device)
     
     joined_test_data = [' '.join(line) for line in test_data_strings]
-    test_data_tokenized = tokenizer(joined_test_data, 
+    test_data_tokenized = tokenizer(joined_test_data,
+                                    padding=True,
                                     return_tensors="pt").to(device)
     
     # decoder_inputs: 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
