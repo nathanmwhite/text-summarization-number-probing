@@ -130,8 +130,13 @@ if __name__ == '__main__':
     
     padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1
     
+    if args.embedding_model == 'UniLM':
+        training_batch_size = 1
+    else:
+        training_batch_size = 64
+    
     training_dataloader = DataLoader(training_dataset, 
-                                     batch_size=64, 
+                                     batch_size=training_batch_size, 
                                      shuffle=True)
     test_dataloader = DataLoader(test_dataset, 
                                  batch_size=1, 
