@@ -457,6 +457,10 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                     padding=True,
                                     return_tensors="pt").to(device)
     
+    # temporary testing only
+    print(training_data_tokenized.input_ids.size())
+    print(test_data_tokenized.input_ids.size())
+    
     # decoder_inputs: 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
     training_decoder_inputs = torch.tensor([0,1]).repeat(num_training_examples, 
                                                          1)
