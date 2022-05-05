@@ -120,6 +120,8 @@ def freeze_module(module, module_type):
                                   'feed_forward',
                                   'decoder',
                                   'cross_attn'}
+    elif module_type == 'UniLM':
+        pass # TODO
         
     freeze_component(module)
     report_phase(f'Parameter freezing successful.')
