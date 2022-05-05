@@ -21,7 +21,7 @@ from transformers import T5ForConditionalGeneration
 from transformers import BartForConditionalGeneration
 from transformers import ProphetNetForConditionalGeneration
 
-from ..sfs_ft.modeling_decoding import BertForSeq2SeqDecoder
+from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
 
 
 def report_phase(message):
