@@ -45,8 +45,13 @@ MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
                   'UniLM': "unilm2-base-uncased"}
 
-def get_model_name_map():
-    return MODEL_NAME_MAP
+def get_model_name(model_type):
+    try:
+        name = MODEL_NAME_MAP[model_type]
+    except KeyError as e:
+        print('Invalid embedding_model specified: {model_type}')
+        raise
+    return name
 
 def get_tokenizer(model_name):
     if model_name == MODEL_NAME_MAP['Pegasus']:
