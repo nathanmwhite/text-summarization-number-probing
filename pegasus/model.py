@@ -280,14 +280,14 @@ class MaxProbingModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
-            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            input_text = {k: v for (k, v) in input_text.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'UniLM':
 #             length_ = input_text.input_ids.size(1)
 #             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
-            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
-            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
             
         # use torch.Tensor as input, not numpy, otherwise
@@ -377,7 +377,7 @@ class DecodingModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
-            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            input_text = {k: v for (k, v) in input_text.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'UniLM':
@@ -525,14 +525,14 @@ class UnitsModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
-            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            input_text = {k: v for (k, v) in input_text.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'UniLM':
 #             length_ = input_text.input_ids.size(1)
 #             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
-            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
-            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
 
         embeddings = encoder_state.detach()[:, :-1]
@@ -593,14 +593,14 @@ class ContextUnitsModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
-            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            input_text = {k: v for (k, v) in input_text.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'UniLM':
 #             length_ = input_text.input_ids.size(1)
 #             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
-            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
-            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
             
         encoder_state = forward.encoder_last_hidden_state
@@ -680,14 +680,14 @@ class RangeModel(torch.nn.Module):
             forward = self.embedding_model.model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
-            input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
+            input_text = {k: v for (k, v) in input_text.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'UniLM':
 #             length_ = input_text.input_ids.size(1)
 #             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
-            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
-            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
             
         encoder_state = forward.encoder_last_hidden_state
