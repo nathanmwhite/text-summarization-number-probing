@@ -140,13 +140,13 @@ if __name__ == '__main__':
     phase_message = 'Completed generating dataset.'
     report_phase(phase_message)
     
-    embedding_model = get_embedding_model(model_name, padded_seq_len)
+    embedding_model = get_embedding_model(model_name)
         
     if args.freeze_embedder:
         freeze_module(embedding_model, args.embedding_model)
     embedding_model = embedding_model.to(device)
     
-    am = AdditionModel(embedding_model).to(device)
+    am = AdditionModel(embedding_model, padded_seq_len).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
