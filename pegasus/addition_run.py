@@ -128,6 +128,10 @@ if __name__ == '__main__':
         n_training_examples, n_test_examples, 'Addition',
         use_word_format=args.use_words)
     
+    # temporary lines to test
+    print(training_dataset.size())
+    print(test_dataset.size())
+    
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=64, 
                                      shuffle=True)
