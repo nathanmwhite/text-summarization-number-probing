@@ -135,6 +135,9 @@ if __name__ == '__main__':
     else:
         training_batch_size = 64
     
+    # temporary testing purposes
+    print(training_batch_size)
+    
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=training_batch_size, 
                                      shuffle=True)
