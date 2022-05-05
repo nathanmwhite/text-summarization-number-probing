@@ -128,6 +128,8 @@ if __name__ == '__main__':
         n_training_examples, n_test_examples, 'Addition',
         use_word_format=args.use_words)
     
+    padded_seq_len = training_dataset[0]['input_ids'].size()[-1]
+    
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=64, 
                                      shuffle=True)
@@ -138,7 +140,7 @@ if __name__ == '__main__':
     phase_message = 'Completed generating dataset.'
     report_phase(phase_message)
     
-    embedding_model = get_embedding_model(model_name)
+    embedding_model = get_embedding_model(model_name, padded_seq_len)
         
     if args.freeze_embedder:
         freeze_module(embedding_model, args.embedding_model)
