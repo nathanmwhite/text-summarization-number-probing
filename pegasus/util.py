@@ -68,7 +68,7 @@ def get_tokenizer(model_name):
     elif model_name == MODEL_NAME_MAP['ProphetNet']:
         tokenizer = ProphetNetTokenizer.from_pretrained(model_name)
     elif model_name == MODEL_NAME_MAP['UniLM']:
-        vocab_path = os.path.join('..', model_name, model_name + '-vocab.txt')
+        vocab_path = os.path.abspath(os.path.join('..', model_name, model_name + '-vocab.txt'))
         tokenizer = UnilmTokenizer.from_pretrained(vocab_path)
     return tokenizer
 
@@ -90,6 +90,6 @@ def get_embedding_model(model_name):
         config_ = BertConfig(rel_pos_bins=0, 
                              vocab_size_or_config_json_file=VOCAB_SIZE, 
                              type_vocab_size=TYPE_VOCAB_SIZE)
-        model_path = os.path.join('..', model_name)
+        model_path = os.path.abspath(os.path.join('..', model_name))
         embedding_model = BertForSeq2SeqDecoder.from_pretrained(model_path, config=config_, search_beam_size=2)
     return embedding_model
