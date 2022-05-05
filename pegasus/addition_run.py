@@ -84,7 +84,7 @@ def evaluate(model, loss_function, eval_dataloader):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--embedding_model', type-str, default='Pegasus')
+    parser.add_argument('--embedding_model', type=str, default='Pegasus')
     parser.add_argument('--training_examples', type=int, default=1000)
     parser.add_argument('--test_examples', type=int, default=100)
     parser.add_argument('--sample_min_int', type=int, default=0)
