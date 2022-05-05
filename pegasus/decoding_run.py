@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader
 
 from .generate_data import generate_data
 from .model import DecodingModel, report_phase, freeze_module
-from .util import check_arguments, get_model_name_map, get_tokenizer, get_embedding_model
+from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
