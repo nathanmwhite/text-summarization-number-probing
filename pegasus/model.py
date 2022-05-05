@@ -16,7 +16,10 @@ logging.basicConfig(filename='model.log', level=logging.INFO)
 
 import torch
 
-from transformers import PegasusForConditionalGeneration, T5ForConditionalGeneration, BartForConditionalGeneration, ProphetNetEncoder
+from transformers import PegasusForConditionalGeneration 
+from transformers import T5ForConditionalGeneration
+from transformers import BartForConditionalGeneration
+from transformers import ProphetNetForConditionalGeneration
 
 from ..sfs_ft.modeling_decoding import BertForSeq2SeqDecoder
 
@@ -27,7 +30,8 @@ def report_phase(message):
     print(formatted_message)
     logging.info(formatted_message)
 
-
+    
+# TODO : run testing to make sure this actually freezes everything intended
 def freeze_module(module, module_type):
     def freeze_component(component):
         for (name, module_) in component.named_children():
@@ -123,7 +127,32 @@ def freeze_module(module, module_type):
                                   'decoder',
                                   'cross_attn'}
     elif module_type == 'UniLM':
-        pass # TODO
+        operational_layer_types = {'word_embeddings',
+                                   'token_type_embeddings',
+                                   'position_embeddings',
+                                   'LayerNorm',
+                                   'dropout',
+                                   'query',
+                                   'key',
+                                   'value',
+                                   'dense',
+                                   'activation',
+                                   'decoder',
+                                   'seq_relationship',
+                                   'crit_mask_lm',
+                                   'crit_next_sent'}
+        expandable_layer_types = {'bert',
+                                  'embeddings',
+                                  'encoder',
+                                  'layer',
+                                  'attention',
+                                  'self',
+                                  'output',
+                                  'intermediate',
+                                  'pooler',
+                                  'cls',
+                                  'predictions',
+                                  'transform'}
         
     freeze_component(module)
     report_phase(f'Parameter freezing successful.')
@@ -216,7 +245,7 @@ class MaxProbingModel(torch.nn.Module):
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            bilstm_input_dim = None # TODO
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
         
         # TODO: determine improved implementation of h0 and c0
         #     decision: no need: just use torch's default
@@ -310,10 +339,14 @@ class DecodingModel(torch.nn.Module):
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layernorm_embedding.normalized_shape[0]
-        elif type(self.embedding_model) == ProphetNetEncoder:
+        elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
-            encoder = self.embedding_model
+            encoder = self.embedding_model.prophetnet.encoder
             input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
+        elif type(self.embedding_model) == BertForSeq2SeqDecoder:
+            self.embedding_type = 'UniLM'
+            encoder = self.embedding_model.bert.encoder
+            input_dim = encoder.layer[11].output.dense.out_features
         
         hidden_dim = 50
 
@@ -336,15 +369,23 @@ class DecodingModel(torch.nn.Module):
     def forward(self, input_text):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'T5':
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'Bart':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
             input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
-            
-        encoder_state = forward.encoder_last_hidden_state
+            encoder_state = forward.encoder_last_hidden_state
+        elif self.embedding_type == 'UniLM':
+#             length_ = input_text.input_ids.size(1)
+#             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
+            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            encoder_state = forward[-1]
 
         embeddings = encoder_state.detach()[:, :-1]
 
@@ -372,10 +413,14 @@ class AdditionModel(torch.nn.Module):
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
-        elif type(self.embedding_model) == ProphetNetEncoder:
+        elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
-            encoder = self.embedding_model
+            encoder = self.embedding_model.prophetnet.encoder
             input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
+        elif type(self.embedding_model) == BertForSeq2SeqDecoder:
+            self.embedding_type = 'UniLM'
+            encoder = self.embedding_model.bert.encoder
+            input_dim = encoder.layer[11].output.dense.out_features * 2
         
         hidden_dim = 50
 
@@ -399,16 +444,24 @@ class AdditionModel(torch.nn.Module):
     def forward(self, input_text):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'T5':
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'Bart':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
             input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
-        
-        encoder_state = forward.encoder_last_hidden_state
-
+            encoder_state = forward.encoder_last_hidden_state
+        elif self.embedding_type == 'UniLM':
+#             length_ = input_text.input_ids.size(1)
+#             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
+            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            encoder_state = forward[-1]
+            
         embeddings = encoder_state.detach()[:, :-1]
 
         embeddings_concat = torch.flatten(embeddings, start_dim=1)
@@ -436,10 +489,14 @@ class UnitsModel(torch.nn.Module):
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
-        elif type(self.embedding_model) == ProphetNetEncoder:
+        elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
-            encoder = self.embedding_model
+            encoder = self.embedding_model.prophetnet.encoder
             input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
+        elif type(self.embedding_model) == BertForSeq2SeqDecoder:
+            self.embedding_type = 'UniLM'
+            encoder = self.embedding_model.bert.encoder
+            input_dim = encoder.layer[11].output.dense.out_features * 2
         
         hidden_dim = 50
 
@@ -460,15 +517,23 @@ class UnitsModel(torch.nn.Module):
     def forward(self, input_text):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'T5':
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'Bart':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
             input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
-
-        encoder_state = forward.encoder_last_hidden_state
+            encoder_state = forward.encoder_last_hidden_state
+        elif self.embedding_type == 'UniLM':
+#             length_ = input_text.input_ids.size(1)
+#             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
+            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            encoder_state = forward[-1]
 
         embeddings = encoder_state.detach()[:, :-1]
 
@@ -497,10 +562,14 @@ class ContextUnitsModel(torch.nn.Module):
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layernorm_embedding.normalized_shape[0]
-        elif type(self.embedding_model) == ProphetNetEncoder:
+        elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
-            encoder = self.embedding_model
+            encoder = self.embedding_model.prophetnet.encoder
             input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
+        elif type(self.embedding_model) == BertForSeq2SeqDecoder:
+            self.embedding_type = 'UniLM'
+            encoder = self.embedding_model.bert.encoder
+            input_dim = encoder.layer[11].output.dense.out_features
 
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
@@ -516,13 +585,23 @@ class ContextUnitsModel(torch.nn.Module):
     def forward(self, input_text):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'T5':
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'Bart':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
             input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
+        elif self.embedding_type == 'UniLM':
+#             length_ = input_text.input_ids.size(1)
+#             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
+            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            encoder_state = forward[-1]
             
         encoder_state = forward.encoder_last_hidden_state
 
@@ -558,10 +637,14 @@ class RangeModel(torch.nn.Module):
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
-        elif type(self.embedding_model) == ProphetNetEncoder:
+        elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
-            encoder = self.embedding_model
+            encoder = self.embedding_model.prophetnet.encoder
             input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
+        elif type(self.embedding_model) == BertForSeq2SeqDecoder:
+            self.embedding_type = 'UniLM'
+            encoder = self.embedding_model.bert.encoder
+            input_dim = encoder.layer[11].output.dense.out_features * 2
 
         hidden_dim = 50
         
@@ -589,13 +672,23 @@ class RangeModel(torch.nn.Module):
     def forward(self, input_text):
         if self.embedding_type == 'Pegasus':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'T5':
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'Bart':
             forward = self.embedding_model.model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
         elif self.embedding_type == 'ProphetNet':
             input_text = {k: v for (k, v) in sent.items() if k != 'token_type_ids'}
             forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.encoder_last_hidden_state
+        elif self.embedding_type == 'UniLM':
+#             length_ = input_text.input_ids.size(1)
+#             input_text['position_ids'] = torch.arange(length_, dtype=torch.long)
+            forward = self.embedding_model.bert.embeddings.forward(input_text.input_ids)
+            forward = self.embedding_model.bert.encoder.forward(forward, input_text.attention_mask)
+            encoder_state = forward[-1]
             
         encoder_state = forward.encoder_last_hidden_state
         
