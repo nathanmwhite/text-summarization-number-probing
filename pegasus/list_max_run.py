@@ -146,6 +146,16 @@ if __name__ == '__main__':
         n_training_examples, n_test_examples, 'ListMax',
         use_word_format=args.use_words)
 
+    if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
+        start_token_length = 0
+    elif args.embedding_model in ('Bart', 'DistilBart', 'UniLM'):
+        start_token_length = 1
+#     else:
+#         raise ValueError('Error: --embedding_model must be a valid model type.')
+    
+    padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1 \
+        - start_token_length
+    
     if args.embedding_model == 'UniLM':
         training_batch_size = 1
     else:
@@ -167,7 +177,7 @@ if __name__ == '__main__':
         freeze_module(embedding_model, 'Pegasus')
     embedding_model = embedding_model.to(device)
     
-    mpm = MaxProbingModel(embedding_model).to(device)
+    mpm = MaxProbingModel(embedding_model, padded_seq_len).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
