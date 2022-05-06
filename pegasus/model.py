@@ -404,8 +404,8 @@ class DecodingModel(torch.nn.Module):
         y_pred = y_pred.squeeze(-1)
         
         # testing only
-        print('Embeddings_out dims:', embeddings.size())
-        print('Y_pred dims:', y_pred.size())
+#         print('Embeddings_out dims:', embeddings.size())
+#         print('Y_pred dims:', y_pred.size())
 
         return y_pred
     
