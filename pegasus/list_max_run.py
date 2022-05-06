@@ -40,8 +40,11 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         # testing only
         print('Inputs size:', inputs['input_ids'].size())
+        print('Inputs:', inputs['input_ids'])
         print('Outputs size:', outputs.size())
+        print('Outputs:', outputs)
         print('Labels size:', labels.size())
+        print('Labels:', labels)
         
         loss = loss_function(outputs, labels)
         
