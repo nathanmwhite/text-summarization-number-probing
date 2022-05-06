@@ -389,7 +389,13 @@ class DecodingModel(torch.nn.Module):
 
         embeddings = encoder_state.detach()[:, :-1]
 
-        y_pred = self.sequential(embeddings).squeeze(-1)
+        y_pred = self.sequential(embeddings)
+        
+        y_pred = y_pred.squeeze(-1)
+        
+        # testing only
+        print('Embeddings_out dims:', embeddings.size())
+        print('Y_pred dims:', y_pred.size())
 
         return y_pred
     
