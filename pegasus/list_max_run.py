@@ -158,6 +158,8 @@ if __name__ == '__main__':
     padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1 \
         - start_token_length
     
+    print('Padded seq len:', padded_seq_len)
+    
     if args.embedding_model == 'UniLM':
         training_batch_size = 1
     else:
