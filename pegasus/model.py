@@ -331,22 +331,27 @@ class DecodingModel(torch.nn.Module):
             self.embedding_type = 'Pegasus'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layer_norm.normalized_shape[0]
+            self.has_start_token = False
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
+            self.has_start_token = True
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
             input_dim = encoder.layernorm_embedding.normalized_shape[0]
+            self.has_start_token = True
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
             input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
+            self.has_start_token = True
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
             input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
         
         hidden_dim = 50
 
@@ -387,7 +392,12 @@ class DecodingModel(torch.nn.Module):
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
 
-        embeddings = encoder_state.detach()[:, :-1]
+        # slice off start and end tokens
+        if self.has_start_token:
+            start = 1
+        else:
+            start = 0
+        embeddings = encoder_state.detach()[:, start:-1]
 
         y_pred = self.sequential(embeddings)
         
