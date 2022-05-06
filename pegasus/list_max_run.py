@@ -21,9 +21,9 @@ from torchmetrics import Accuracy
 
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
-from model import MaxProbingModel, report_phase, freeze_module
-from generate_data import generate_data
-from util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
+from .model import MaxProbingModel, report_phase, freeze_module
+from .generate_data import generate_data
+from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
@@ -141,9 +141,14 @@ if __name__ == '__main__':
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, 'ListMax',
         use_word_format=args.use_words)
-    
+
+    if args.embedding_model == 'UniLM':
+        training_batch_size = 1
+    else:
+        training_batch_size = 64
+        
     training_dataloader = DataLoader(training_dataset, 
-                                     batch_size=64, 
+                                     batch_size=training_batch_size, 
                                      shuffle=True)
     test_dataloader = DataLoader(test_dataset, 
                                  batch_size=1, 
