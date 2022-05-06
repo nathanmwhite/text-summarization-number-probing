@@ -271,8 +271,11 @@ class MaxProbingModel(torch.nn.Module):
         # hidden_dim*2 because input is from a bidirectional LSTM
         # output 1 is from the orig code, and produces exactly one 
         #     output per word
+        # this logic does not work with the tokenizer behavior:
+        #  the individual numbers are broken up into multiple tokens,
+        #  meaning that output 1 per word is impossible
         self.linear = torch.nn.Linear(in_features=hidden_dim*2, 
-                                      out_features=1) 
+                                      out_features=5)
         
     def forward(self, input_text):
         if self.embedding_type == 'Pegasus':
