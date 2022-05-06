@@ -333,7 +333,7 @@ class MaxProbingModel(torch.nn.Module):
         #      metrics is written.
         
         # testing only
-        print('Logits size:', logits.size())
+        #print('Logits size:', logits.size())
         
         y_pred = torch.nn.functional.log_softmax(logits, dim=1)
         
