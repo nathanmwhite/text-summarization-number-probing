@@ -238,7 +238,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         return terms[idx]
     
  
-    if task in ('Decoder', 'Percent', 'Basis_Points', 'Units', 'Orders'):
+    if task in ('Decoding', 'Percent', 'Basis_Points', 'Units', 'Orders'):
         datapoint_length = 1
     elif task in ('Addition', 'Ranges'):
         datapoint_length = 2
