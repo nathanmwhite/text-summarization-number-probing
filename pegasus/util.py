@@ -86,6 +86,8 @@ def get_embedding_model(model_name):
         # TODO: test if AutoModelForConditionalGeneration works; 
         #  default listed is AutoModelForSeq2SeqLM
         embedding_model = ProphetNetForConditionalGeneration.from_pretrained(model_name)
+        # use_cache=False to avoid clash with gradient checkpointing used by ProphetNet
+        embedding_model.config.use_cache = False
     elif model_name == MODEL_NAME_MAP['UniLM']:
         VOCAB_SIZE = 30522
         TYPE_VOCAB_SIZE = 2
