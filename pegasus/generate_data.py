@@ -427,11 +427,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_data_strings = [[n[1].format(a=n[0][0], b=n[0][1])] for n in zip(test_data, test_range_terms)]
     elif task == 'Orders':
         if use_word_format:
-            training_data_strings = [[' '.join(num2words(n[0]), n[1])] for n in zip(training_data, training_order_terms)]
-            test_data_strings = [[' '.join(num2words(n[0]), n[1])] for n in zip(test_data, test_order_terms)]
+            training_data_strings = [[' '.join((num2words(n[0]), n[1]))] for n in zip(training_data, training_order_terms)]
+            test_data_strings = [[' '.join((num2words(n[0]), n[1]))] for n in zip(test_data, test_order_terms)]
         else:
-            training_data_strings = [[' '.join(str(n[0]), n[1])] for n in zip(training_data, training_order_terms)]
-            test_data_strings = [[' '.join(str(n[0]), n[1])] for n in zip(test_data, test_order_terms)]
+            training_data_strings = [[' '.join((str(n[0]), n[1]))] for n in zip(training_data, training_order_terms)]
+            test_data_strings = [[' '.join((str(n[0]), n[1]))] for n in zip(test_data, test_order_terms)]
     else:
         if use_word_format:
             training_data_strings = [[num2words(n) for n in line]
