@@ -134,6 +134,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         # 2. they shuffled and split based on string representations (unlikely because Gaussian wouldn't work then)
         # I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
         #  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
+        # prevents log(0) or log(negative); numbers such as 0 billion are unnatural anyway
+        if task == 'Orders' and sample_min <= 0:
+            sample_min = 1
         data_range = np.asarray(range(sample_min, sample_max + 1))
 
         np.random.shuffle(data_range)
