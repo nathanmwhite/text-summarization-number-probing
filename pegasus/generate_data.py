@@ -135,6 +135,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         # I conclude they shuffled and split based on the integer numbers, meaning different integers would be seen in training and testing
         #  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
         # prevents log(0) or log(negative); numbers such as 0 billion are unnatural anyway
+        print(sample_min)
         if task == 'Orders' and sample_min <= 0:
             sample_min = 1
         data_range = np.asarray(range(sample_min, sample_max + 1))
