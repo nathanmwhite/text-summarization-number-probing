@@ -136,10 +136,10 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         #  --checked: This is in fact what they did in their code: numeracy/max.py, lines 143-149
         # prevents log(0) or log(negative); numbers such as 0 billion are unnatural anyway
 
-#         if task == 'Orders' and sample_min <= 0:
-#             sample_min = 1
+        nonlocal sample_min
+        if task == 'Orders' and sample_min <= 0:
+            sample_min = 1
         data_range = np.asarray(range(sample_min, sample_max + 1))
-        print(sample_min)
 
         np.random.shuffle(data_range)
         split = math.floor(data_range.size * 0.8)
