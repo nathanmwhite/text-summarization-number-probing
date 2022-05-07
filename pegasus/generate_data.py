@@ -323,6 +323,14 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_data_numpy = np.array(test_data).squeeze(-1)
         test_order_numpy = np.array([[order_dict[term]] for term in test_order_terms])
         test_order_numpy = test_order_numpy.squeeze(-1)
+    elif task == 'Percent': #TODO: determine why this needs to be squeezed but Decoding does not
+        training_data = generation_loop(training_pool, num_training_examples)
+        test_data = generation_loop(test_pool, num_test_examples)
+        
+        # Convert to Numpy arrays and generate target values
+        training_data_numpy = np.array(training_data).squeeze(-1)
+
+        test_data_numpy = np.array(test_data).squeeze(-1)
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
