@@ -310,9 +310,7 @@ class MaxProbingModel(torch.nn.Module):
           # self.h0 needs to be the initial hidden state for each element
           #  in the input sequence; likewise for self.c0
         
-        embeddings_concat = torch.flatten(embeddings, start_dim=1)
-        
-        hidden_vectors = self.bilstm(embeddings_concat)
+        hidden_vectors = self.bilstm(embeddings)
         # .size is a method, not a property (unlike tensorflow shape)
         # hidden_vectors[0] has size [1, 5, 10]
         # From Wallace et al. (2019):
@@ -324,7 +322,8 @@ class MaxProbingModel(torch.nn.Module):
         #      states of the model
         # likewise, they do not specify h0 or c0 in their code, and do 
         #     not feed any into the bilstm
-        logits = self.linear(hidden_vectors[0]).squeeze(-1)
+        embeddings_concat = torch.flatten(hidden_vectors[0], start_dim=1)
+        logits = self.linear(embeddings_concat).squeeze(-1)
         
         # TODO: review choice to use log_softmax here,
         #  as pytorch's CrossEntropyLoss implicitly applies softmax and
