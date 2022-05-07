@@ -164,7 +164,7 @@ if __name__ == '__main__':
     #    I currently recall that DecodingModel may
     #    not be appropriate to handle the two-element
     #    width of the input
-    dm = DecodingModel(embedding_model).to(device)
+    dm = DecodingModel(embedding_model, padded_seq_len).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
