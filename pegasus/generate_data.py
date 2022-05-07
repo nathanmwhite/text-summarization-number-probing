@@ -314,11 +314,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                       num_test_examples,
                                                       orders=True)
         # Convert to Numpy arrays and generate target values
-        training_data_numpy = np.array(training_data)
+        training_data_numpy = np.array(training_data).squeeze(-1)
         training_order_numpy = np.array([[order_dict[term]] for term in training_order_terms])
+        training_order_numpy = training_order_numpy.squeeze(-1)
 
-        test_data_numpy = np.array(test_data)
+        test_data_numpy = np.array(test_data).squeeze(-1)
         test_order_numpy = np.array([[order_dict[term]] for term in test_order_terms])
+        test_order_numpy = test_order_numpy.squeeze(-1)
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
