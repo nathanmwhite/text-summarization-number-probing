@@ -145,6 +145,10 @@ if __name__ == '__main__':
         training_batch_size = 1
     else:
         training_batch_size = 64
+        
+    # testing purposes    
+    print(training_dataset[0][0]['input_ids'].size())
+    print(test_dataset[0][0]['input_ids'].size())
     
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=training_batch_size, 
