@@ -228,28 +228,28 @@ class MaxProbingModel(torch.nn.Module):
         if type(self.embedding_model) == PegasusForConditionalGeneration:
             self.embedding_type = 'Pegasus'
             encoder = self.embedding_model.model.encoder
-            bilstm_input_dim = encoder.layer_norm.normalized_shape[0] * padded_seq_len
+            bilstm_input_dim = encoder.layer_norm.normalized_shape[0]
             self.has_start_token = False
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
             # specific to T5-small; T5-base last is block[11]
-            bilstm_input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * padded_seq_len
+            bilstm_input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
             self.has_start_token = False
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
-            bilstm_input_dim = encoder.layernorm_embedding.normalized_shape[0] * padded_seq_len
+            bilstm_input_dim = encoder.layernorm_embedding.normalized_shape[0]
             self.has_start_token = True
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            bilstm_input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
+            bilstm_input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
             self.has_start_token = False
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
         
         # TODO: determine improved implementation of h0 and c0
@@ -274,7 +274,7 @@ class MaxProbingModel(torch.nn.Module):
         # this logic does not work with the tokenizer behavior:
         #  the individual numbers are broken up into multiple tokens,
         #  meaning that output 1 per word is impossible
-        self.linear = torch.nn.Linear(in_features=hidden_dim*2, 
+        self.linear = torch.nn.Linear(in_features=hidden_dim*2*padded_seq_len, 
                                       out_features=5)
         
     def forward(self, input_text):
