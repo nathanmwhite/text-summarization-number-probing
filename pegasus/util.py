@@ -36,7 +36,7 @@ def check_arguments(args):
 def obtain_units(source_loc):
     with open(source_loc, 'r') as f:
         unit_strings = f.readlines()
-    units = (tuple(line.rstrip().split('/')) for line in unit_strings)
+    units = tuple(tuple(line.rstrip().split('/')) for line in unit_strings)
     return units
 
 
