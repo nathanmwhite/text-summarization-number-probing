@@ -19,6 +19,8 @@ import math
 import torch
 from torch.utils.data import DataLoader
 
+from torchmetrics import Accuracy
+
 from .generate_data import generate_data
 from .model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
 from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
@@ -43,6 +45,18 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         loss = loss_function(outputs, labels)
         
         loss.backward()
+        
+        label_int_tensor = torch.argmax(labels, axis=-1)
+        
+        # testing only
+        #print(label_int_tensor.device)
+        #print(outputs.device)
+        
+        # torchmetrics implementation requires transfer to CPU
+        labels_cpu = label_int_tensor.to("cpu")
+        outputs_cpu = outputs.to("cpu")
+        
+        batch_accuracy = accuracy(outputs_cpu, labels_cpu)
                 
         optimizer.step()
         
@@ -60,21 +74,24 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     return batch_loss, continuing_loss, total_loss
 
 
-def evaluate(model, loss_function, eval_dataloader):
+def evaluate(model, eval_dataloader):
     model.eval()
-    
-    total_loss = 0.0
+    accuracy = Accuracy()
     
     for i, data_point in enumerate(eval_dataloader):
         inputs, labels = data_point
         
         output = model(inputs)
         
-        loss = loss_function(output, labels)
+        label_int_tensor = torch.argmax(labels, axis=-1)
         
-        total_loss += loss.item()
+        # torchmetrics implementation requires transfer to CPU
+        labels_cpu = label_int_tensor.to("cpu")
+        outputs_cpu = output.to("cpu")
         
-    return total_loss
+        _ = accuracy(outputs_cpu, labels_cpu)
+        
+    return accuracy.compute()
   
   
 if __name__ == '__main__':
@@ -176,11 +193,9 @@ if __name__ == '__main__':
     phase_message = 'Model set up.'
     report_phase(phase_message)
     
-    loss_fn = torch.nn.MSELoss()
+    loss_fn = torch.nn.CrossEntropyLoss()
     
     # hyperparameters per Wallace et al. (2019) code
-    # TODO: learning rate is too big after epoch 35 or so
-    # need to implement a LR scheduler
     if args.freeze_embedder:
         optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, dm.parameters()), 
                                     lr=args.lr, 
@@ -226,7 +241,6 @@ if __name__ == '__main__':
     report_phase(message)
     message = 'Begin evaluation.'
     report_phase(message)
-    mse = evaluate(dm, loss_fn, test_dataloader)
-    rmse = math.sqrt(mse)
-    message = f"Test RMSE: {rmse}"
+    accuracy = evaluate(mpm, test_dataloader)
+    message = f"Test accuracy: {accuracy}"
     report_phase(message)
