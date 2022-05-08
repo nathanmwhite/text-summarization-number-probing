@@ -186,9 +186,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         idx = random.randint(0, maximum)
         target_index, singular_form, plural_form = units_data[idx]
         if singular:
-            return singular_form, target_index
+            return singular_form, int(target_index)
         else:
-            return plural_form, target_index
+            return plural_form, int(target_index)
     
     # TODO: evaluate whether to tease out two version for the different tasks
     def generation_loop(pool, num_examples, units=False, ranges=False, orders=False):
