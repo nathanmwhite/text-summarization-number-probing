@@ -141,7 +141,7 @@ if __name__ == '__main__':
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
-        n_training_examples, n_test_examples, 'Addition',
+        n_training_examples, n_test_examples, 'Ranges',
         use_word_format=args.use_words)
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
