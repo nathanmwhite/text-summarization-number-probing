@@ -19,9 +19,9 @@ import math
 import torch
 from torch.utils.data import DataLoader
 
-from generate_data import generate_data
-from model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
-from util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
+from .generate_data import generate_data
+from .model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
+from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
@@ -116,16 +116,16 @@ if __name__ == '__main__':
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
     
-    if args.basis_points == True:
-        task = 'Basis_Points'
+    if args.context_units == True:
+        task = 'Context_Units'
     else:
-        task = 'Percent'
+        task = 'Units'
     
     phase_message = 'Begin generating dataset.'
     report_phase(phase_message)
     
-    units_path = "../units_processing/units.txt"
-    data_path = "../units_processing/data.txt"
+    units_path = "text-summarization-number-probing/units_processing/units.txt"
+    data_path = "text-summarization-number-probing/units_processing/data.txt"
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
@@ -133,8 +133,27 @@ if __name__ == '__main__':
         use_word_format=args.use_words,
         units_loc=units_path, data_loc=data_path)
     
+    if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
+        start_token_length = 0
+    elif args.embedding_model in ('Bart', 'DistilBart', 'UniLM'):
+        start_token_length = 1
+#     else:
+#         raise ValueError('Error: --embedding_model must be a valid model type.')
+    
+    padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1 \
+        - start_token_length
+    output_dim = training_dataset[0][1].size()[-1]
+    print('Output_dim:', output_dim)
+    
+    print('Padded seq len:', padded_seq_len)
+    
+    if args.embedding_model == 'UniLM':
+        training_batch_size = 1
+    else:
+        training_batch_size = 64
+    
     training_dataloader = DataLoader(training_dataset, 
-                                     batch_size=64, 
+                                     batch_size=training_batch_size, 
                                      shuffle=True)
     test_dataloader = DataLoader(test_dataset, 
                                  batch_size=1, 
@@ -150,9 +169,9 @@ if __name__ == '__main__':
     embedding_model = embedding_model.to(device)
     
     if args.context_units:
-        dm = ContextUnitsModel(embedding_model).to(device)
+        dm = ContextUnitsModel(embedding_model, output_dim, padded_seq_len).to(device)
     else:
-        dm = UnitsModel(embedding_model).to(device)
+        dm = UnitsModel(embedding_model, output_dim, padded_seq_len).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
