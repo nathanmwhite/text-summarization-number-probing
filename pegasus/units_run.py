@@ -26,10 +26,12 @@ from .model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
 from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 
 
-def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
+def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_classes):
     batch_loss = 0.0
     continuing_loss = 0.0
     total_loss = 0.0
+    
+    accuracy = Accuracy(num_classes=num_classes)
     
     for i, data_batch in enumerate(training_data_loader):
         inputs, labels = data_batch
@@ -217,9 +219,8 @@ if __name__ == '__main__':
         # Make sure gradient tracking is on, and do a pass over the data
         dm.train(True)
         avg_loss, continuing_loss, total_loss = train_epoch(
-            epoch_number, training_dataloader, dm,
-                                                            loss_fn, 
-                                                            optimizer)
+            epoch_number, training_dataloader, dm, loss_fn, 
+            optimizer, output_dim)
         
         phase_message = f"End of epoch average batch loss: {avg_loss}"
         report_phase(phase_message)
@@ -235,10 +236,13 @@ if __name__ == '__main__':
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     model_path = f"model_{timestamp}_{epoch_number}"
     torch.save(dm.state_dict(), model_path)
-        
+    
     # testing and metrics
     message = 'Training finished.'
     report_phase(message)
+    
+    dm.eval()
+    
     message = 'Begin evaluation.'
     report_phase(message)
     accuracy = evaluate(mpm, test_dataloader)
