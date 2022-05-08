@@ -87,11 +87,11 @@ def evaluate(model, loss_function, eval_dataloader):
     total_loss = 0.0
     
     for i, data_point in enumerate(eval_dataloader):
-        inputs, labels = data_point
+        inputs, labels_y1, labels_y2 = data_point
         
-        output = model(inputs)
+        output_y1, output_y2 = model(inputs)
         
-        loss = loss_function(output, labels)
+        loss = loss_function(output_y1, output_y2, labels_y1, labels_y2)
         
         total_loss += loss.item()
         
