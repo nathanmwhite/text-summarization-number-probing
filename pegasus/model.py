@@ -701,14 +701,14 @@ class RangeModel(torch.nn.Module):
         self.joined_linear = torch.nn.Linear(in_features=input_dim,
                                              out_features=hidden_dim)
         self.joined_sequential = torch.nn.Sequential(self.joined_linear,
-                                                     torch.nn.ReLU)
+                                                     torch.nn.ReLU())
         
         self.linear_left_1 = torch.nn.Linear(in_features=hidden_dim,
                                              out_features=hidden_dim)
         self.linear_left_2 = torch.nn.Linear(in_features=hidden_dim,
                                              out_features=1)
         self.left_sequential = torch.nn.Sequential(self.linear_left_1,
-                                                   torch.nn.ReLU,
+                                                   torch.nn.ReLU(),
                                                    self.linear_left_2)
         
         self.linear_right_1 = torch.nn.Linear(in_features=hidden_dim,
@@ -716,7 +716,7 @@ class RangeModel(torch.nn.Module):
         self.linear_right_2 = torch.nn.Linear(in_features=hidden_dim,
                                               out_features=1)
         self.right_sequential = torch.nn.Sequential(self.linear_right_1,
-                                                    torch.nn.ReLU,
+                                                    torch.nn.ReLU(),
                                                     self.linear_right_2)
         
     def forward(self, input_text):
