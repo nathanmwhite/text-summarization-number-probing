@@ -33,11 +33,11 @@ class SiameseMSELoss(torch.nn.Module):
     # this implementation may make it problematic to train the separate
     #    components individually
     # TODO: test actual behavior of this approach
-    def forward(self, x, y1, y2):
+    def forward(self, y_hat_1, y_hat_2, y1, y2):
         print('Calling forward: mse_1')
-        mse_out_1 = self.mse_1(x, y1)
+        mse_out_1 = self.mse_1(y_hat_1, y1)
         print('Calling forward: mse_2')
-        mse_out_2 = self.mse_2(x, y2)
+        mse_out_2 = self.mse_2(y_hat_2, y2)
         return mse_out_1 + mse_out_2
 
 
@@ -47,11 +47,11 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     total_loss = 0.0
     
     for i, data_batch in enumerate(training_data_loader):
-        inputs, labels = data_batch
+        inputs, labels_y1, labels_y2 = data_batch
         
         optimizer.zero_grad()
         
-        outputs = model(inputs)
+        output_y1, output_y2 = model(inputs)
         
         # testing only
         #print('Outputs size:', outputs.size())
@@ -60,7 +60,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         # TODO: troubleshoot here
         # Using a target size (torch.Size([64])) that is different
         #     to the input size (torch.Size([64, 2])).
-        loss = loss_function(outputs, labels)
+        loss = loss_function(output_y1, output_y2, labels_y1, labels_y2)
         
         loss.backward()
                 
