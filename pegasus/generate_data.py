@@ -81,7 +81,29 @@ class ProbingDataset(Dataset):
                    'decoder_input_ids': decoder_input_ids}
         
         return _inputs, _output
+    
+class RangeProbingDataset(Dataset):
+    def __init__(self, input_data, decoder_input_data, output_data_y1, output_data_y2):
+        self._inputs = input_data
+        self._decoder_inputs = decoder_input_data
+        self._outputs_y1 = output_data_y1
+        self._outputs_y2 = output_data_y2
+        
+    def __len__(self):
+        return len(self._outputs_y1)
+    
+    def __getitem__(self, idx):
+        input_ids = self._inputs['input_ids'][idx]
+        attention_mask = self._inputs['attention_mask'][idx]
+        decoder_input_ids = self._decoder_inputs[idx]
+        _output_y1 = self._outputs_y1[idx]
+        _output_y2 = self._outputs_y2[idx]
 
+        _inputs = {'input_ids': input_ids, 
+                   'attention_mask': attention_mask, 
+                   'decoder_input_ids': decoder_input_ids}
+        
+        return _inputs, _output_y1, _output_y2
     
     
 # their description does not specify what happens to the obtained value via the Gaussian process
@@ -126,7 +148,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param data_loc (str) : Indicates location of text file containing
         sentences with numbers and units identified as lines, where
         'Context_Units' is task
-    returns : two ProbingDatasets: training, test datasets
+    returns : two ProbingDatasets: training, test datasets;
+        for task 'Ranges', two RangeProbingDatasets: training, test
     """
     def generate_pools():
         # the definition from Wallace et al. could mean:
@@ -380,10 +403,14 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_targets = one_hot(test_tensor, datapoint_length)
         test_targets = test_targets.to(torch.float32).to(device)
     elif task == 'Ranges': # TODO: ensure that target data with final dimension (:,2) works
-        train_tensor = torch.as_tensor(training_data_numpy)
-        training_targets = training_targets.to(torch.float32).to(device)
-        test_tensor = torch.as_tensor(test_data_numpy)
-        test_targets = test_targets.to(torch.float32).to(device)
+        train_tensor_y1 = torch.as_tensor(training_data_numpy[...,0])
+        train_tensor_y2 = torch.as_tensor(training_data_numpy[...,1])
+        training_targets_y1 = train_tensor_y1.to(torch.float32).to(device)
+        training_targets_y2 = train_tensor_y2.to(torch.float32).to(device)
+        test_tensor_y1 = torch.as_tensor(test_data_numpy[...,0])
+        test_tensor_y2 = torch.as_tensor(test_data_numpy[...,1])
+        test_targets_y1 = test_tensor_y1.to(torch.float32).to(device)
+        test_targets_y2 = test_tensor_y2.to(torch.float32).to(device)
     elif task == 'Orders': # TODO: ensure that broadcasting occurs on the correct axis
         train_tensor = torch.as_tensor(np.log(training_data_numpy) + training_order_numpy)
         training_targets = train_tensor.to(torch.float32).to(device)
@@ -486,11 +513,21 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     test_decoder_inputs = test_decoder_inputs.to(device)
     
     # Store in a Dataset object
-    training_dataset = ProbingDataset(training_data_tokenized, 
-                                      training_decoder_inputs, 
-                                      training_targets)
-    test_dataset = ProbingDataset(test_data_tokenized, 
-                                  test_decoder_inputs, 
-                                  test_targets)
+    if task == 'Ranges':
+        training_dataset = RangeProbingDataset(training_data_tokenized,
+                                               training_decoder_inputs,
+                                               training_targets_y1,
+                                               training_targets_y2)
+        test_dataset = RangeProbingDataset(test_data_tokenized,
+                                           test_decoder_inputs,
+                                           test_targets_y1,
+                                           test_targets_y2)
+    else:
+        training_dataset = ProbingDataset(training_data_tokenized, 
+                                          training_decoder_inputs, 
+                                          training_targets)
+        test_dataset = ProbingDataset(test_data_tokenized, 
+                                      test_decoder_inputs, 
+                                      test_targets)
     
     return training_dataset, test_dataset
