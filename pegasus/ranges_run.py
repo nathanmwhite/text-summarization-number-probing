@@ -34,7 +34,9 @@ class SiameseMSELoss(torch.nn.Module):
     #    components individually
     # TODO: test actual behavior of this approach
     def forward(self, x, y1, y2):
+        print('Calling forward: mse_1')
         mse_out_1 = self.mse_1(x, y1)
+        print('Calling forward: mse_2')
         mse_out_2 = self.mse_2(x, y2)
         return mse_out_1 + mse_out_2
 
