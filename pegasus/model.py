@@ -665,7 +665,7 @@ class ContextUnitsModel(torch.nn.Module):
 # TODO: this has variable length input by nature;
 #    check to ensure this works given in the inputs
 class RangeModel(torch.nn.Module):
-    def __init__(self, embedding_model, hidden_dim=5):
+    def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=5):
         super(RangeModel, self).__init__()
         
         self.embedding_model = embedding_model
@@ -673,23 +673,28 @@ class RangeModel(torch.nn.Module):
         if type(self.embedding_model) == PegasusForConditionalGeneration:
             self.embedding_type = 'Pegasus'
             encoder = self.embedding_model.model.encoder
-            input_dim = encoder.layer_norm.normalized_shape[0] * 2
+            input_dim = encoder.layer_norm.normalized_shape[0] * padded_seq_len
+            self.has_start_token = False
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * 2
+            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * padded_seq_len
+            self.has_start_token = False
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
             encoder = self.embedding_model.model.encoder
-            input_dim = encoder.layernorm_embedding.normalized_shape[0] * 2
+            input_dim = encoder.layernorm_embedding.normalized_shape[0] * padded_seq_len
+            self.has_start_token = True
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * 2
+            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
+            self.has_start_token = False
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            input_dim = encoder.layer[11].output.dense.out_features * 2
+            input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
+            self.has_start_token = True
 
         hidden_dim = 50
         
@@ -737,7 +742,12 @@ class RangeModel(torch.nn.Module):
             
         encoder_state = forward.encoder_last_hidden_state
         
-        embeddings = encoder_state.detach()[:, :-1]
+        # slice off start and end tokens
+        if self.has_start_token:
+            start = 1
+        else:
+            start = 0
+        embeddings = encoder_state.detach()[:, start:-1]
         
         embeddings_concat = torch.flatten(embeddings, start_dim=1)
         
