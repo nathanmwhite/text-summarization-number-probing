@@ -739,8 +739,6 @@ class RangeModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
-            
-        encoder_state = forward.encoder_last_hidden_state
         
         # slice off start and end tokens
         if self.has_start_token:
