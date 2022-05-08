@@ -245,6 +245,6 @@ if __name__ == '__main__':
     
     message = 'Begin evaluation.'
     report_phase(message)
-    accuracy = evaluate(mpm, test_dataloader)
+    accuracy = evaluate(dm, test_dataloader)
     message = f"Test accuracy: {accuracy}"
     report_phase(message)
