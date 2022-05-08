@@ -82,6 +82,7 @@ class ProbingDataset(Dataset):
         
         return _inputs, _output
     
+    
 class RangeProbingDataset(Dataset):
     def __init__(self, input_data, decoder_input_data, output_data_y1, output_data_y2):
         self._inputs = input_data
@@ -265,7 +266,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         idx = np.random.randint(len(terms))
         return terms[idx]
     
- 
+    # here, I redefine datapoint_length; should not be necessary
+    # TODO: fix
     if task in ('Decoding', 'Percent', 'Basis_Points', 'Units', 'Orders'):
         datapoint_length = 1
     elif task in ('Addition', 'Ranges'):
@@ -277,6 +279,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     # Generate example values
     if task == 'Units':
         units_data = obtain_units(units_loc)
+        max_idx = len(units_data) - 1
         training_data, training_units, training_targets = generation_loop(training_pool,
                                                                           num_training_examples,
                                                                           units=True)
@@ -397,10 +400,10 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     # TODO: confirm if this can be integrated into Decoding task above
     elif task in ('Units', 'Context_Units'):
         train_tensor = torch.as_tensor(training_data_numpy)
-        training_targets = one_hot(train_tensor, datapoint_length)
+        training_targets = one_hot(train_tensor, max_idx)
         training_targets = training_targets.to(torch.float32).to(device)
         test_tensor = torch.as_tensor(test_data_numpy)
-        test_targets = one_hot(test_tensor, datapoint_length)
+        test_targets = one_hot(test_tensor, max_idx)
         test_targets = test_targets.to(torch.float32).to(device)
     elif task == 'Ranges': # TODO: ensure that target data with final dimension (:,2) works
         train_tensor_y1 = torch.as_tensor(training_data_numpy[...,0])
