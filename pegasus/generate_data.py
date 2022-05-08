@@ -287,8 +287,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                               num_test_examples,
                                                               units=True)
 
-        training_data_numpy = np.array(training_targets)
-        test_data_numpy = np.array(test_targets)
+        training_data_numpy = np.array(training_targets).squeeze(1)
+        test_data_numpy = np.array(test_targets).squeeze(1)
     elif task == 'Context_Units':
         assert(data_loc is not None)
         assert(units_loc is not None)
