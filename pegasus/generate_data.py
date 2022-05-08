@@ -444,17 +444,17 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     elif task == 'Units':
         if use_word_format:
             train_num_unit_pairs = zip([[num2words(n) for n in line]
-                                        for n in training_data], 
+                                        for line in training_data], 
                                        training_units)
             test_num_unit_pairs = zip([[num2words(n) for n in line]
-                                       for n in test_data],
+                                       for line in test_data],
                                       test_units)
         else:
             train_num_unit_pairs = zip([[str(n) for n in line]
-                                        for n in training_data],
+                                        for line in training_data],
                                        training_units)
             test_num_unit_pairs = zip([[str(n) for n in line]
-                                       for n in test_data],
+                                       for line in test_data],
                                       test_units)
         # TODO: test and likely remove: this appears duplicated below as 'joined_training_data'
         training_data_strings = [[' '.join(n[0] for n in line)] for line in train_num_unit_pairs]
