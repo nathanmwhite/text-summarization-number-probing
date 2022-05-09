@@ -330,6 +330,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         # Convert to Numpy arrays and generate target values
         # sort to ensure lower number comes first
         training_data_numpy = np.sort(np.array(training_data), axis=-1)
+        # testing only
+        print(training_data_numpy)
 
         test_data_numpy = np.sort(np.array(test_data), axis=-1)
     elif task == 'Orders': # TODO: review order terms
