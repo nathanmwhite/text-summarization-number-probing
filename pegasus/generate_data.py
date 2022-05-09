@@ -252,7 +252,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         units_data = obtain_units(units_loc)
 
         # raw_data is of format [sentence[tab]number[tab]target_unit_idx]
-        with open(data_loc, 'r') as f:
+        with open(data_loc, 'r', encoding='iso-8859-1') as f:
             raw_data = f.readlines()
 
         data = [tuple(line.rstrip().split('\t')) for line in raw_data]
