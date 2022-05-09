@@ -144,7 +144,7 @@ if __name__ == '__main__':
     report_phase(phase_message)
     
     units_path = "text-summarization-number-probing/units_processing/units.txt"
-    data_path = "text-summarization-number-probing/units_processing/data.txt"
+    data_path = "text-summarization-number-probing/units_processing/context_units.csv"
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
