@@ -328,9 +328,10 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                       ranges=True)
         
         # Convert to Numpy arrays and generate target values
-        training_data_numpy = np.array(training_data)
+        # sort to ensure lower number comes first
+        training_data_numpy = np.sort(np.array(training_data), axis=-1)
 
-        test_data_numpy = np.array(test_data)
+        test_data_numpy = np.sort(np.array(test_data), axis=-1)
     elif task == 'Orders': # TODO: review order terms
         order_terms = ('thousand', 'K', 'million', 'mln', 'mn', 'm', 'crore', 'billion', 'bn', 'bln', 'trillion')
         order_dict = {'thousand': math.log(1e3),
