@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         dm.train(True)
-        avg_loss, continuing_loss, total_loss = train_epoch(
+        avg_loss, continuing_loss, acc = train_epoch(
             epoch_number, training_dataloader, dm, loss_fn, 
             optimizer, output_dim)
         
