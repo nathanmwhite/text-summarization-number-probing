@@ -277,11 +277,17 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     
     # Generate pools from which to draw example values
     training_pool, test_pool = generate_pools()
-                                       
-    # Generate example values
-    if task == 'Units':
+    
+    if task in ('Units', 'Context_Units'):
+        # essentially reloading obtain_units twice
+        # may be better to factor obtain_units out
+        #  of extract_data above to prevent duplication
+        # TODO
         units_data = obtain_units(units_loc)
         max_idx = len(units_data) - 1
+    
+    # Generate example values
+    if task == 'Units':
         training_data, training_units, training_targets = generation_loop(training_pool,
                                                                           num_training_examples,
                                                                           units=True)
