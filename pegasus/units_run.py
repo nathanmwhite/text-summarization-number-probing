@@ -73,7 +73,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_
             logging.info(loss_message)
             continuing_loss = 0.0
             
-    return batch_loss, continuing_loss, total_loss
+    return batch_loss, continuing_loss, accuracy.compute()
 
 
 def evaluate(model, eval_dataloader):
@@ -233,7 +233,7 @@ if __name__ == '__main__':
         report_phase(phase_message)
         phase_message = f"End of epoch last loss: {continuing_loss}"
         report_phase(phase_message)
-        phase_message = f"Epoch total loss: {total_loss}"
+        phase_message = f"Epoch accuracy: {acc}"
         report_phase(phase_message)
         
         epoch_number += 1
