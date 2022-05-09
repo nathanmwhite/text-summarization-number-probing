@@ -309,6 +309,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
          train_units,
          test_units) = train_test_split(sentences, numbers, units, test_size=0.2, random_state=123)
         
+        # Despite Transformers documentation, produces warning:
+        #  Using sep_token, but it is not set yet.
         sep_token = tokenizer.sep_token
   
         training_data = [s.split(' ') + [sep_token] + [n] for s, n in zip(train_sents, train_numbers)]
