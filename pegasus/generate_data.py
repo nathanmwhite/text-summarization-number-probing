@@ -294,12 +294,12 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         assert(units_loc is not None)
         sentences, numbers, units = extract_data(data_loc, units_loc)
         # split into train and test sets
-        train_sents, 
-        test_sents, 
-        train_numbers, 
-        test_numbers, 
-        train_units,
-        test_units = train_test_split(sentences, numbers, units, test_size=0.2, random_state=123)
+        (train_sents, 
+         test_sents, 
+         train_numbers, 
+         test_numbers, 
+         train_units,
+         test_units) = train_test_split(sentences, numbers, units, test_size=0.2, random_state=123)
         
         sep_token = tokenizer.sep_token
   
