@@ -110,6 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=10)
+    parser.add_argument('--hidden_dim', type=int, default=64)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
     parser.add_argument('--context_units', type=bool, default=False)
     parser.add_argument('--log_filename', type=str, default='decoding_units.log')
@@ -188,9 +189,15 @@ if __name__ == '__main__':
     embedding_model = embedding_model.to(device)
     
     if args.context_units:
-        dm = ContextUnitsModel(embedding_model, output_dim, padded_seq_len).to(device)
+        dm = ContextUnitsModel(embedding_model, 
+                               output_dim, 
+                               padded_seq_len, 
+                               args.hidden_dim).to(device)
     else:
-        dm = UnitsModel(embedding_model, output_dim, padded_seq_len).to(device)
+        dm = UnitsModel(embedding_model, 
+                        output_dim, 
+                        padded_seq_len,
+                        args.hidden_dim).to(device)
 
     phase_message = 'Model set up.'
     report_phase(phase_message)
