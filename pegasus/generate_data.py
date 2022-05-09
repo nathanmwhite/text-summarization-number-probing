@@ -500,14 +500,29 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     # Note: input_data submitted to Dataset needs to be tensors, since .size() must be implemented
     # padding=True since some tokenizers and datasets give varying-length data
     joined_training_data = [' '.join(line) for line in training_data_strings]
-    training_data_tokenized = tokenizer(joined_training_data,
+    joined_test_data = [' '.join(line) for line in test_data_strings]    
+    
+    # TODO: is_split_into_words
+    if task == 'Context_Units':
+        tokenizer.padding_side = 'left'
+        padding_pattern = 'max_length'
+        max_length = 128
+        training_data_tokenized = tokenizer(joined_training_data,
+                                            padding=padding_pattern,
+                                            max_length=max_length,
+                                            return_tensors="pt").to(device)
+        test_data_tokenized = tokenizer(joined_training_data,
+                                        padding=padding_pattern,
+                                        max_length=max_length,
+                                        return_tensors="pt").to(device)
+    else:
+        training_data_tokenized = tokenizer(joined_training_data,
+                                            padding=True,
+                                            return_tensors="pt").to(device)
+    
+        test_data_tokenized = tokenizer(joined_test_data,
                                         padding=True,
                                         return_tensors="pt").to(device)
-    
-    joined_test_data = [' '.join(line) for line in test_data_strings]
-    test_data_tokenized = tokenizer(joined_test_data,
-                                    padding=True,
-                                    return_tensors="pt").to(device)
     
     # temporary testing only
 #     print(training_data_tokenized.input_ids.size())
