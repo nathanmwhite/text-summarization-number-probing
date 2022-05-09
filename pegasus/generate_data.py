@@ -255,9 +255,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         with open(data_loc, 'r', encoding='iso-8859-1') as f:
             raw_data = f.readlines()
 
-        data = [tuple(line.rstrip().split('\t')) for line in raw_data]
+        data = tuple(tuple(line.rstrip().split('\t')) for line in raw_data)
 
         sentences, numerals, units = zip(*data)
+        
+        units = tuple(int(n) for n in units)
         
         return sentences, numerals, units
     
