@@ -521,7 +521,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                             padding=padding_pattern,
                                             max_length=max_length,
                                             return_tensors="pt").to(device)
-        test_data_tokenized = tokenizer(joined_training_data,
+        test_data_tokenized = tokenizer(joined_test_data,
                                         padding=padding_pattern,
                                         max_length=max_length,
                                         return_tensors="pt").to(device)
