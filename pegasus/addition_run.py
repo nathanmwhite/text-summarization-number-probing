@@ -121,8 +121,8 @@ if __name__ == '__main__':
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
     
-    phase_message = 'Begin generating dataset.'
-    report_phase(phase_message)
+#     phase_message = 'Begin generating dataset.'
+#     report_phase(phase_message)
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
@@ -154,8 +154,8 @@ if __name__ == '__main__':
                                  batch_size=1, 
                                  shuffle=True)
     
-    phase_message = 'Completed generating dataset.'
-    report_phase(phase_message)
+#     phase_message = 'Completed generating dataset.'
+#     report_phase(phase_message)
     
     embedding_model = get_embedding_model(model_name)
         
@@ -165,8 +165,8 @@ if __name__ == '__main__':
     
     am = AdditionModel(embedding_model, padded_seq_len).to(device)
 
-    phase_message = 'Model set up.'
-    report_phase(phase_message)
+#     phase_message = 'Model set up.'
+#     report_phase(phase_message)
     
     loss_fn = torch.nn.MSELoss()
     
@@ -182,14 +182,14 @@ if __name__ == '__main__':
     
     EPOCHS = args.epochs
     
-    phase_message = 'Begin training.'
-    report_phase(phase_message)
+#     phase_message = 'Begin training.'
+#     report_phase(phase_message)
     
     epoch_number = 0
     
     for epoch in range(EPOCHS):
-        epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
-        report_phase(epoch_message)
+#         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
+#         report_phase(epoch_message)
 
         # Make sure gradient tracking is on, and do a pass over the data
         am.train(True)
@@ -208,15 +208,15 @@ if __name__ == '__main__':
         
     # temporary: save last version of model
     # TODO: reimplement to save best version
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    model_path = f"model_{timestamp}_{epoch_number}"
-    torch.save(am.state_dict(), model_path)
+#     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+#     model_path = f"model_{timestamp}_{epoch_number}"
+#     torch.save(am.state_dict(), model_path)
         
     # testing and metrics
-    message = 'Training finished.'
-    report_phase(message)
-    message = 'Begin evaluation.'
-    report_phase(message)
+#     message = 'Training finished.'
+#     report_phase(message)
+#     message = 'Begin evaluation.'
+#     report_phase(message)
     mse = evaluate(am, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
     hyperparam_set = ('Addition trial',
