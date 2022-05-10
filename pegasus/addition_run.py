@@ -98,6 +98,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
     parser.add_argument('--log_filename', type=str, default='addition.log')
+    parser.add_argument('--trial_number', type=int, default=1)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -218,5 +219,15 @@ if __name__ == '__main__':
     report_phase(message)
     mse = evaluate(am, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
+    hyperparam_set = ('Addition trial',
+                      args.embedding_model,
+                      args.training_examples,
+                      args.lr,
+                      args.momentum,
+                      args.epochs,
+                      args.trial_number)
+                      
+    message = f"Model hyperparameters:" + ' | '.join(str(w) for w in hyperparam_set)
+    report_phase(message)
     message = f"Test RMSE: {rmse}"
     report_phase(message)
