@@ -227,7 +227,7 @@ if __name__ == '__main__':
                       args.epochs,
                       args.trial_number)
                       
-    message = f"Model hyperparameters:" + ' | '.join(str(w) for w in hyperparam_set)
+    message = f"Model hyperparameters: " + ' | '.join(str(w) for w in hyperparam_set)
     report_phase(message)
     message = f"Test RMSE: {rmse}"
     report_phase(message)
