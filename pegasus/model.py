@@ -41,6 +41,7 @@ def freeze_module(module, module_type):
                 report_phase(f'Parameter {name} frozen.')
             else: # numbered layers, expandable_layer_types
                 freeze_component(module_)
+                report_phase(f'Expanding {name}.')
     
     if module_type == 'Pegasus':
         # embed_positions may not be necessary
