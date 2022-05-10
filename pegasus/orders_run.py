@@ -156,7 +156,7 @@ if __name__ == '__main__':
     embedding_model = get_embedding_model(model_name)
     
     if args.freeze_embedder:
-        freeze_module(embedding_model, 'Pegasus')
+        freeze_module(embedding_model, args.embedding_model)
     embedding_model = embedding_model.to(device)
     
     # TODO: Confirm that DecodingModel is correct;
