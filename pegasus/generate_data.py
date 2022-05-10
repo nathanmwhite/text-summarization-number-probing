@@ -311,7 +311,12 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         
         # Despite Transformers documentation, produces warning:
         #  Using sep_token, but it is not set yet.
-        sep_token = tokenizer.sep_token
+        # Choice: use sep_token if set, otherwise eos_token
+        #  interpreting eos as end of sentence
+        if tokenizer.sep_token:
+            sep_token = tokenizer.sep_token
+        else:
+            sep_token = tokenizer.eos_token
   
         training_data = [s.split(' ') + [sep_token] + [n] for s, n in zip(train_sents, train_numbers)]
         test_data = [s.split(' ') + [sep_token] + [n] for s, n in zip(test_sents, test_numbers)]
