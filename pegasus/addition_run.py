@@ -217,7 +217,9 @@ if __name__ == '__main__':
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
-    mse = evaluate(am, loss_fn, test_dataloader)
+    am.eval()
+    with torch.no_grad():
+        mse = evaluate(am, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
     hyperparam_set = ('Addition trial',
                       args.embedding_model,
