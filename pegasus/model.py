@@ -156,7 +156,7 @@ def freeze_module(module, module_type):
                                   'transform'}
         
     freeze_component(module)
-    report_phase(f'Parameter freezing successful.')
+#     report_phase(f'Parameter freezing successful.')
     
     
 # def layers_generator(embedding_model):
