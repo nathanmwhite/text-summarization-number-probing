@@ -220,6 +220,10 @@ if __name__ == '__main__':
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
+    dm.eval()
+    with torch.no_grad():
+        mse = evaluate(dm, loss_fn, test_dataloader)
+    rmse = math.sqrt(mse)
     hyperparam_set = ('Orders trial',
                       args.embedding_model,
                       args.training_examples,
@@ -229,7 +233,5 @@ if __name__ == '__main__':
                       args.trial_number)
                       
     message = f"Model hyperparameters: " + ' | '.join(str(w) for w in hyperparam_set)
-    mse = evaluate(dm, loss_fn, test_dataloader)
-    rmse = math.sqrt(mse)
     message = f"Test RMSE: {rmse}"
     report_phase(message)
