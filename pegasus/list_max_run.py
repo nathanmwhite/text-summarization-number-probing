@@ -241,6 +241,9 @@ if __name__ == '__main__':
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
+    mpm.eval()
+    with torch.no_grad():
+        accuracy = evaluate(mpm, test_dataloader)
     hyperparam_set = ('ListMax trial',
                       args.embedding_model,
                       args.training_examples,
@@ -251,7 +254,5 @@ if __name__ == '__main__':
                       
     message = f"Model hyperparameters: " + ' | '.join(str(w) for w in hyperparam_set)
     report_phase(message)
-
-    accuracy = evaluate(mpm, test_dataloader)
     message = f"Test accuracy: {accuracy}"
     report_phase(message)
