@@ -93,6 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--freeze_embedder', type=bool, default=False)
     parser.add_argument('--log_filename', type=str, default='decoding_orders.log')
+    parser.add_argument('--trial_number', type=int, default=1)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -117,8 +118,8 @@ if __name__ == '__main__':
     
     task = 'Orders'
     
-    phase_message = 'Begin generating dataset.'
-    report_phase(phase_message)
+#     phase_message = 'Begin generating dataset.'
+#     report_phase(phase_message)
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
@@ -150,8 +151,8 @@ if __name__ == '__main__':
                                  batch_size=1, 
                                  shuffle=True)
     
-    phase_message = 'Completed generating dataset.'
-    report_phase(phase_message)
+#     phase_message = 'Completed generating dataset.'
+#     report_phase(phase_message)
     
     embedding_model = get_embedding_model(model_name)
     
@@ -166,8 +167,8 @@ if __name__ == '__main__':
     #    width of the input
     dm = DecodingModel(embedding_model, padded_seq_len).to(device)
 
-    phase_message = 'Model set up.'
-    report_phase(phase_message)
+#     phase_message = 'Model set up.'
+#     report_phase(phase_message)
     
     loss_fn = torch.nn.MSELoss()
     
@@ -183,14 +184,14 @@ if __name__ == '__main__':
     
     EPOCHS = args.epochs
     
-    phase_message = 'Begin training.'
-    report_phase(phase_message)
+#     phase_message = 'Begin training.'
+#     report_phase(phase_message)
     
     epoch_number = 0
     
     for epoch in range(EPOCHS):
-        epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
-        report_phase(epoch_message)
+#         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
+#         report_phase(epoch_message)
 
         # Make sure gradient tracking is on, and do a pass over the data
         dm.train(True)
@@ -199,26 +200,35 @@ if __name__ == '__main__':
                                                             loss_fn, 
                                                             optimizer)
         
-        phase_message = f"End of epoch average batch loss: {avg_loss}"
-        report_phase(phase_message)
-        phase_message = f"End of epoch last loss: {continuing_loss}"
-        report_phase(phase_message)
-        phase_message = f"Epoch total loss: {total_loss}"
-        report_phase(phase_message)
+#         phase_message = f"End of epoch average batch loss: {avg_loss}"
+#         report_phase(phase_message)
+#         phase_message = f"End of epoch last loss: {continuing_loss}"
+#         report_phase(phase_message)
+#         phase_message = f"Epoch total loss: {total_loss}"
+#         report_phase(phase_message)
         
         epoch_number += 1
         
     # temporary: save last version of model
     # TODO: reimplement to save best version
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    model_path = f"model_{timestamp}_{epoch_number}"
-    torch.save(dm.state_dict(), model_path)
+#     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+#     model_path = f"model_{timestamp}_{epoch_number}"
+#     torch.save(dm.state_dict(), model_path)
         
     # testing and metrics
-    message = 'Training finished.'
-    report_phase(message)
-    message = 'Begin evaluation.'
-    report_phase(message)
+#     message = 'Training finished.'
+#     report_phase(message)
+#     message = 'Begin evaluation.'
+#     report_phase(message)
+    hyperparam_set = ('Orders trial',
+                      args.embedding_model,
+                      args.training_examples,
+                      args.lr,
+                      args.momentum,
+                      args.epochs,
+                      args.trial_number)
+                      
+    message = f"Model hyperparameters: " + ' | '.join(str(w) for w in hyperparam_set)
     mse = evaluate(dm, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
     message = f"Test RMSE: {rmse}"
