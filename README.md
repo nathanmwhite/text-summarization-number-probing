@@ -6,4 +6,5 @@ This represents the first step of the larger Hmong Medical Text Summarization pr
 
 This repository contains the following folders:
 1. pegasus : code to run number probing for each task, with Pegasus defined as the default.
-2. units_processing : processing code and text files containing the units for the Units and Context_Units probing tasks.
+2. s2s_ft : code for UniLMv2 derived from microsoft/unilm/s2s-ft/s2s_ft and edited for compatibility.
+3. units_processing : processing code and text files containing the units for the Units and Context_Units probing tasks.
