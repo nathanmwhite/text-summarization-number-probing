@@ -1,7 +1,13 @@
-# Text summarization number probing
-## Pegasus
+# Probing of Quantitative Values in Abstractive Summarization Models
+## text-summarization-number-probing/pegasus
 
-This folder contains the code to run number probing on Pegasus.
+This folder contains the code to run quantitative value probing tasks, with Pegasus defined as the default model type. Other model types available if explicitly specified include:
+1. T5
+2. T5+SSR
+3. BART
+4. DistilBART
+5. ProphetNet
+6. UniLMv2
 
 The three basic tasks for number probing (List Maximum, Decoding, Addition) were first proposed for static and contextual embeddings in Wallace et al. (2019). These will be implemented here in a new format that relies on generally available and up-to-date libraries as of 2022.
 
@@ -13,14 +19,12 @@ Beyond these, several additional number probing tests will be supported, includi
 5. Ranges -- This is somewhat similar to Addition in concept, but data containing numerical ranges with units are inputted into an embedder with a siamese MLP at the top that provides the starting and ending numerals representing the endpoints. Data as input is natural language input including sequences such as "2015-2020", "from 6 to 10", "3 to 5", and so on.
 6. Mixed Numeracy -- This is similar to Decoding in concept, but data containing numerical elements with word-based expansion of large numbers is used, with datapoints such as "16.5 mn" or "16.5 million". These are embedded and fed into a MLP for decoding, with the numerical representation matching the real-world number under a logarithmic scale.
 
-Other planned tasks:
+Other tasks that should be considered in a later stage:
 1. Layers -- This is similar to Decoding in concept and architecture, except that only one Encoding layer derived from the original embedding model is involved, in order to identify which parts of the model are involved in numeracy representation.
-
-Additional considerations:
-1. Changes -- Another possible task is handling changes: "sales increased by 8 % to EUR 155.2 mn" or "operating profit rose to EUR 31.1 mn from EUR 17.1 mn in 2004".
+2. Changes -- Another consideration is handling changes: "sales increased by 8 % to EUR 155.2 mn" or "operating profit rose to EUR 31.1 mn from EUR 17.1 mn in 2004".
 
 TODO:
 1. Add protections against exploding gradients. Changing hyperparameters may be enough in this case, with monitoring for infinity/nan issues.
-2. Revisit local/relative import method to prevent future breaks.
-3. Test units and context units tasks.
-4. Confirm that MSE calculations for Ranges task fits the model architecture.
+2. Develop and finalize the dataset for context units.
+3. Confirm that MSE calculations for Ranges task fits the model architecture.
+4. Revisit the Percent task model architecture to ensure avoidance of a recurring training/test size mismatch issue due to differing tokenization methods.
