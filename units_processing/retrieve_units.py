@@ -1,5 +1,14 @@
-# Text summarization number probing
+#!/usr/bin/python
+
+# text-summarization-number-probing
 # Original code Copyright © 2022 Nathan M. White
+"""
+This file contains a script to locate and log the most common
+ single-word unit terms in a dataset.
+This file also contains the useful ancillary function
+ is_a_number, which checks text to see if a number is present,
+ including hyphens and commas.
+"""
 
 # Copyright notice
 __copyright__ = "Copyright © 2022 Nathan M. White"
@@ -14,6 +23,14 @@ logging.basicConfig(filename='retrieve_units.log', level=logging.INFO)
 
 
 def is_a_number(thing):
+    """
+    is_a_number : a function that checks if a string contains
+        a number, including hyphens and commas that normally
+        appear in a number in text
+    @param thing (str) : string to check if it is a number
+    returns bool : True if the string represents a numerical
+        value, False if it does not
+    """
     if thing == '':
         return False
     if thing[0].isdigit() and thing[-1].isdigit():
@@ -27,10 +44,9 @@ def is_a_number(thing):
     return True
 
 
-# TODO: redo logic also to find sequences ending in -s,
+# TODO: consider also searching for sequences ending in -s,
 #   or using stopwords to split
-#   as of now, this does not successfully find unit types
-#   that are multiword
+#   this currently only considers single-word units
 if __name__ == '__main__':
     items_found = []
     for element in data_list:
