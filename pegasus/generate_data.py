@@ -531,12 +531,28 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                         max_length=max_length,
                                         return_tensors="pt").to(device)
     else:
+#         if task == 'Percent':
+#             # prev problem: percent: (input 1x1024 and weight 2048x50) (size 2 vs. 3)
+#             # prev problem: percent: (input 1x2048 and weight 1024x50) (size 3 vs. 2)
+#             # always successful when length is 3 for both
+#             max_length = 3
+#         elif task == 'ListMax':
+#             # prev problem: listmax: (input 1x90 and weight 100x5) (size 10 vs. 11)
+#             max_length = 11
+#         else task == 'Orders':
+#             max_length = 4 # 
+#         tokenizer.padding_side = 'right'
+#         padding_pattern = 'max_length'
         training_data_tokenized = tokenizer(joined_training_data,
                                             padding=True,
-                                            return_tensors="pt").to(device)
-    
+#                                             padding=padding_pattern,
+#                                             max_length=max_length,
+                                            return_tensors="pt").to(device)    
+
         test_data_tokenized = tokenizer(joined_test_data,
                                         padding=True,
+#                                         padding=padding_pattern,
+#                                         max_length=max_length,
                                         return_tensors="pt").to(device)
     
     # temporary testing only
