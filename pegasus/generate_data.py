@@ -554,6 +554,31 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 #                                         padding=padding_pattern,
 #                                         max_length=max_length,
                                         return_tensors="pt").to(device)
+        
+        # training and test data need to be the same length
+        # this approach was chosen to avoid potential confusion
+        #  between training and test sets if fed together into
+        #  tokenizer, even if the task of tokenization is repeated
+        # TODO: test and evaluate performance
+        #  it may be the case that feeding both and separating them again
+        #  may be the better approach
+        training_dim = training_data_tokenized['input_ids'].size()[-1]
+        test_dim = test_data_tokenized['input_ids'].size()[-1]
+        
+        if training_dim != test_dim:
+            tokenizer.padding_side = 'left'
+            padding_pattern = 'max_length'
+            max_length = max(training_dim, test_dim)
+            if training_dim != max_length:
+                training_data_tokenized = tokenizer(joined_training_data,
+                                                    padding=padding_pattern,
+                                                    max_length=max_length,
+                                                    return_tensors="pt").to(device)
+            else:
+                test_data_tokenized = tokenizer(joined_test_data,
+                                                padding=padding_pattern,
+                                                max_length=max_length,
+                                                return_tensors="pt").to(device)          
     
     # temporary testing only
 #     print(training_data_tokenized.input_ids.size())
