@@ -122,7 +122,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   datapoint_length: int=5,
                   use_word_format: bool=False,
                   units_loc: str=None,
-                  data_loc: str=None):
+                  data_loc: str=None,
+                  simple_iteration: bool=False):
     """
     generate_data : Function that generates training and test data for  
         the List Maximum task specified in Wallace et al. (2019).
@@ -149,6 +150,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param data_loc (str) : Indicates location of text file containing
         sentences with numbers and units identified as lines, where
         'Context_Units' is task
+    @param simple_iteration (bool) : if True, dataset is a simple pass
+        through the specified range; if False, dataset is the expected
+        randomly generated data
     returns : two ProbingDatasets: training, test datasets;
         for task 'Ranges', two RangeProbingDatasets: training, test
     """
@@ -372,8 +376,12 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_order_numpy = np.array([[order_dict[term]] for term in test_order_terms])
         test_order_numpy = test_order_numpy.squeeze(-1)
     elif task in ('Percent', 'Basis_Points', 'Decoding'):
-        training_data = generation_loop(training_pool, num_training_examples)
-        test_data = generation_loop(test_pool, num_test_examples)
+        if simple_iteration == True:
+            training_data = training_pool
+            test_data = test_pool
+        else:
+            training_data = generation_loop(training_pool, num_training_examples)
+            test_data = generation_loop(test_pool, num_test_examples)
         
         # Convert to Numpy arrays and generate target values
         training_data_numpy = np.array(training_data).squeeze(-1)
