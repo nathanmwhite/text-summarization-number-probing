@@ -95,6 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('--basis_points', type=bool, default=False)
     parser.add_argument('--log_filename', type=str, default='decoding_percent.log')
     parser.add_argument('--trial_number', type=int, default=1)
+    parser.add_argument('--simple_iteration', type=bool, default=False)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -128,7 +129,8 @@ if __name__ == '__main__':
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, task,
-        use_word_format=args.use_words)
+        use_word_format=args.use_words,
+        simple_iteration=args.simple_iteration)
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
         start_token_length = 0
