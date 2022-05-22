@@ -377,17 +377,16 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         test_order_numpy = test_order_numpy.squeeze(-1)
     elif task in ('Percent', 'Basis_Points', 'Decoding'):
         if simple_iteration == True:
-            training_data = training_pool
-            test_data = test_pool
-            # Convert to Numpy arrays and generate target values
-            training_data_numpy = np.array(training_data)
-            test_data_numpy = np.array(test_data)
+            training_data = [[n] for n in training_pool]
+            test_data = [[n] for n in test_pool]
+
         else:
             training_data = generation_loop(training_pool, num_training_examples)
             test_data = generation_loop(test_pool, num_test_examples)
-            # Convert to Numpy arrays and generate target values
-            training_data_numpy = np.array(training_data).squeeze(-1)
-            test_data_numpy = np.array(test_data).squeeze(-1)
+            
+        # Convert to Numpy arrays and generate target values
+        training_data_numpy = np.array(training_data).squeeze(-1)
+        test_data_numpy = np.array(test_data).squeeze(-1)
 
     else:
         training_data = generation_loop(training_pool, num_training_examples)
