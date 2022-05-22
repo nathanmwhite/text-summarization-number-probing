@@ -192,7 +192,10 @@ if __name__ == '__main__':
     # "We use the negative log-likelihood of the maximum number as the loss function."
     # PyTorch's CrossEntropyLoss applies softmax along with the negative log-likelihood, 
     #     as described in the paper.
-    loss_fn = torch.nn.CrossEntropyLoss()
+    # however, the model already has a log_softmax layer applied, so this should be
+    #     NLLLoss
+    #loss_fn = torch.nn.CrossEntropyLoss()
+    loss_fn = torch.nn.NLLLoss()
 
     # hyperparameters per Wallace et al. (2019) code
     if args.freeze_embedder:
