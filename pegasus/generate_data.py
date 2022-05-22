@@ -379,19 +379,16 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         if simple_iteration == True:
             training_data = training_pool
             test_data = test_pool
+            # Convert to Numpy arrays and generate target values
+            training_data_numpy = np.array(training_data)
+            test_data_numpy = np.array(test_data)
         else:
             training_data = generation_loop(training_pool, num_training_examples)
             test_data = generation_loop(test_pool, num_test_examples)
-        
-        # Convert to Numpy arrays and generate target values
-        # TODO:
-        # when using simple_iteration
-        # ValueError: cannot select an axis to squeeze out which has size not equal to one
-        # In other words, training_data and test_data do not have the same dimensions as
-        #     the output of generation_loop
-        training_data_numpy = np.array(training_data).squeeze(-1)
+            # Convert to Numpy arrays and generate target values
+            training_data_numpy = np.array(training_data).squeeze(-1)
+            test_data_numpy = np.array(test_data).squeeze(-1)
 
-        test_data_numpy = np.array(test_data).squeeze(-1)
     else:
         training_data = generation_loop(training_pool, num_training_examples)
         test_data = generation_loop(test_pool, num_test_examples)
