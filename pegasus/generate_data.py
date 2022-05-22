@@ -400,15 +400,19 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     # indices for one_hot must be dtype torch.int64
     # targets with class probabilities must be a floating type
     if task == 'ListMax':
-        train_tensor = torch.as_tensor(np.argmax(training_data_numpy, axis=1),
-                                       dtype=torch.int64)
-        training_targets = one_hot(train_tensor, datapoint_length)
-        training_targets = training_targets.to(torch.float32).to(device)
+#         train_tensor = torch.as_tensor(np.argmax(training_data_numpy, axis=1),
+#                                        dtype=torch.int64)
+#         training_targets = one_hot(train_tensor, datapoint_length)
+#         training_targets = training_targets.to(torch.float32).to(device)
 
-        test_tensor = torch.as_tensor(np.argmax(test_data_numpy, axis=1),
-                                      dtype=torch.int64)
-        test_targets = one_hot(test_tensor, datapoint_length)
-        test_targets = test_targets.to(torch.float32).to(device)
+#         test_tensor = torch.as_tensor(np.argmax(test_data_numpy, axis=1),
+#                                       dtype=torch.int64)
+#         test_targets = one_hot(test_tensor, datapoint_length)
+#         test_targets = test_targets.to(torch.float32).to(device)
+        train_tensor = torch.as_tensor(training_data_numpy)
+        training_targets = train_tensor.to(device)
+        test_tensor = torch.as_tensor(test_data_numpy)
+        test_targets = test_tensor.to(device)
     elif task == 'Decoding':
         train_tensor = torch.as_tensor(training_data_numpy)
         training_targets = train_tensor.to(torch.float32).to(device)
