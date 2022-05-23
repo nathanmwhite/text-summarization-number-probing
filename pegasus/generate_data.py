@@ -416,6 +416,10 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     elif task == 'Decoding':
         train_tensor = torch.as_tensor(training_data_numpy)
         training_targets = train_tensor.to(torch.float32).to(device)
+        # debug only
+        print(training_data_numpy.size())
+        print(training_targets.size())
+        
         test_tensor = torch.as_tensor(test_data_numpy)
         test_targets = test_tensor.to(torch.float32).to(device)
     elif task == 'Addition':
