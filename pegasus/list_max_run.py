@@ -44,10 +44,10 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         # debug only
 #         report_phase('Outputs size:', outputs.size())
-        report_phase(outputs.size())
+#        report_phase(outputs.size())
 #         report_phase('Outputs:', outputs)
 #         report_phase('Labels size:', labels.size())
-        report_phase(labels.size())
+#        report_phase(labels.size())
 #         report_phase('Labels:', labels)
         
         loss = loss_function(outputs, labels)
