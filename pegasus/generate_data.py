@@ -409,9 +409,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 #                                       dtype=torch.int64)
 #         test_targets = one_hot(test_tensor, datapoint_length)
 #         test_targets = test_targets.to(torch.float32).to(device)
-        train_tensor = torch.as_tensor(training_data_numpy)
+        train_tensor = torch.as_tensor(np.argmax(training_data_numpy, axis=1))
         training_targets = train_tensor.to(device)
-        test_tensor = torch.as_tensor(test_data_numpy)
+        test_tensor = torch.as_tensor(np.argmax(test_data_numpy, axis=1))
         test_targets = test_tensor.to(device)
     elif task == 'Decoding':
         train_tensor = torch.as_tensor(training_data_numpy)
