@@ -96,6 +96,7 @@ if __name__ == '__main__':
     parser.add_argument('--log_filename', type=str, default='decoding_percent.log')
     parser.add_argument('--trial_number', type=int, default=1)
     parser.add_argument('--simple_iteration', type=bool, default=False)
+    parser.add_argument('--batch_size', type=int, default=64)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -147,7 +148,7 @@ if __name__ == '__main__':
     if args.embedding_model == 'UniLM':
         training_batch_size = 1
     else:
-        training_batch_size = 64
+        training_batch_size = args.batch_size
         
     # testing purposes    
     print(training_dataset[0][0]['input_ids'].size())
