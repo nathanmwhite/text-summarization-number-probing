@@ -99,6 +99,7 @@ if __name__ == '__main__':
     parser.add_argument('--freeze_embedder', type=bool, default=False)
     parser.add_argument('--log_filename', type=str, default='addition.log')
     parser.add_argument('--trial_number', type=int, default=1)
+    parser.add_argument('--batch_size', type=int, default=64)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -142,7 +143,7 @@ if __name__ == '__main__':
     if args.embedding_model == 'UniLM':
         training_batch_size = 1
     else:
-        training_batch_size = 64
+        training_batch_size = args.batch_size
     
     # temporary testing purposes
 #     print(training_batch_size)
