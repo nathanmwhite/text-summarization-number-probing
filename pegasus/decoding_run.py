@@ -23,6 +23,7 @@ from torch.utils.data import DataLoader
 from .generate_data import generate_data
 from .model import DecodingModel, report_phase, freeze_module
 from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
+from .early_stopping import Early_Stopping
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
@@ -98,6 +99,7 @@ if __name__ == '__main__':
     parser.add_argument('--trial_number', type=int, default=1)
     parser.add_argument('--simple_iteration', type=bool, default=False)
     parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--early_stopping', type=bool, default=False)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -176,6 +178,8 @@ if __name__ == '__main__':
                                     momentum=args.momentum)
     else:
         optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
+        
+    early_stopping = Early_Stopping(min_delta=0.0, patience=10)
     
     EPOCHS = args.epochs
     
@@ -201,7 +205,11 @@ if __name__ == '__main__':
 #         report_phase(phase_message)
 #         phase_message = f"Epoch total loss: {total_loss}"
 #         report_phase(phase_message)
-        
+        if args.early_stopping:
+            early_stopping(total_loss)
+            if early_stopping.early_stopping == True:
+                break
+    
         epoch_number += 1
         
     # temporary: save last version of model
