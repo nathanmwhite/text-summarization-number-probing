@@ -372,7 +372,8 @@ class DecodingModel(torch.nn.Module):
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
         
-        hidden_dim = 50
+        #hidden_dim = 50 # tests pre-May 30 were hidden_dim=50
+        hidden_dim = 100
 
         # their description suggests ReLU at every layer,
         #  though their implementation only has it for first two,
@@ -464,7 +465,8 @@ class AdditionModel(torch.nn.Module):
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
         
-        hidden_dim = 50
+        #hidden_dim = 50 # pre-May 30
+        hidden_dim = 100
 
         # their description suggests ReLU at every layer,
         #  though their implementation only has it for first two,
