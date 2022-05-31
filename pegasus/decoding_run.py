@@ -208,6 +208,8 @@ if __name__ == '__main__':
         if args.early_stopping:
             early_stopping(total_loss)
             if early_stopping.early_stopping == True:
+                message = f'Early stopping of training at epoch {epoch_number}.'
+                report_phase(message)
                 break
     
         epoch_number += 1
