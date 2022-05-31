@@ -24,6 +24,7 @@ from torchmetrics import Accuracy
 from .generate_data import generate_data
 from .model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
 from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
+from .early_stopping import Early_Stopping
 
 
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_classes):
@@ -116,6 +117,8 @@ if __name__ == '__main__':
     parser.add_argument('--log_filename', type=str, default='decoding_units.log')
     parser.add_argument('--trial_number', type=int, default=1)
     parser.add_argument('--batch_size', type=int, default=64)
+    parser.add_argument('--early_stopping', type=bool, default=False)
+    parser.add_argument('--patience', type=int, default=10)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -218,6 +221,8 @@ if __name__ == '__main__':
     
 #     phase_message = 'Begin training.'
 #     report_phase(phase_message)
+
+    early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
     
@@ -237,6 +242,13 @@ if __name__ == '__main__':
 #         report_phase(phase_message)
 #         phase_message = f"Epoch accuracy: {acc}"
 #         report_phase(phase_message)
+
+        if args.early_stopping:
+            early_stopping(total_loss)
+            if early_stopping.early_stopping == True:
+                message = f'Early stopping of training at epoch {epoch_number}.'
+                report_phase(message)
+                break
         
         epoch_number += 1
         
