@@ -29,6 +29,7 @@ from .early_stopping import Early_Stopping
 def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
     batch_loss = 0.0
     continuing_loss = 0.0
+    total_loss = 0.0
     
     accuracy = Accuracy(num_classes=5)
     
@@ -72,6 +73,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         
         continuing_loss += loss.item()
         
+        total_loss += loss.item()
+        
         if i % 250 == 249:
             batch_loss = continuing_loss / 250
             n = i + 1
@@ -83,7 +86,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
             logging.info(accuracy_message)
             continuing_loss = 0.0
             
-    return batch_loss, continuing_loss, accuracy.compute()
+    return batch_loss, continuing_loss, total_loss, accuracy.compute()
 
 
 def evaluate(model, eval_dataloader):
@@ -228,11 +231,11 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         mpm.train(True)
-        avg_loss, continuing_loss, acc = train_epoch(epoch_number,
-                                                training_dataloader,
-                                                mpm,
-                                                loss_fn, 
-                                                optimizer)
+        avg_loss, continuing_loss, total_loss, acc = train_epoch(epoch_number,
+                                                                 training_dataloader,
+                                                                 mpm,
+                                                                 loss_fn, 
+                                                                 optimizer)
         
 #         phase_message = f"End of epoch average batch loss: {avg_loss}"
 #         report_phase(phase_message)
