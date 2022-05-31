@@ -179,7 +179,7 @@ if __name__ == '__main__':
     else:
         optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
         
-    early_stopping = Early_Stopping(min_delta=0.0, patience=10)
+    early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     EPOCHS = args.epochs
     
