@@ -97,6 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--trial_number', type=int, default=1)
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--early_stopping', type=bool, default=False)
+    parser.add_argument('--patience', type=int, default=10)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     else:
         optimizer = torch.optim.SGD(dm.parameters(), lr=args.lr, momentum=args.momentum)
     
-    early_stopping = Early_Stopping(min_delta=0.0, patience=10)
+    early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     EPOCHS = args.epochs
     
