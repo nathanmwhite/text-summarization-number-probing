@@ -189,7 +189,7 @@ if __name__ == '__main__':
 #     phase_message = 'Begin training.'
 #     report_phase(phase_message)
 
-    early_stopping = Early_Stopping(min_delta=0.0, patience=30)
+    early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
     
