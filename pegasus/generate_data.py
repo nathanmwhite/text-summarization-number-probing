@@ -123,7 +123,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   use_word_format: bool=False,
                   units_loc: str=None,
                   data_loc: str=None,
-                  simple_iteration: bool=False):
+                  simple_iteration: bool=False,
+                  float: bool=False):
     """
     generate_data : Function that generates training and test data for  
         the List Maximum task specified in Wallace et al. (2019).
@@ -153,6 +154,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param simple_iteration (bool) : if True, dataset is a simple pass
         through the specified range; if False, dataset is the expected
         randomly generated data
+    @param float (bool) : if True, generate float values; if False,
+        generate integers
     returns : two ProbingDatasets: training, test datasets;
         for task 'Ranges', two RangeProbingDatasets: training, test
     """
@@ -167,6 +170,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         nonlocal sample_min
         if task == 'Orders' and sample_min <= 0:
             sample_min = 1
+        
         data_range = np.asarray(range(sample_min, sample_max + 1))
 
         np.random.shuffle(data_range)
@@ -194,8 +198,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             return singular_form, int(target_index)
         else:
             return plural_form, int(target_index)
+        
+    def sample_float(integer):
+        tenths = np.random.randint(0, 10) * 0.1
+        return integer + tenths
     
     # TODO: evaluate whether to tease out two version for the different tasks
+    # TODO: implement Wallace's approach to listmax with decimals in D3 of their paper
     def generation_loop(pool, num_examples, units=False, ranges=False, orders=False):
         assert(units == False or ranges == False or orders == False)
         assembled_data = []
@@ -225,6 +234,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                     datapoint.append(value)
                     datapoint_units.append(unit)
                     datapoint_targets.append(target_idx)
+                elif:
+                    value = sample_float(sample_gaussian(pool))
+                    while value in datapoint:
+                        value = sample_float(sample_gaussian(pool))
+                    datapoint.append(value)
                 else:
                     value = sample_gaussian(pool)
                     while value in datapoint:
