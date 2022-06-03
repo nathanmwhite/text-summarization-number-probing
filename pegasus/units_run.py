@@ -148,9 +148,12 @@ if __name__ == '__main__':
     
 #     phase_message = 'Begin generating dataset.'
 #     report_phase(phase_message)
-    
-    units_path = "text-summarization-number-probing/units_processing/units.txt"
-    data_path = "text-summarization-number-probing/units_processing/context_units.csv"
+    if args.context_units:
+        units_path = "text-summarization-number-probing/units_processing/context_units.txt"
+        data_path = "text-summarization-number-probing/units_processing/context_units_complete_"
+    else:
+        units_path = "text-summarization-number-probing/units_processing/units.txt"
+        data_path = None
     
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
