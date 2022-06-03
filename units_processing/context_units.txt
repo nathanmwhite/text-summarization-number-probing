@@ -1,0 +1,202 @@
+0/employee/employees
+1/worker/workers
+2/person/people
+3/euro/euro
+3/eur/eur
+3/EUR/EUR
+3/euro/euros
+3/€/€
+4/ton/tons
+4/tonne/tonnes
+5/share/shares
+6/country/countries
+7/year/years
+8/job/jobs
+9/meter/meters
+9/metre/metres
+10/month/months
+11/MHz/MHz
+12/store/stores
+13/company/companies
+14/office/offices
+15/unit/units
+16/reader/readers
+17/km/km
+17/kilometer/kilometers
+17/kilometre/kilometres
+18/p.m./p.m.
+18/pm/pm
+19/cent/cents
+20/crown/crowns
+21/kroon/kroons
+22/square meter/square meters
+22/square metre/square metres
+22/m2/m2
+22/sq m/sq m
+22/floor square meter/floor square meters
+23/a.m./a.m.
+23/am/am
+24/point/points
+24/pt/pts
+25/result/results
+26/cubic meter/cubic meters
+26/cubic metre/cubic metres
+26/m3/m3
+27/liter/liters
+27/litre/litres
+28/dwt/dwt
+29/kW/kW
+30/ml/ml
+31/engine/engines
+32/volunteer/volunteers
+33/period/periods
+34/dollar/dollars
+35/$/$
+36/USD/USD
+37/CAD/CAD
+37/C$/C$
+38/AUD/AUD
+38/A$/A$
+39/cu/cu
+40/bps/bps
+41/sq. ft./sq. ft.
+41/square foot/square feet
+41/sq ft/sq ft
+42/day/days
+43/megawatt/megawatts
+43/MW/MW
+44/vehicle/vehicles
+45/zloty/zloty
+46/period/periods
+47/tire/tires
+47/tyre/tyres
+48/elevator/elevators
+49/room/rooms
+50/library/libraries
+51/home/homes
+52/subject/subjects
+53/mm/mm
+54/degree/degrees
+55/skr/skr
+55/SEK/SEK
+55/krona/kronor
+56/MB/MB
+56/megabyte/megabytes
+57/teacher/teachers
+58/liquid/liquids
+59/outlet/outlets
+60/operator/operators
+61/investor/investors
+62/patient/patients
+63/escalator/escalators
+64/expert/experts
+65/model/models
+66/time/times
+67/condominium/condominiums
+68/stage/stages
+69/second/seconds
+70/total/totals
+71/hour/hours
+72/destination/destinations
+73/specialist/specialists
+74/region/regions
+75/subscriber/subscribers
+76/hectare/hectares
+77/supermarket/supermarkets
+78/panel/panels
+79/position/positions
+80/shareholder/shareholders
+81/tent/tents
+82/organization/organizations
+83/revenue/revenues
+84/tenant/tenants
+85/barrel/barrels
+86/contract/contracts
+87/household/households
+88/redunancy/redunancies
+89/island/islands
+90/star/stars
+91/man-year/man-years
+92/participant/participants
+93/mile/miles
+94/flight/flights
+95/passenger/passengers
+96/lawmaker/lawmakers
+97/loader crane/loader cranes
+98/service area/service areas
+99/tanker/tankers
+100/TEU/TEUs
+101/sales office/sales offices
+102/language/languages
+103/transaction/transactions
+104/asset management expert/asset management experts
+105/basis point/basis points
+106/biscuit carton/biscuit cartons
+107/cargo unit/cargo units
+108/cash register/cash registers
+109/building site/building sites
+110/custom designed elevator/custom designed elevators
+110/customised elevator/customised elevators
+111/customer company/customer companies
+112/forest machine/forest machines
+113/debenture bond/debenture bonds
+114/ERP system/ERP systems
+115/city/cities
+116/tablet computer/tablet computers
+117/discount store/discount stores
+118/e-mail account/e-mail accounts
+119/price target/price targets
+120/firm order/firm orders
+121/harvester head/harvester heads
+122/holiday home/holiday homes
+123/initial public offering/initial public offerings
+124/job cut/job cuts
+125/kroon par value bond/kroon par value bonds
+126/actor/actors
+127/local newspaper/local newspapers
+128/manufacturing unit/manufacturing units
+129/metric ton/metric tons
+130/minute/minutes
+131/stock/stocks
+132/client/clients
+133/paper machine/paper machines
+134/staffer/staffers
+135/substation/substations
+136/nonbinding commitment/nonbinding commitments
+137/payroll client/payroll clients
+138/productional employee/productional employees
+139/log house/log houses
+140/rental outlet/rental outlets
+141/research community/research communities
+142/return/returns
+143/service location/service locations
+144/short ton/short tons
+145/small local brewery/small local breweries
+146/special event/special events
+147/state/states
+148/station/stations
+149/stock option/stock options
+150/suction anchor/suction anchors
+151/surveillance camera/surveillance cameras
+152/tabloid page/tabloid pages
+153/unquoted company/unquoted companies
+154/vantage point/vantage points
+155/staff/staff
+156/power plant/power plants
+157/year old/years old
+158/foot/feet
+159/litas/litas
+160/GHz/GHz
+161/TWh/TWh
+162/kilogram/kilograms
+163/network/networks
+164/ore/ores
+165/piece/pieces
+166/GW/GW
+167/decaliter/decaliters
+168/£/£
+169/HK$/HK$
+170/Rmb/Rmb
+170/RMB/RMB
+171/¥/¥
+172/Y/Y
