@@ -556,13 +556,16 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         tokenizer.padding_side = 'left'
         padding_pattern = 'max_length'
         max_length = 256
+        truncate = True
         training_data_tokenized = tokenizer(joined_training_data,
                                             padding=padding_pattern,
                                             max_length=max_length,
+                                            truncate=truncate,
                                             return_tensors="pt").to(device)
         test_data_tokenized = tokenizer(joined_test_data,
                                         padding=padding_pattern,
                                         max_length=max_length,
+                                        truncate=truncate,
                                         return_tensors="pt").to(device)
     else:
 #         if task == 'Percent':
