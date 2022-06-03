@@ -256,8 +256,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         units_data = obtain_units(units_loc)
 
         # raw_data is of format [sentence[tab]number[tab]target_unit_idx]
-        with open(data_loc, 'r', encoding='iso-8859-1') as f:
+        # two files: 1.csv and 2.csv
+        with open(data_loc+'1.csv', 'r', encoding='utf-8') as f:
             raw_data = f.readlines()
+        with open(data_loc+'2.csv', 'r', encoding='utf-8') as f:
+            raw_data += f.readlines()
 
         data = tuple(tuple(line.rstrip().split('\t')) for line in raw_data)
 
