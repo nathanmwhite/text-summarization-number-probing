@@ -124,7 +124,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                   units_loc: str=None,
                   data_loc: str=None,
                   simple_iteration: bool=False,
-                  float: bool=False):
+                  float_: bool=False):
     """
     generate_data : Function that generates training and test data for  
         the List Maximum task specified in Wallace et al. (2019).
@@ -154,7 +154,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     @param simple_iteration (bool) : if True, dataset is a simple pass
         through the specified range; if False, dataset is the expected
         randomly generated data
-    @param float (bool) : if True, generate float values; if False,
+    @param float_ (bool) : if True, generate float values; if False,
         generate integers
     returns : two ProbingDatasets: training, test datasets;
         for task 'Ranges', two RangeProbingDatasets: training, test
@@ -234,7 +234,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                     datapoint.append(value)
                     datapoint_units.append(unit)
                     datapoint_targets.append(target_idx)
-                elif:
+                elif float_:
                     value = sample_float(sample_gaussian(pool))
                     while value in datapoint:
                         value = sample_float(sample_gaussian(pool))
