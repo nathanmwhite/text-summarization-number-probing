@@ -90,8 +90,8 @@ if __name__ == '__main__':
     parser.add_argument('--test_examples', type=int, default=100)
     parser.add_argument('--sample_min_int', type=int, default=0)
     parser.add_argument('--sample_max_int', type=int, default=99)
-    parser.add_argument('--sample_min_float', type=float, default=0.0)
-    parser.add_argument('--sample_max_float', type=float, default=99.9)
+    parser.add_argument('--sample_min_float', type=float, default=0)
+    parser.add_argument('--sample_max_float', type=float, default=99)
     parser.add_argument('--float', type=bool, default=False)
     parser.add_argument('--use_words', type=bool, default=False)
     parser.add_argument('--lr', type=float, default=0.01)
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, 'Addition',
-        use_word_format=args.use_words)
+        use_word_format=args.use_words, float=args.float)
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
         start_token_length = 0
