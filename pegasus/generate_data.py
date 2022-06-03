@@ -330,6 +330,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
          train_units,
          test_units) = train_test_split(sentences, numbers, units, test_size=0.2, random_state=123)
         
+        num_training_examples = len(train_sents)
+        num_test_examples = len(test_sents)
+        
         # Despite Transformers documentation, produces warning:
         #  Using sep_token, but it is not set yet.
         # Choice: use sep_token if set, otherwise eos_token
