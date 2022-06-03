@@ -555,7 +555,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     if task == 'Context_Units':
         tokenizer.padding_side = 'left'
         padding_pattern = 'max_length'
-        max_length = 128
+        max_length = 256
         training_data_tokenized = tokenizer(joined_training_data,
                                             padding=padding_pattern,
                                             max_length=max_length,
