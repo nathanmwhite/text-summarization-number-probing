@@ -235,9 +235,21 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                     datapoint_units.append(unit)
                     datapoint_targets.append(target_idx)
                 elif float_:
-                    value = sample_float(sample_gaussian(pool))
-                    while value in datapoint:
+                    # this is designed to handle both modes:
+                    #  [15.3, 15.6, 15.1, 15.8, 15.2] at 50%
+                    #  [11.7, 16.4, 9.3, 7.9, 13.3] at 50%
+                    # per Wallace et al. (2019), appendix D3
+                    # TODO: need to confirm this is shuffled somewhere
+                    if i < num_examples/2:
+                        if j == 0:
+                            base_value = sample_gaussian(pool)
+                        value = sample_float(base_value)
+                        while value in datapoint:
+                            value = sample_float(base_value)
+                    else:
                         value = sample_float(sample_gaussian(pool))
+                        while value in datapoint:
+                            value = sample_float(sample_gaussian(pool))
                     datapoint.append(value)
                 else:
                     value = sample_gaussian(pool)
