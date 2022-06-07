@@ -134,7 +134,8 @@ if __name__ == '__main__':
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, task,
         use_word_format=args.use_words,
-        simple_iteration=args.simple_iteration)
+        simple_iteration=args.simple_iteration,
+        float_=args.float)
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
         start_token_length = 0
