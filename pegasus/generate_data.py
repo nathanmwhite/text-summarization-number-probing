@@ -204,7 +204,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         return integer + tenths
     
     # TODO: evaluate whether to tease out two version for the different tasks
-    # TODO: implement Wallace's approach to listmax with decimals in D3 of their paper
+    # TODO: current approach does not allow units to be used with float
     def generation_loop(pool, num_examples, units=False, ranges=False, orders=False):
         assert(units == False or ranges == False or orders == False)
         assembled_data = []
@@ -261,6 +261,14 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             if units:
                 assembled_units.append(datapoint_units)
                 assembled_targets.append(datapoint_targets)
+        if float_: 
+            # TODO: currently does not overlap with units; will need to revise
+            # compatible with ranges and orders as these do not depend on which
+            # floats appear where
+            # this step needs to happen to ensure that longer datapoints (len > 1)
+            #  that represent variation only in tenths vs. variation throughout
+            #  the numerals are dispersed throughout the dataset
+            random.shuffle(assembled_data)
         if units:
             return assembled_data, assembled_units, assembled_targets
         elif ranges:
