@@ -159,6 +159,7 @@ if __name__ == '__main__':
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, task,
         use_word_format=args.use_words,
+        float_=args.float,
         units_loc=units_path, data_loc=data_path)
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
