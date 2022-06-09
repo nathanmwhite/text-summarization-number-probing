@@ -19,6 +19,7 @@ import os
 
 import torch
 from torch.utils.data import DataLoader
+from torch.nn.utils import clip_grad_norm_
 
 from .generate_data import generate_data
 from .model import AdditionModel, report_phase, freeze_module
@@ -26,7 +27,7 @@ from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_
 from .early_stopping import Early_Stopping
 
 
-def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
+def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip_norm):
     batch_loss = 0.0
     continuing_loss = 0.0
     total_loss = 0.0
@@ -48,6 +49,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         loss = loss_function(outputs, labels)
         
         loss.backward()
+        
+        clip_grad_norm_(model.parameters(), clip_norm)
                 
         optimizer.step()
         
@@ -103,6 +106,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
+    parser.add_argument('--clip_norm', type=int, default=5)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -200,7 +204,7 @@ if __name__ == '__main__':
         # Make sure gradient tracking is on, and do a pass over the data
         am.train(True)
         avg_loss, continuing_loss, total_loss = train_epoch(
-            epoch_number, training_dataloader, am, loss_fn, optimizer
+            epoch_number, training_dataloader, am, loss_fn, optimizer, args.clip_norm
         )
         
 #         phase_message = f"End of epoch average batch loss: {avg_loss}"
