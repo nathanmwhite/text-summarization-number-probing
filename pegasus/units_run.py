@@ -18,6 +18,7 @@ import math
 
 import torch
 from torch.utils.data import DataLoader
+from torch.nn.utils import clip_grad_norm_
 
 from torchmetrics import Accuracy
 
@@ -27,7 +28,7 @@ from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_
 from .early_stopping import Early_Stopping
 
 
-def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_classes):
+def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_classes, clip_norm):
     batch_loss = 0.0
     continuing_loss = 0.0
     total_loss = 0.0
@@ -60,6 +61,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_
         outputs_cpu = outputs.to("cpu")
         
         batch_accuracy = accuracy(outputs_cpu, labels_cpu)
+        
+        clip_grad_norm_(filter(lambda x: x.requires_grad, model.parameters()), clip_norm)
                 
         optimizer.step()
         
@@ -119,6 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
+    parser.add_argument('--clip_norm', type=int, default=5)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -238,7 +242,7 @@ if __name__ == '__main__':
         dm.train(True)
         avg_loss, continuing_loss, total_loss, acc = train_epoch(
             epoch_number, training_dataloader, dm, loss_fn, 
-            optimizer, output_dim)
+            optimizer, output_dim, args.clip_norm)
         
 #         phase_message = f"End of epoch average batch loss: {avg_loss}"
 #         report_phase(phase_message)
