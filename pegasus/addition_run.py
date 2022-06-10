@@ -50,7 +50,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
         
         loss.backward()
         
-        clip_grad_norm_(model.parameters(), clip_norm)
+        clip_grad_norm_(filter(lambda x: x.requires_grad, model.parameters()), clip_norm)
                 
         optimizer.step()
         
