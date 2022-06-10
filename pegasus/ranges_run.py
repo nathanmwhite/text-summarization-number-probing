@@ -18,6 +18,7 @@ import math
 
 import torch
 from torch.utils.data import DataLoader
+from torch.nn.utils import clip_grad_norm_
 
 from .generate_data import generate_data
 from .model import RangeModel, report_phase, freeze_module
@@ -42,7 +43,7 @@ class SiameseMSELoss(torch.nn.Module):
         return mse_out_1 + mse_out_2
 
 
-def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
+def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip_norm):
     batch_loss = 0.0
     continuing_loss = 0.0
     total_loss = 0.0
@@ -64,6 +65,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer):
         loss = loss_function(output_y1, output_y2, labels_y1, labels_y2)
         
         loss.backward()
+        
+        clip_grad_norm_(filter(lambda x: x.requires_grad, model.parameters()), clip_norm)
                 
         optimizer.step()
         
@@ -119,6 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
+    parser.add_argument('--clip_norm', type=int, default=5)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -216,7 +220,7 @@ if __name__ == '__main__':
         # Make sure gradient tracking is on, and do a pass over the data
         am.train(True)
         avg_loss, continuing_loss, total_loss = train_epoch(
-            epoch_number, training_dataloader, am, loss_fn, optimizer
+            epoch_number, training_dataloader, am, loss_fn, optimizer, args.clip_norm
         )
         
 #         phase_message = f"End of epoch average batch loss: {avg_loss}"
