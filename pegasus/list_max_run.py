@@ -134,6 +134,7 @@ if __name__ == '__main__':
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--clip_norm', type=int, default=5)
+    parser.add_argument('--hidden_dim', type=int, default=5)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -198,7 +199,7 @@ if __name__ == '__main__':
         freeze_module(embedding_model, args.embedding_model)
     embedding_model = embedding_model.to(device)
     
-    mpm = MaxProbingModel(embedding_model, padded_seq_len).to(device)
+    mpm = MaxProbingModel(embedding_model, padded_seq_len, hidden_dim=args.hidden_dim).to(device)
 
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
