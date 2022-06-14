@@ -253,6 +253,11 @@ class MaxProbingModel(torch.nn.Module):
             encoder = self.embedding_model.bert.encoder
             bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
+        elif type(self.embedding_model) == BertModel:
+            self.embedding_type = 'Bert'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
         
         # TODO: determine improved implementation of h0 and c0
         #     decision: no need: just use torch's default
@@ -299,7 +304,10 @@ class MaxProbingModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
-            
+        # TODO: test
+        elif self.embedding_type == 'Bert':
+            forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.last_hidden_state
         # there may be a problem with padding here
         # use torch.Tensor as input, not numpy, otherwise
         #  error will be thrown related to size and 'int'
