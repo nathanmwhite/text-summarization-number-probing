@@ -127,7 +127,7 @@ def freeze_module(module, module_type):
                                   'feed_forward',
                                   'decoder',
                                   'cross_attn'}
-    elif module_type == 'UniLM':
+    elif module_type == ('Bert', 'UniLM'): # UniLM plus intermediate_act_fn from Bert
         operational_layer_types = {'word_embeddings',
                                    'token_type_embeddings',
                                    'position_embeddings',
@@ -138,6 +138,7 @@ def freeze_module(module, module_type):
                                    'value',
                                    'dense',
                                    'activation',
+                                   'intermediate_act_fn',
                                    'decoder',
                                    'seq_relationship',
                                    'crit_mask_lm',
