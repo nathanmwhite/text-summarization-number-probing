@@ -128,7 +128,7 @@ def freeze_module(module, module_type):
                                   'feed_forward',
                                   'decoder',
                                   'cross_attn'}
-    elif module_type == ('Bert', 'UniLM'): # UniLM plus intermediate_act_fn from Bert
+    elif module_type in ('Bert', 'UniLM'): # UniLM plus intermediate_act_fn from Bert
         operational_layer_types = {'word_embeddings',
                                    'token_type_embeddings',
                                    'position_embeddings',
@@ -381,6 +381,11 @@ class DecodingModel(torch.nn.Module):
             encoder = self.embedding_model.bert.encoder
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
+        elif type(self.embedding_model) == BertModel:
+            self.embedding_type = 'Bert'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
         
         #hidden_dim = 50 # tests pre-May 30 were hidden_dim=50
         hidden_dim = 100
@@ -421,6 +426,9 @@ class DecodingModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
+        elif self.embedding_type == 'Bert':
+            forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.last_hidden_state
 
         # slice off start and end tokens
         if self.has_start_token:
@@ -474,6 +482,11 @@ class AdditionModel(torch.nn.Module):
             encoder = self.embedding_model.bert.encoder
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
+        elif type(self.embedding_model) == BertModel:
+            self.embedding_type = 'Bert'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
         
         #hidden_dim = 50 # pre-May 30
         hidden_dim = 100
@@ -515,6 +528,9 @@ class AdditionModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
+        elif self.embedding_type == 'Bert':
+            forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.last_hidden_state
         
         if self.has_start_token:
             start = 1
@@ -562,6 +578,11 @@ class UnitsModel(torch.nn.Module):
             encoder = self.embedding_model.bert.encoder
             bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
+        elif type(self.embedding_model) == BertModel:
+            self.embedding_type = 'Bert'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
         
         # they fail to specify their hidden_dim anywhere
 #         self.linear_1 = torch.nn.Linear(in_features=input_dim,
@@ -607,6 +628,9 @@ class UnitsModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
+        elif self.embedding_type == 'Bert':
+            forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.last_hidden_state
 
         if self.has_start_token:
             start = 1
@@ -657,6 +681,11 @@ class ContextUnitsModel(torch.nn.Module):
             encoder = self.embedding_model.bert.encoder
             bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
+        elif type(self.embedding_model) == BertModel:
+            self.embedding_type = 'Bert'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
 
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
@@ -689,6 +718,9 @@ class ContextUnitsModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
+        elif self.embedding_type == 'Bert':
+            forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.last_hidden_state
             
         if self.has_start_token:
             start = 1
@@ -737,6 +769,11 @@ class RangeModel(torch.nn.Module):
             encoder = self.embedding_model.bert.encoder
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
+        elif type(self.embedding_model) == BertModel:
+            self.embedding_type = 'Bert'
+            encoder = self.embedding_model.encoder
+            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            self.has_start_token = True
 
         hidden_dim = 50
         
@@ -781,6 +818,9 @@ class RangeModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
+        elif self.embedding_type == 'Bert':
+            forward = self.embedding_model.forward(**input_text)
+            encoder_state = forward.last_hidden_state
         
         # slice off start and end tokens
         if self.has_start_token:
