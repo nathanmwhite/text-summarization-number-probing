@@ -14,8 +14,10 @@ from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from transformers import BartTokenizer, BartForConditionalGeneration
 from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration
+from transformers import BertTokenizer, BertModel
+from transformers import BertConfig as TrBertConfig
 from ..s2s_ft.tokenization_unilm import UnilmTokenizer
-from ..s2s_ft.modeling_decoding import BertConfig, BertForSeq2SeqDecoder
+from ..s2s_ft.modeling_decoding import S2SBertConfig, BertForSeq2SeqDecoder
 
 
 def check_arguments(args):
@@ -46,7 +48,8 @@ MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'Bart': "facebook/bart-base",
                   'DistilBart': "sshleifer/distilbart-xsum-12-6",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
-                  'UniLM': "unilm2-base-uncased"}
+                  'UniLM': "unilm2-base-uncased",
+                  'Bert': "bert-base-uncased"}
 
 
 def get_model_name(model_type):
@@ -72,10 +75,12 @@ def get_tokenizer(model_name):
                                                   model_name, 
                                                   model_name + '-vocab.txt'))
         tokenizer = UnilmTokenizer.from_pretrained(vocab_path)
+    elif model_name == MODEL_NAME_MAP['Bert']:
+        tokenizer = BertTokenizer.from_pretrained(model_name)
     return tokenizer
 
                         
-def get_embedding_model(model_name):
+def get_embedding_model(model_name, trained=True):
     if model_name == MODEL_NAME_MAP['Pegasus']:
         embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
     elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR']):
@@ -91,11 +96,18 @@ def get_embedding_model(model_name):
     elif model_name == MODEL_NAME_MAP['UniLM']:
         VOCAB_SIZE = 30522
         TYPE_VOCAB_SIZE = 2
-        config_ = BertConfig(rel_pos_bins=0, 
+        config_ = S2SBertConfig(rel_pos_bins=0, 
                              vocab_size_or_config_json_file=VOCAB_SIZE, 
                              type_vocab_size=TYPE_VOCAB_SIZE)
         model_path = os.path.abspath(os.path.join('text-summarization-number-probing', model_name))
         embedding_model = BertForSeq2SeqDecoder.from_pretrained(model_path, 
                                                                 config=config_, 
                                                                 search_beam_size=2)
+    elif model_name == MODEL_NAME_MAP['Bert']:
+        if trained:
+            embedding_model = BertModel.from_pretrained(model_name)
+        else:
+            config_ = TrBertConfig()
+            embedding_model = BertModel(config_)
+           
     return embedding_model
