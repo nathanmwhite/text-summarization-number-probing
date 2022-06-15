@@ -107,6 +107,7 @@ if __name__ == '__main__':
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--clip_norm', type=int, default=5)
+    parser.add_argument('--trained', type=bool, default=True)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -139,7 +140,7 @@ if __name__ == '__main__':
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
         start_token_length = 0
-    elif args.embedding_model in ('Bart', 'DistilBart', 'UniLM'):
+    elif args.embedding_model in ('Bert', 'Bart', 'DistilBart', 'UniLM'):
         start_token_length = 1
 #     else:
 #         raise ValueError('Error: --embedding_model must be a valid model type.')
