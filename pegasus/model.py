@@ -20,6 +20,7 @@ from transformers import PegasusForConditionalGeneration
 from transformers import T5ForConditionalGeneration
 from transformers import BartForConditionalGeneration
 from transformers import ProphetNetForConditionalGeneration
+from transformers import BertModel, BertConfig
 
 from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
 
@@ -219,7 +220,19 @@ def freeze_module(module, module_type):
 #         y_pred = self.sequential(embeddings).squeeze(-1)
 
 #         return y_pred
+
+
+def get_baseline_model(trained=False):
+    model_name = 'bert-base-uncased'
+    
+    if trained:
+        model = BertModel.from_pretrained(model_name)
+    else:
+        config = BertConfig()
+        model = BertModel(config)
         
+    return model
+
 
 class MaxProbingModel(torch.nn.Module):
     def __init__(self, embedding_model, padded_seq_len=5, hidden_dim=5):
