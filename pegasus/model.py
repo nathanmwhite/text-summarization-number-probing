@@ -307,6 +307,7 @@ class MaxProbingModel(torch.nn.Module):
             encoder_state = forward[-1]
         # TODO: test
         elif self.embedding_type == 'Bert':
+            input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
         # there may be a problem with padding here
@@ -427,6 +428,7 @@ class DecodingModel(torch.nn.Module):
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
         elif self.embedding_type == 'Bert':
+            input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
 
@@ -529,6 +531,7 @@ class AdditionModel(torch.nn.Module):
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
         elif self.embedding_type == 'Bert':
+            input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
         
@@ -629,6 +632,7 @@ class UnitsModel(torch.nn.Module):
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
         elif self.embedding_type == 'Bert':
+            input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
 
@@ -719,6 +723,7 @@ class ContextUnitsModel(torch.nn.Module):
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
         elif self.embedding_type == 'Bert':
+            input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
             
@@ -819,6 +824,7 @@ class RangeModel(torch.nn.Module):
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
         elif self.embedding_type == 'Bert':
+            input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
         
