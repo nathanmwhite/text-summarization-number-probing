@@ -222,18 +222,6 @@ def freeze_module(module, module_type):
 #         return y_pred
 
 
-def get_baseline_model(trained=False):
-    model_name = 'bert-base-uncased'
-    
-    if trained:
-        model = BertModel.from_pretrained(model_name)
-    else:
-        config = BertConfig()
-        model = BertModel(config)
-        
-    return model
-
-
 class MaxProbingModel(torch.nn.Module):
     def __init__(self, embedding_model, padded_seq_len=5, hidden_dim=5):
         super(MaxProbingModel, self).__init__()
