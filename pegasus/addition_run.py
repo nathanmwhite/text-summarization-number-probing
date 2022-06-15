@@ -166,7 +166,7 @@ if __name__ == '__main__':
 #     phase_message = 'Completed generating dataset.'
 #     report_phase(phase_message)
     
-    embedding_model = get_embedding_model(model_name)
+    embedding_model = get_embedding_model(model_name, args.trained)
         
     if args.freeze_embedder:
         freeze_module(embedding_model, args.embedding_model)
