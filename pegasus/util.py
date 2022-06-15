@@ -17,7 +17,8 @@ from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration
 from transformers import BertTokenizer, BertModel
 from transformers import BertConfig as TrBertConfig
 from ..s2s_ft.tokenization_unilm import UnilmTokenizer
-from ..s2s_ft.modeling_decoding import S2SBertConfig, BertForSeq2SeqDecoder
+from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
+from ..s2s_ft.modeling_decoding import BertConfig as S2SBertConfig
 
 
 def check_arguments(args):
