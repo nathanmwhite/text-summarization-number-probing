@@ -384,7 +384,7 @@ class DecodingModel(torch.nn.Module):
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
         
         #hidden_dim = 50 # tests pre-May 30 were hidden_dim=50
@@ -485,7 +485,7 @@ class AdditionModel(torch.nn.Module):
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
         
         #hidden_dim = 50 # pre-May 30
@@ -772,7 +772,7 @@ class RangeModel(torch.nn.Module):
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
 
         hidden_dim = 50
