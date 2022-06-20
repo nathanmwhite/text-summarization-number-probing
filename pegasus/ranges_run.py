@@ -123,6 +123,7 @@ if __name__ == '__main__':
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--clip_norm', type=int, default=5)
+    parser.add_argument('--trained', type=bool, default=True)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -181,7 +182,7 @@ if __name__ == '__main__':
 #     phase_message = 'Completed generating dataset.'
 #     report_phase(phase_message)
     
-    embedding_model = get_embedding_model(model_name)
+    embedding_model = get_embedding_model(model_name, args.trained)
     
     if args.freeze_embedder:
         freeze_module(embedding_model, args.embedding_model)
