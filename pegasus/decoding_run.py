@@ -104,6 +104,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--clip_norm', type=int, default=5)
+    parser.add_argument('--trained', type=bool, default=True)
     args = parser.parse_args()
     
     check_arguments(args)
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     
     if args.embedding_model in ('Pegasus', 'T5', 'SSR', 'ProphetNet'):
         start_token_length = 0
-    elif args.embedding_model in ('Bart', 'DistilBart', 'UniLM'):
+    elif args.embedding_model in ('Bart', 'DistilBart', 'UniLM', 'Bert'):
         start_token_length = 1
 #     else:
 #         raise ValueError('Error: --embedding_model must be a valid model type.')
@@ -161,7 +162,7 @@ if __name__ == '__main__':
 #     phase_message = 'Completed generating dataset.'
 #     report_phase(phase_message)
     
-    embedding_model = get_embedding_model(model_name)
+    embedding_model = get_embedding_model(model_name, args.trained)
         
     if args.freeze_embedder:
         freeze_module(embedding_model, args.embedding_model)
