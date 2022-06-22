@@ -135,7 +135,9 @@ if __name__ == '__main__':
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--clip_norm', type=int, default=5)
     parser.add_argument('--hidden_dim', type=int, default=5)
-    parser.add_argument('--trained', type=bool, default=True)
+    parser.add_argument('--feature', action='store_true')
+    parser.add_argument('--no-feature', dest='feature', action='store_false')
+    parser.set_defaults(feature=True)
     args = parser.parse_args()
     
     check_arguments(args)
