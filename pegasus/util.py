@@ -20,6 +20,7 @@ from ..s2s_ft.tokenization_unilm import UnilmTokenizer
 from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
 from ..s2s_ft.modeling_decoding import BertConfig as S2SBertConfig
 
+from .model import report_phase
 
 def check_arguments(args):
     if args.sample_min_int >= args.sample_max_int:
@@ -106,8 +107,10 @@ def get_embedding_model(model_name, trained=True):
                                                                 search_beam_size=2)
     elif model_name == MODEL_NAME_MAP['Bert']:
         if trained:
+            report_phase('Loading pretrained Bert model.')
             embedding_model = BertModel.from_pretrained(model_name)
         else:
+            report_phase('Creating new untrained Bert model.')
             config_ = TrBertConfig()
             embedding_model = BertModel(config_)
            
