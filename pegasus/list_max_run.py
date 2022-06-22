@@ -136,7 +136,7 @@ if __name__ == '__main__':
     parser.add_argument('--clip_norm', type=int, default=5)
     parser.add_argument('--hidden_dim', type=int, default=5)
     parser.add_argument('--trained', action='store_true')
-    parser.add_argument('--no-trained', dest='trained', action='store_false')
+    parser.add_argument('--untrained', dest='trained', action='store_false')
     parser.set_defaults(trained=True)
     args = parser.parse_args()
     
