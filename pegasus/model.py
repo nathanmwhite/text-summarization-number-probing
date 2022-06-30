@@ -21,7 +21,8 @@ from transformers import T5ForConditionalGeneration
 from transformers import BartForConditionalGeneration
 from transformers import ProphetNetForConditionalGeneration
 from transformers import BertModel, BertConfig
-from torch.nn.functional import embedding
+#from torch.nn.functional import embedding
+from torch.nn import Embedding
 
 from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
 
@@ -231,13 +232,14 @@ class RandomEmbeddingModel(torch.nn.Module):
         self.vocab_size = vocab_size
         self.embedding_size = embedding_size
         
-        self.embedding_matrix = torch.rand(self.vocab_size, self.embedding_size)
-        self.embedding_matrix[0, :].zero_()
+        #self.embedding_matrix = torch.rand(self.vocab_size, self.embedding_size)
+        #self.embedding_matrix[0, :].zero_()
+        self.embedding_matrix = Embedding(self.vocab_size, self.embedding_size, padding_idx=0)
         
         # TODO: determine what to do with values such as <sep> or </s>
         
     def forward(self, input_text):
-        return embedding(input_text, self.embedding_matrix, padding_idx=0)
+        return self.embedding_matrix(input_text)
 
 
 class MaxProbingModel(torch.nn.Module):
