@@ -156,6 +156,9 @@ def freeze_module(module, module_type):
                                   'cls',
                                   'predictions',
                                   'transform'}
+    elif module_type in {'Random'}:
+        operational_layer_types = None # TODO: update with actual operational layer name
+        expandable_layer_types = None
         
     freeze_component(module)
 #     report_phase(f'Parameter freezing successful.')
