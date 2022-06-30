@@ -283,8 +283,8 @@ class MaxProbingModel(torch.nn.Module):
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
-            encoder = self.embedding_model.embedding_matrix
-            bilstm_input_dim = encoder.size()[1]
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.embedding_size
             self.has_start_token = True        
         
         # TODO: determine improved implementation of h0 and c0
@@ -420,8 +420,8 @@ class DecodingModel(torch.nn.Module):
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
-            encoder = self.embedding_model.embedding_matrix
-            bilstm_input_dim = encoder.size()[1]
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.embedding_size
             self.has_start_token = True     
         
         #hidden_dim = 50 # tests pre-May 30 were hidden_dim=50
@@ -532,8 +532,8 @@ class AdditionModel(torch.nn.Module):
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
-            encoder = self.embedding_model.embedding_matrix
-            bilstm_input_dim = encoder.size()[1]
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.embedding_size
             self.has_start_token = True
         
         #hidden_dim = 50 # pre-May 30
@@ -638,8 +638,8 @@ class UnitsModel(torch.nn.Module):
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
-            encoder = self.embedding_model.embedding_matrix
-            bilstm_input_dim = encoder.size()[1]
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.embedding_size
             self.has_start_token = True
         
         # they fail to specify their hidden_dim anywhere
@@ -751,8 +751,8 @@ class ContextUnitsModel(torch.nn.Module):
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
-            encoder = self.embedding_model.embedding_matrix
-            bilstm_input_dim = encoder.size()[1]
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.embedding_size
             self.has_start_token = True
 
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
@@ -849,8 +849,8 @@ class RangeModel(torch.nn.Module):
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
-            encoder = self.embedding_model.embedding_matrix
-            input_dim = encoder.size()[1]
+            encoder = self.embedding_model
+            bilstm_input_dim = encoder.embedding_size
             self.has_start_token = True
             
         #hidden_dim = 50 # hard-coded as 50 until 30 June!
