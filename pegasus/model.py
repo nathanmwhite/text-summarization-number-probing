@@ -229,6 +229,8 @@ def freeze_module(module, module_type):
 
 class RandomEmbeddingModel(torch.nn.Module):
     def __init__(self, vocab_size=30522, embedding_size=768):
+        super(RandomEmbeddingModel, self).__init__()
+        
         self.vocab_size = vocab_size
         self.embedding_size = embedding_size
         
