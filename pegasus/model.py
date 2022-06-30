@@ -21,6 +21,7 @@ from transformers import T5ForConditionalGeneration
 from transformers import BartForConditionalGeneration
 from transformers import ProphetNetForConditionalGeneration
 from transformers import BertModel, BertConfig
+from torch.nn.functional import embedding
 
 from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
 
@@ -224,9 +225,9 @@ def freeze_module(module, module_type):
 
 #         return y_pred
 
-# TODO: what self.embedding_model type will this show up as?
+
 class RandomEmbeddingModel(torch.nn.Module):
-    def __init__(self, vocab_size=30522, embedding_size=128):
+    def __init__(self, vocab_size=30522, embedding_size=768):
         self.vocab_size = vocab_size
         self.embedding_size = embedding_size
         
@@ -276,6 +277,11 @@ class MaxProbingModel(torch.nn.Module):
             encoder = self.embedding_model.encoder
             bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
+        elif type(self.embedding_model) == RandomEmbeddingModel:
+            self.embedding_type = 'Random'
+            encoder = self.embedding_model.embedding_matrix
+            bilstm_input_dim = encoder.size()[1]
+            self.has_start_token = True        
         
         # TODO: determine improved implementation of h0 and c0
         #     decision: no need: just use torch's default
@@ -322,11 +328,15 @@ class MaxProbingModel(torch.nn.Module):
             forward = self.embedding_model.bert.embeddings.forward(input_text['input_ids'])
             forward = self.embedding_model.bert.encoder.forward(forward, input_text['attention_mask'])
             encoder_state = forward[-1]
-        # TODO: test
+        # TODO: test--all runs successful
         elif self.embedding_type == 'Bert':
             input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
+        elif self.embedding_type == 'Random':
+            input_text = input_text['input_ids']
+            forward = self.embedding_model.forward(input_text)
+            encoder_state = forward
         # there may be a problem with padding here
         # use torch.Tensor as input, not numpy, otherwise
         #  error will be thrown related to size and 'int'
@@ -369,7 +379,7 @@ class MaxProbingModel(torch.nn.Module):
 
     
 class DecodingModel(torch.nn.Module):
-    def __init__(self, embedding_model, padded_seq_len=1):
+    def __init__(self, embedding_model, padded_seq_len=1, hidden_dim=100):
         super(DecodingModel, self).__init__()
 
         self.embedding_model = embedding_model
@@ -404,9 +414,15 @@ class DecodingModel(torch.nn.Module):
             encoder = self.embedding_model.encoder
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
+        elif type(self.embedding_model) == RandomEmbeddingModel:
+            self.embedding_type = 'Random'
+            encoder = self.embedding_model.embedding_matrix
+            bilstm_input_dim = encoder.size()[1]
+            self.has_start_token = True     
         
         #hidden_dim = 50 # tests pre-May 30 were hidden_dim=50
-        hidden_dim = 100
+        # hidden_dim made a parameter on June 30
+        #hidden_dim = 100
 
         # their description suggests ReLU at every layer,
         #  though their implementation only has it for first two,
@@ -448,6 +464,10 @@ class DecodingModel(torch.nn.Module):
             input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
+        elif self.embedding_type == 'Random':
+            input_text = input_text['input_ids']
+            forward = self.embedding_model.forward(input_text)
+            encoder_state = forward
 
         # slice off start and end tokens
         if self.has_start_token:
@@ -470,7 +490,7 @@ class DecodingModel(torch.nn.Module):
     
     
 class AdditionModel(torch.nn.Module):
-    def __init__(self, embedding_model, padded_seq_len=2):
+    def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=100):
         super(AdditionModel, self).__init__()
 
         self.embedding_model = embedding_model
@@ -506,9 +526,14 @@ class AdditionModel(torch.nn.Module):
             encoder = self.embedding_model.encoder
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
+        elif type(self.embedding_model) == RandomEmbeddingModel:
+            self.embedding_type = 'Random'
+            encoder = self.embedding_model.embedding_matrix
+            bilstm_input_dim = encoder.size()[1]
+            self.has_start_token = True
         
         #hidden_dim = 50 # pre-May 30
-        hidden_dim = 100
+        #hidden_dim = 100 # pre-June 30, now a parameter
 
         # their description suggests ReLU at every layer,
         #  though their implementation only has it for first two,
@@ -551,6 +576,10 @@ class AdditionModel(torch.nn.Module):
             input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
+        elif self.embedding_type == 'Random':
+            input_text = input_text['input_ids']
+            forward = self.embedding_model.forward(input_text)
+            encoder_state = forward
         
         if self.has_start_token:
             start = 1
@@ -603,6 +632,11 @@ class UnitsModel(torch.nn.Module):
             encoder = self.embedding_model.encoder
             bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
+        elif type(self.embedding_model) == RandomEmbeddingModel:
+            self.embedding_type = 'Random'
+            encoder = self.embedding_model.embedding_matrix
+            bilstm_input_dim = encoder.size()[1]
+            self.has_start_token = True
         
         # they fail to specify their hidden_dim anywhere
 #         self.linear_1 = torch.nn.Linear(in_features=input_dim,
@@ -652,6 +686,10 @@ class UnitsModel(torch.nn.Module):
             input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
+        elif self.embedding_type == 'Random':
+            input_text = input_text['input_ids']
+            forward = self.embedding_model.forward(input_text)
+            encoder_state = forward
 
         if self.has_start_token:
             start = 1
@@ -707,6 +745,11 @@ class ContextUnitsModel(torch.nn.Module):
             encoder = self.embedding_model.encoder
             bilstm_input_dim = encoder.layer[11].output.dense.out_features
             self.has_start_token = True
+        elif type(self.embedding_model) == RandomEmbeddingModel:
+            self.embedding_type = 'Random'
+            encoder = self.embedding_model.embedding_matrix
+            bilstm_input_dim = encoder.size()[1]
+            self.has_start_token = True
 
         self.bilstm = torch.nn.LSTM(input_size = bilstm_input_dim,
                                     hidden_size = hidden_dim,
@@ -743,6 +786,10 @@ class ContextUnitsModel(torch.nn.Module):
             input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
+        elif self.embedding_type == 'Random':
+            input_text = input_text['input_ids']
+            forward = self.embedding_model.forward(input_text)
+            encoder_state = forward
             
         if self.has_start_token:
             start = 1
@@ -761,7 +808,7 @@ class ContextUnitsModel(torch.nn.Module):
     
 # TODO: revisit: BiLSTM may be more appropriate
 class RangeModel(torch.nn.Module):
-    def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=5):
+    def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=100):
         super(RangeModel, self).__init__()
         
         self.embedding_model = embedding_model
@@ -796,8 +843,13 @@ class RangeModel(torch.nn.Module):
             encoder = self.embedding_model.encoder
             input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
             self.has_start_token = True
-
-        hidden_dim = 50
+        elif type(self.embedding_model) == RandomEmbeddingModel:
+            self.embedding_type = 'Random'
+            encoder = self.embedding_model.embedding_matrix
+            input_dim = encoder.size()[1]
+            self.has_start_token = True
+            
+        #hidden_dim = 50 # hard-coded as 50 until 30 June!
         
         self.joined_linear = torch.nn.Linear(in_features=input_dim,
                                              out_features=hidden_dim)
@@ -844,6 +896,10 @@ class RangeModel(torch.nn.Module):
             input_text = {k: v for (k, v) in input_text.items() if k != 'decoder_input_ids'}
             forward = self.embedding_model.forward(**input_text)
             encoder_state = forward.last_hidden_state
+        elif self.embedding_type == 'Random':
+            input_text = input_text['input_ids']
+            forward = self.embedding_model.forward(input_text)
+            encoder_state = forward
         
         # slice off start and end tokens
         if self.has_start_token:
