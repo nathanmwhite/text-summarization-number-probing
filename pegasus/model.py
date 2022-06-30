@@ -224,7 +224,7 @@ def freeze_module(module, module_type):
 
 #         return y_pred
 
-
+# TODO: what self.embedding_model type will this show up as?
 class RandomEmbeddingModel(torch.nn.Module):
     def __init__(self, vocab_size=30522, embedding_size=128):
         self.vocab_size = vocab_size
