@@ -16,6 +16,7 @@ from transformers import BartTokenizer, BartForConditionalGeneration
 from transformers import ProphetNetTokenizer, ProphetNetForConditionalGeneration
 from transformers import BertTokenizer, BertModel
 from transformers import BertConfig as TrBertConfig
+from .model import RandomEmbeddingModel
 from ..s2s_ft.tokenization_unilm import UnilmTokenizer
 from ..s2s_ft.modeling_decoding import BertForSeq2SeqDecoder
 from ..s2s_ft.modeling_decoding import BertConfig as S2SBertConfig
@@ -51,7 +52,8 @@ MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'DistilBart': "sshleifer/distilbart-xsum-12-6",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
                   'UniLM': "unilm2-base-uncased",
-                  'Bert': "bert-base-uncased"}
+                  'Bert': "bert-base-uncased",
+                  'Random': "random-vectors"}
 
 
 def get_model_name(model_type):
@@ -79,6 +81,8 @@ def get_tokenizer(model_name):
         tokenizer = UnilmTokenizer.from_pretrained(vocab_path)
     elif model_name == MODEL_NAME_MAP['Bert']:
         tokenizer = BertTokenizer.from_pretrained(model_name)
+    elif model_name == MODEL_NAME_MAP['Random']:
+        tokenizer = BertTokenizer.from_pretrained(MODEL_NAME_MAP['Bert'])
     return tokenizer
 
                         
@@ -113,5 +117,7 @@ def get_embedding_model(model_name, trained=True):
             report_phase('Creating new untrained Bert model.')
             config_ = TrBertConfig()
             embedding_model = BertModel(config_)
+    elif model_name == MODEL_NAME_MAP['Random']:
+        embedding_model = RandomEmbeddingModel()
            
     return embedding_model
