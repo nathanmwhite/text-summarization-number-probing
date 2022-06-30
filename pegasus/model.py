@@ -421,7 +421,7 @@ class DecodingModel(torch.nn.Module):
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
             encoder = self.embedding_model
-            input_dim = encoder.embedding_size
+            input_dim = encoder.embedding_size * padded_seq_len
             self.has_start_token = True     
         
         #hidden_dim = 50 # tests pre-May 30 were hidden_dim=50
@@ -533,7 +533,7 @@ class AdditionModel(torch.nn.Module):
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
             encoder = self.embedding_model
-            input_dim = encoder.embedding_size
+            input_dim = encoder.embedding_size * padded_seq_len
             self.has_start_token = True
         
         #hidden_dim = 50 # pre-May 30
@@ -850,7 +850,7 @@ class RangeModel(torch.nn.Module):
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
             encoder = self.embedding_model
-            input_dim = encoder.embedding_size
+            input_dim = encoder.embedding_size * padded_seq_len
             self.has_start_token = True
             
         #hidden_dim = 50 # hard-coded as 50 until 30 June!
