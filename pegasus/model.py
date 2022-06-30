@@ -222,6 +222,20 @@ def freeze_module(module, module_type):
 #         return y_pred
 
 
+class RandomEmbeddingModel(torch.nn.Module):
+    def __init__(self, vocab_size=30522, embedding_size=128):
+        self.vocab_size = vocab_size
+        self.embedding_size = embedding_size
+        
+        self.embedding_matrix = torch.rand(self.vocab_size, self.embedding_size)
+        self.embedding_matrix[0, :].zero_()
+        
+        # TODO: determine what to do with values such as <sep> or </s>
+        
+    def forward(self, input_text):
+        return embedding(input_text, self.embedding_matrix, padding_idx=0)
+
+
 class MaxProbingModel(torch.nn.Module):
     def __init__(self, embedding_model, padded_seq_len=5, hidden_dim=5):
         super(MaxProbingModel, self).__init__()
