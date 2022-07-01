@@ -812,7 +812,7 @@ class ContextUnitsModel(torch.nn.Module):
     
 # TODO: revisit: BiLSTM may be more appropriate
 class RangeModel(torch.nn.Module):
-    def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=100):
+    def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=50):
         super(RangeModel, self).__init__()
         
         self.embedding_model = embedding_model
