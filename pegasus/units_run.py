@@ -20,7 +20,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn.utils import clip_grad_norm_
 
-from torchmetrics import Accuracy
+from torchmetrics import Accuracy, F1Score
 
 from .generate_data import generate_data
 from .model import UnitsModel, ContextUnitsModel, report_phase, freeze_module
@@ -28,12 +28,16 @@ from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_
 from .early_stopping import Early_Stopping
 
 
-def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_classes, clip_norm):
+def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_classes, clip_norm, context_units=False):
     batch_loss = 0.0
     continuing_loss = 0.0
     total_loss = 0.0
     
-    accuracy = Accuracy(num_classes=num_classes)
+    if context_units:
+        f1macro = F1Score(num_classes=num_classes, average='macro')
+        f1weighted = F1Score(num_classes=num_classes, average='weighted')
+    else:
+        accuracy = Accuracy(num_classes=num_classes)
     
     for i, data_batch in enumerate(training_data_loader):
         inputs, labels = data_batch
@@ -60,7 +64,11 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_
         labels_cpu = label_int_tensor.to("cpu")
         outputs_cpu = outputs.to("cpu")
         
-        batch_accuracy = accuracy(outputs_cpu, labels_cpu)
+        if context_units:
+            batch_f1macro = f1macro(outputs_cpu, labels_cpu)
+            batch_f1weighted = f1weighted(outputs_cpu, labels_cpu)
+        else:
+            batch_accuracy = accuracy(outputs_cpu, labels_cpu)
         
         clip_grad_norm_(filter(lambda x: x.requires_grad, model.parameters()), clip_norm)
                 
@@ -77,12 +85,19 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_
             logging.info(loss_message)
             continuing_loss = 0.0
             
-    return batch_loss, continuing_loss, total_loss, accuracy.compute()
+    if context_units:
+        return batch_loss, continuing_loss, total_loss, f1macro.compute(), f1weighted.compute()
+    else:
+        return batch_loss, continuing_loss, total_loss, accuracy.compute()
 
 
-def evaluate(model, eval_dataloader):
+def evaluate(model, eval_dataloader, num_classes=None, context_units=False):
     model.eval()
-    accuracy = Accuracy()
+    if context_units:
+        f1macro = F1Score(num_classes=num_classes, average='macro')
+        f1weighted = F1Score(num_classes=num_classes, average='weighted')
+    else:
+        accuracy = Accuracy()
     
     for i, data_point in enumerate(eval_dataloader):
         inputs, labels = data_point
@@ -95,9 +110,16 @@ def evaluate(model, eval_dataloader):
         labels_cpu = label_int_tensor.to("cpu")
         outputs_cpu = output.to("cpu")
         
-        _ = accuracy(outputs_cpu, labels_cpu)
+        if context_units:
+            _ = f1macro(outputs_cpu, labels_cpu)
+            _ = f1weighted(outputs_cpu, labels_cpu)
+        else:  
+            _ = accuracy(outputs_cpu, labels_cpu)
         
-    return accuracy.compute()
+    if context_units:
+        return f1macro.compute(), f1weighted.compute()
+    else:
+        return accuracy.compute()
   
   
 if __name__ == '__main__':
@@ -218,6 +240,7 @@ if __name__ == '__main__':
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
     
+    # TODO: review whether to provide weights for CrossEntropyLoss
     loss_fn = torch.nn.CrossEntropyLoss()
     
     # hyperparameters per Wallace et al. (2019) code
@@ -243,9 +266,14 @@ if __name__ == '__main__':
 
         # Make sure gradient tracking is on, and do a pass over the data
         dm.train(True)
-        avg_loss, continuing_loss, total_loss, acc = train_epoch(
-            epoch_number, training_dataloader, dm, loss_fn, 
-            optimizer, output_dim, args.clip_norm)
+        if args.context_units:
+            avg_loss, continuing_loss, total_loss, f1macro, f1weighted = train_epoch(
+                epoch_number, training_dataloader, dm, loss_fn,
+                optimizer, output_dim, args.clip_norm, args.context_units)
+        else:
+            avg_loss, continuing_loss, total_loss, acc = train_epoch(
+                epoch_number, training_dataloader, dm, loss_fn, 
+                optimizer, output_dim, args.clip_norm)
         
 #         phase_message = f"End of epoch average batch loss: {avg_loss}"
 #         report_phase(phase_message)
@@ -278,7 +306,14 @@ if __name__ == '__main__':
     dm.eval()
     
     with torch.no_grad():
-        accuracy = evaluate(dm, test_dataloader)
+        if args.context_units:
+            f1macro, f1weighted = evaluate(dm, 
+                                           test_dataloader, 
+                                           num_classes=output_dim,
+                                           context_units=args.context_units
+                                          )
+        else:
+            accuracy = evaluate(dm, test_dataloader)
         
     hyperparam_set = ('Units trial',
                       args.embedding_model,
@@ -290,5 +325,11 @@ if __name__ == '__main__':
                       
     message = f"Model hyperparameters: " + ' | '.join(str(w) for w in hyperparam_set)
     report_phase(message)
-    message = f"Test accuracy: {accuracy}"
-    report_phase(message)
+    if args.context_units:
+        message = f"Test F1 Macro: {f1macro}"
+        report_phase(message)
+        message = f"Test F1 Weighted: {f1weighted}"
+        report_phase(message)
+    else:
+        message = f"Test accuracy: {accuracy}"
+        report_phase(message)
