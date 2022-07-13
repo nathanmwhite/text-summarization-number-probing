@@ -361,9 +361,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 #         num_test_examples = len(test_sents)
         
         # Despite Transformers documentation, produces warning:
-        #  Using sep_token, but it is not set yet.
+        #  Using sep_token, but it is not set yet
         # Choice: use sep_token if set, otherwise eos_token
         #  interpreting eos as end of sentence
+        # Note: if sep_token is not set yet, then it is None,
+        #  which triggers the else statement and uses tokenizer.eos_token.
+        # All models either have sep_token or eos_token;
+        # Only Bart-type models have both sep_token and eos_token, defined as the same element
         if tokenizer.sep_token:
             sep_token = tokenizer.sep_token
         else:
