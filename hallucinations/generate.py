@@ -18,7 +18,7 @@ from datasets import load_dataset
 
 #from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 
-from .util import get_model_name, get_tokenizer, get_embedding_model
+from ..pegasus.util import get_model_name, get_tokenizer, get_embedding_model
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
