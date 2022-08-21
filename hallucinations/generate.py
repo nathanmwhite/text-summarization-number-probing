@@ -35,7 +35,7 @@ def is_a_number(sequence):
 
 
 def get_numbers(data_line):
-    word_sequence = data_line.split(' ')
+    word_sequence = data_line[0].split(' ')
     found = []
     for word in word_sequence:
         if is_a_number(word):
@@ -57,7 +57,7 @@ def generate_results(tokenizer, model, dataset):
     for item in dataset['test']:
         doc = item['document']
         
-        doc_numbers = get_numbers(doc[0])
+        doc_numbers = get_numbers(doc)
 
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
         #print(batch_result)
