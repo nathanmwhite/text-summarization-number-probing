@@ -60,7 +60,9 @@ def generate_results(tokenizer, model, dataset):
         doc_numbers = get_numbers(doc)
 
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc)
+        print(batch_result)
         out = model.generate(**batch_result)
+        print(out)
         out_sequence = tokenizer.batch_decode(out)
         
         out_numbers = get_numbers(out_sequence)
