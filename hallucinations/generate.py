@@ -20,6 +20,8 @@ from datasets import load_dataset
 
 from .util import get_model_name, get_tokenizer, get_embedding_model
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 def is_a_number(sequence):
     for i, c in enumerate(sequence):
@@ -57,7 +59,7 @@ def generate_results(tokenizer, model, dataset):
         
         doc_numbers = get_numbers(doc)
 
-        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc)
+        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc).to(device)
         out = model.generate(**batch_result)
         out_sequence = tokenizer.batch_decode(out)
         
@@ -81,8 +83,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
     args = parser.parse_args()
-
-    model_name = get_model_name(args.embedding_model)
+    
+    model_name = get_model_name(args.embedding_model).to(device)
     tokenizer = get_tokenizer(model_name)
     model = get_embedding_model(model_name)
     
