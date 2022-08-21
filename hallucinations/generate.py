@@ -10,6 +10,8 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 
 import argparse
 
+import string
+
 import torch
 
 from datasets import load_dataset
@@ -19,15 +21,51 @@ from datasets import load_dataset
 from .util import get_model_name, get_tokenizer, get_embedding_model
 
 
+def is_a_number(sequence):
+    for i, c in enumerate(sequence):
+        if c in string.digits:
+            continue
+        elif c in '-,.' and i > 0:
+            continue
+        else:
+            return False
+    return True
+
+
+def get_numbers(data_line):
+    word_sequence = data_line.split(' ')
+    found = []
+    for word in word_sequence:
+        if is_a_number(word):
+            found.append(word)
+    return found
+
+
+def values_shared(group1, group2):
+    set1 = set(group1)
+    set2 = set(group2)
+    if set1.intersection(set2) == set():
+        return False
+    else:
+        return True
+
+
 def generate_results(tokenizer, model, dataset):
     results = []
     for item in dataset['test']:
         doc = item['document']
-        #tokenized = tokenizer(doc, return_tensors='pt', truncation=True, max_length=128)
+        
+        doc_numbers = get_numbers(doc)
+
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc)
         out = model.generate(**batch_result)
         out_sequence = tokenizer.batch_decode(out)
-        results.append((doc, out_sequence))
+        
+        out_numbers = get_numbers(out_sequence)
+        
+        if values_shared(doc_numbers, out_numbers) == False:
+            results.append((doc, out_sequence))
+            
     return results
 
 
