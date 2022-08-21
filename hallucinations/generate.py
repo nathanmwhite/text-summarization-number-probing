@@ -57,7 +57,7 @@ def generate_results(tokenizer, model, dataset):
     for item in dataset['test']:
         doc = item['document']
         
-        doc_numbers = get_numbers(doc)
+        doc_numbers = get_numbers(doc[0])
 
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
         #print(batch_result)
