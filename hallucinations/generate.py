@@ -59,7 +59,7 @@ def generate_results(tokenizer, model, dataset):
         
         doc_numbers = get_numbers(doc)
 
-        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc).to(device)
+        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc)
         out = model.generate(**batch_result)
         out_sequence = tokenizer.batch_decode(out)
         
@@ -84,9 +84,9 @@ if __name__ == '__main__':
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
     args = parser.parse_args()
     
-    model_name = get_model_name(args.embedding_model).to(device)
-    tokenizer = get_tokenizer(model_name)
-    model = get_embedding_model(model_name)
+    model_name = get_model_name(args.embedding_model)
+    tokenizer = get_tokenizer(model_name).to(device)
+    model = get_embedding_model(model_name).to(device)
     
     dataset = load_dataset('xsum', cache_dir='./models')
 
