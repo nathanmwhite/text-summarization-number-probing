@@ -61,6 +61,9 @@ def generate_results(tokenizer, model, dataset):
 
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
         #print(batch_result)
+        for k in batch_result.keys():
+            batch_result[k] = batch_result[k].to(device)
+        
         out = model.generate(**batch_result)
         #print(out)
         out_sequence = tokenizer.batch_decode(out)
