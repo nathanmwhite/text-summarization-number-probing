@@ -59,7 +59,7 @@ def generate_results(tokenizer, model, dataset):
         
         doc_numbers = get_numbers(doc)
 
-        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc).to(device)
+        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc)
         out = model.generate(**batch_result)
         out_sequence = tokenizer.batch_decode(out)
         
