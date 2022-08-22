@@ -35,7 +35,7 @@ def is_a_number(sequence):
 
 
 def get_numbers(data_line):
-    word_sequence = data_line[0].split(' ')
+    word_sequence = data_line.split(' ')
     found = []
     for word in word_sequence:
         if is_a_number(word):
@@ -68,7 +68,7 @@ def generate_results(tokenizer, model, dataset):
         #print(out)
         out_sequence = tokenizer.batch_decode(out)
         
-        out_numbers = get_numbers(out_sequence)
+        out_numbers = get_numbers(out_sequence[0])
         
         if values_shared(doc_numbers, out_numbers) == False:
             results.append((doc, out_sequence))
