@@ -17,6 +17,7 @@ import torch
 from datasets import load_dataset
 
 #from transformers import PegasusTokenizer, PegasusForConditionalGeneration
+from transformers import ProphetNetForConditionalGeneration
 
 from ..pegasus.util import get_model_name, get_tokenizer, get_embedding_model
 
@@ -62,7 +63,10 @@ def generate_results(tokenizer, model, dataset):
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
         #print(batch_result)
         for k in batch_result.keys():
-            batch_result[k] = batch_result[k].to(device)
+            if k == 'token_type_ids' and type(model) == ProphetNetForConditionalGeneration:
+                continue
+            else:
+                batch_result[k] = batch_result[k].to(device)
         
         out = model.generate(**batch_result)
         #print(out)
