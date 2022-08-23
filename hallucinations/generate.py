@@ -62,13 +62,17 @@ def generate_results(tokenizer, model, dataset):
 
         batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
         #print(batch_result)
+        batch_result_out = {}
         for k in batch_result.keys():
+            print(type(model))
             if k == 'token_type_ids' and type(model) == ProphetNetForConditionalGeneration:
                 continue
             else:
-                batch_result[k] = batch_result[k].to(device)
-        
-        out = model.generate(**batch_result)
+                batch_result_out[k] = batch_result[k].to(device)
+        try:
+            out = model.generate(**batch_result_out)
+        except TypeError:
+            out = model.generate(
         #print(out)
         out_sequence = tokenizer.batch_decode(out)
         
