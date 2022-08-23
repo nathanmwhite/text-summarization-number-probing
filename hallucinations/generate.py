@@ -47,7 +47,7 @@ def get_numbers(data_line):
 def values_shared(group1, group2):
     set1 = set(group1)
     set2 = set(group2)
-    if set1.intersection(set2) == set():
+    if set1.intersection(set2) == set() and set2 != set():
         return False
     else:
         return True
