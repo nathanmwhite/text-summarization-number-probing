@@ -69,10 +69,8 @@ def generate_results(tokenizer, model, dataset):
                 continue
             else:
                 batch_result_out[k] = batch_result[k].to(device)
-        try:
-            out = model.generate(**batch_result_out)
-        except TypeError:
-            out = model.generate(
+
+        out = model.generate(**batch_result_out)
         #print(out)
         out_sequence = tokenizer.batch_decode(out)
         
