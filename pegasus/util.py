@@ -47,10 +47,13 @@ def obtain_units(source_loc):
 
 MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'T5': "t5-base",
-                  'SSR': "microsoft/ssr-base",
+                  'T5-CDM': "flax-community/t5-base-cnn-dm", # unknown if same tokenizer is appropriate
+                  'SSR': "microsoft/ssr-base", # no equivalent for SSR
                   'Bart': "facebook/bart-base",
+                  'Bart-XSum': "facebook/bart-large-xsum",
                   'DistilBart': "sshleifer/distilbart-xsum-12-6",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
+                  'ProphetNet-CDM': "microsoft/prophetnet-large-uncased-cnndm", 
                   'UniLM': "unilm2-base-uncased",
                   'Bert': "bert-base-uncased",
                   'Random': "random-vectors"}
@@ -68,11 +71,11 @@ def get_model_name(model_type):
 def get_tokenizer(model_name):
     if model_name == MODEL_NAME_MAP['Pegasus']:
         tokenizer = PegasusTokenizer.from_pretrained(model_name)
-    elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR']):
+    elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR'], MODEL_NAME_MAP['T5-CDM']):
         tokenizer = T5Tokenizer.from_pretrained(model_name)
-    elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart']):
+    elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart'], MODEL_NAME_MAP['Bart-XSum']):
         tokenizer = BartTokenizer.from_pretrained(model_name)
-    elif model_name == MODEL_NAME_MAP['ProphetNet']:
+    elif model_name in (MODEL_NAME_MAP['ProphetNet'], MODEL_NAME_MAP['ProphetNet-CDM']):
         tokenizer = ProphetNetTokenizer.from_pretrained(model_name)
     elif model_name == MODEL_NAME_MAP['UniLM']:
         vocab_path = os.path.abspath(os.path.join('text-summarization-number-probing', 
@@ -89,11 +92,11 @@ def get_tokenizer(model_name):
 def get_embedding_model(model_name, trained=True):
     if model_name == MODEL_NAME_MAP['Pegasus']:
         embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
-    elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR']):
+    elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR'], MODEL_NAME_MAP['T5-CDM']):
         embedding_model = T5ForConditionalGeneration.from_pretrained(model_name)
-    elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart']):
+    elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart'], MODEL_NAME_MAP['Bart-XSum']):
         embedding_model = BartForConditionalGeneration.from_pretrained(model_name)
-    elif model_name == MODEL_NAME_MAP['ProphetNet']:
+    elif model_name in (MODEL_NAME_MAP['ProphetNet'], MODEL_NAME_MAP['ProphetNet-CDM']):
         # TODO: test if AutoModelForConditionalGeneration works; 
         #  default listed is AutoModelForSeq2SeqLM
         embedding_model = ProphetNetForConditionalGeneration.from_pretrained(model_name)
