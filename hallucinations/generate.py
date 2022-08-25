@@ -60,7 +60,7 @@ def generate_results(tokenizer, model, dataset, task_prefix):
         
         doc_numbers = get_numbers(doc)
 
-        if task_prefix:
+        if task_prefix and type(model) == T5ForConditionalGeneration:
             batch_result = tokenizer.prepare_seq2seq_batch(src_texts='summarize: ' + doc, return_tensors='pt')
         else:
             batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
