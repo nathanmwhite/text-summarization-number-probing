@@ -17,7 +17,7 @@ import torch
 from datasets import load_dataset
 
 #from transformers import PegasusTokenizer, PegasusForConditionalGeneration
-from transformers import ProphetNetForConditionalGeneration
+from transformers import T5ForConditionalGeneration, ProphetNetForConditionalGeneration
 
 from ..pegasus.util import get_model_name, get_tokenizer, get_embedding_model
 
@@ -53,14 +53,17 @@ def values_shared(group1, group2):
         return True
 
 
-def generate_results(tokenizer, model, dataset):
+def generate_results(tokenizer, model, dataset, task_prefix):
     results = []
     for item in dataset['test']:
         doc = item['document']
         
         doc_numbers = get_numbers(doc)
 
-        batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
+        if task_prefix:
+            batch_result = tokenizer.prepare_seq2seq_batch(src_texts='summarize: ' + doc, return_tensors='pt')
+        else:
+            batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
         #print(batch_result)
         batch_result_out = {}
         for k in batch_result.keys():
@@ -93,6 +96,7 @@ def record_results(results):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
+    parser.add_argument('--task_prefix', type=bool, default=False)
     args = parser.parse_args()
     
     model_name = get_model_name(args.embedding_model)
@@ -101,5 +105,5 @@ if __name__ == '__main__':
     
     dataset = load_dataset('xsum', cache_dir='./models')
 
-    results = generate_results(tokenizer, model, dataset)
+    results = generate_results(tokenizer, model, dataset, args.task_prefix)
     record_results(results)
