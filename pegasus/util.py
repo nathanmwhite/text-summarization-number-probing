@@ -10,6 +10,7 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 
 import os
 
+from transformers import AutoTokenizer
 from transformers import PegasusTokenizer, PegasusForConditionalGeneration
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from transformers import BartTokenizer, BartForConditionalGeneration
@@ -71,8 +72,10 @@ def get_model_name(model_type):
 def get_tokenizer(model_name):
     if model_name == MODEL_NAME_MAP['Pegasus']:
         tokenizer = PegasusTokenizer.from_pretrained(model_name)
-    elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR'], MODEL_NAME_MAP['T5-CDM']):
+    elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR']):
         tokenizer = T5Tokenizer.from_pretrained(model_name)
+    elif model_name == MODEL_NAME_MAP['T5-CDM']:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
     elif model_name in (MODEL_NAME_MAP['Bart'], MODEL_NAME_MAP['DistilBart'], MODEL_NAME_MAP['Bart-XSum']):
         tokenizer = BartTokenizer.from_pretrained(model_name)
     elif model_name in (MODEL_NAME_MAP['ProphetNet'], MODEL_NAME_MAP['ProphetNet-CDM']):
