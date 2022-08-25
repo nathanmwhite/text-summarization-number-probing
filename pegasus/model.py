@@ -65,7 +65,7 @@ def freeze_module(module, module_type):
                                   'decoder',
                                   'layers',
                                   'self_attn'}
-    elif module_type in ('T5', 'SSR'): # referred to as T5 below
+    elif module_type in ('T5', 'SSR', 'T5-CDM'): # referred to as T5 below
         operational_layer_types = {'shared',
                                    'embed_tokens',
                                    'q',
@@ -87,7 +87,7 @@ def freeze_module(module, module_type):
                                   'DenseReluDense', 
                                   'decoder', 
                                   'EncDecAttention'}
-    elif module_type in ('Bart', 'DistilBart'): # referred to as Bart below
+    elif module_type in ('Bart', 'DistilBart', 'Bart-XSum'): # referred to as Bart below
         operational_layer_types = {'shared',
                                    'embed_tokens',
                                    'embed_positions',
@@ -108,7 +108,7 @@ def freeze_module(module, module_type):
                                   'self_attn',
                                   'decoder',
                                   'encoder_attn'}
-    elif module_type == 'ProphetNet':
+    elif module_type in ('ProphetNet', 'ProphetNet-CDM'):
         operational_layer_types = {'word_embeddings',
                                    'position_embeddings',
                                    'embeddings_layer_norm',
