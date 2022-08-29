@@ -79,8 +79,8 @@ def generate_results(tokenizer, model, dataset, task_prefix):
         
         out_numbers = get_numbers(out_sequence[0])
         
-        if values_shared(doc_numbers, out_numbers) == False:
-            results.append((doc, out_sequence))
+        #if values_shared(doc_numbers, out_numbers) == False:
+        results.append((doc, out_sequence))
             
     return results
 
