@@ -144,7 +144,7 @@ if __name__ == '__main__':
         simple_iteration=args.simple_iteration,
         float_=args.float)
     
-    if args.embedding_model in ('Pegasus', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
+    if args.embedding_model in ('Pegasus', 'Pegasus-CDM', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
         start_token_length = 0
     elif args.embedding_model in ('Bert', 'Bart', 'Bart-L', 'Bart-XSum', 'Bart-CDM', 'DistilBart', 'DistilBart-CDM', 'UniLM', 'Random'):
         start_token_length = 1
