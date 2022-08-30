@@ -47,6 +47,7 @@ def obtain_units(source_loc):
 
 
 MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
+                  'Pegasus-CDM': "google/pegasus-cnn_dailymail",
                   'T5': "t5-base",
                   'T5-CDM': "flax-community/t5-base-cnn-dm", # note also: sshleifer/t5-base-cnn
                   'SSR': "microsoft/ssr-base", # no equivalent for SSR
@@ -73,7 +74,7 @@ def get_model_name(model_type):
 
 
 def get_tokenizer(model_name):
-    if model_name == MODEL_NAME_MAP['Pegasus']:
+    if model_name in (MODEL_NAME_MAP['Pegasus'], MODEL_NAME_MAP['Pegasus-CDM']):
         tokenizer = PegasusTokenizer.from_pretrained(model_name)
     elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR']):
         tokenizer = T5Tokenizer.from_pretrained(model_name)
@@ -101,7 +102,7 @@ def get_tokenizer(model_name):
 
                         
 def get_embedding_model(model_name, trained=True):
-    if model_name == MODEL_NAME_MAP['Pegasus']:
+    if model_name in (MODEL_NAME_MAP['Pegasus'], MODEL_NAME_MAP['Pegasus-CDM']):
         embedding_model = PegasusForConditionalGeneration.from_pretrained(model_name)
     elif model_name in (MODEL_NAME_MAP['T5'], MODEL_NAME_MAP['SSR'], MODEL_NAME_MAP['T5-CDM']):
         embedding_model = T5ForConditionalGeneration.from_pretrained(model_name)
