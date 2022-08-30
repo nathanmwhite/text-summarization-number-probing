@@ -146,7 +146,7 @@ if __name__ == '__main__':
     
     if args.embedding_model in ('Pegasus', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
         start_token_length = 0
-    elif args.embedding_model in ('Bart', 'Bart-XSum', 'DistilBart', 'UniLM', 'Bert', 'Random'):
+    elif args.embedding_model in ('Bert', 'Bart', 'Bart-L', 'Bart-XSum', 'Bart-CDM', 'DistilBart', 'DistilBart-CDM', 'UniLM', 'Random'):
         start_token_length = 1
 #     else:
 #         raise ValueError('Error: --embedding_model must be a valid model type.')
