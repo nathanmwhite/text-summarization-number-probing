@@ -191,7 +191,7 @@ if __name__ == '__main__':
         float_=args.float,
         units_loc=units_path, data_loc=data_path)
     
-    if args.embedding_model in ('Pegasus', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
+    if args.embedding_model in ('Pegasus', 'Pegasus-CDM', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
         start_token_length = 0
     elif args.embedding_model in ('Bert', 'Bart', 'Bart-L', 'Bart-XSum', 'Bart-CDM', 'DistilBart', 'DistilBart-CDM', 'UniLM', 'Random'):
         start_token_length = 1
