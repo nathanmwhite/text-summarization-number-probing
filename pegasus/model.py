@@ -46,7 +46,7 @@ def freeze_module(module, module_type):
                 freeze_component(module_)
 #                 report_phase(f'Expanding {name}.')
     
-    if module_type == 'Pegasus':
+    if module_type in ('Pegasus', 'Pegasus-CDM'):
         # embed_positions may not be necessary
         operational_layer_types = {'shared',
                                    'embed_tokens',
@@ -87,7 +87,12 @@ def freeze_module(module, module_type):
                                   'DenseReluDense', 
                                   'decoder', 
                                   'EncDecAttention'}
-    elif module_type in ('Bart', 'DistilBart', 'Bart-XSum'): # referred to as Bart below
+    elif module_type in ('Bart', 
+                         'DistilBart', 
+                         'Bart-L', 
+                         'Bart-XSum',
+                         'Bart-CDM',
+                         'DistilBart-CDM'): # referred to as Bart below
         operational_layer_types = {'shared',
                                    'embed_tokens',
                                    'embed_positions',
@@ -508,7 +513,7 @@ class AdditionModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * padded_seq_len
+            input_dim = encoder.block[-1].layer[1].DenseReluDense.wo.out_features * padded_seq_len
             self.has_start_token = False
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
@@ -518,17 +523,17 @@ class AdditionModel(torch.nn.Module):
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
+            input_dim = encoder.layers[-1].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
             self.has_start_token = False
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
+            input_dim = encoder.layer[-1].output.dense.out_features * padded_seq_len
             self.has_start_token = True
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
+            input_dim = encoder.layer[-1].output.dense.out_features * padded_seq_len
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
@@ -614,7 +619,7 @@ class UnitsModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
+            bilstm_input_dim = encoder.block[-1].layer[1].DenseReluDense.wo.out_features
             self.has_start_token = False
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
@@ -624,17 +629,17 @@ class UnitsModel(torch.nn.Module):
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            bilstm_input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
+            bilstm_input_dim = encoder.layers[-1].feed_forward_layer_norm.normalized_shape[0]
             self.has_start_token = False
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            bilstm_input_dim = encoder.layer[-1].output.dense.out_features
             self.has_start_token = True
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            bilstm_input_dim = encoder.layer[-1].output.dense.out_features
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
@@ -727,7 +732,7 @@ class ContextUnitsModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features
+            bilstm_input_dim = encoder.block[-1].layer[1].DenseReluDense.wo.out_features
             self.has_start_token = False
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
@@ -737,17 +742,17 @@ class ContextUnitsModel(torch.nn.Module):
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            bilstm_input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0]
+            bilstm_input_dim = encoder.layers[-1].feed_forward_layer_norm.normalized_shape[0]
             self.has_start_token = False
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            bilstm_input_dim = encoder.layer[-1].output.dense.out_features
             self.has_start_token = True
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            bilstm_input_dim = encoder.layer[11].output.dense.out_features
+            bilstm_input_dim = encoder.layer[-1].output.dense.out_features
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
@@ -825,7 +830,7 @@ class RangeModel(torch.nn.Module):
         elif type(self.embedding_model) == T5ForConditionalGeneration:
             self.embedding_type = 'T5'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.block[11].layer[1].DenseReluDense.wo.out_features * padded_seq_len
+            input_dim = encoder.block[-1].layer[1].DenseReluDense.wo.out_features * padded_seq_len
             self.has_start_token = False
         elif type(self.embedding_model) == BartForConditionalGeneration:
             self.embedding_type = 'Bart'
@@ -835,17 +840,17 @@ class RangeModel(torch.nn.Module):
         elif type(self.embedding_model) == ProphetNetForConditionalGeneration:
             self.embedding_type = 'ProphetNet'
             encoder = self.embedding_model.prophetnet.encoder
-            input_dim = encoder.layers[11].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
+            input_dim = encoder.layers[-1].feed_forward_layer_norm.normalized_shape[0] * padded_seq_len
             self.has_start_token = False
         elif type(self.embedding_model) == BertForSeq2SeqDecoder:
             self.embedding_type = 'UniLM'
             encoder = self.embedding_model.bert.encoder
-            input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
+            input_dim = encoder.layer[-1].output.dense.out_features * padded_seq_len
             self.has_start_token = True
         elif type(self.embedding_model) == BertModel:
             self.embedding_type = 'Bert'
             encoder = self.embedding_model.encoder
-            input_dim = encoder.layer[11].output.dense.out_features * padded_seq_len
+            input_dim = encoder.layer[-1].output.dense.out_features * padded_seq_len
             self.has_start_token = True
         elif type(self.embedding_model) == RandomEmbeddingModel:
             self.embedding_type = 'Random'
