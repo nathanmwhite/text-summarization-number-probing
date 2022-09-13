@@ -44,7 +44,7 @@ def get_numbers(data_line):
     return found
 
 
-def values_shared(group1, group2):
+def values_shared_check(group1, group2):
     set1 = set(group1)
     set2 = set(group2)
     if set1.intersection(set2) == set() and set2 != set():
@@ -53,7 +53,7 @@ def values_shared(group1, group2):
         return True
 
 
-def generate_results(tokenizer, model, dataset, task_prefix):
+def generate_results(tokenizer, model, dataset, task_prefix, values_shared):
     results = []
     for item in dataset['test']:
         doc = item['document']
@@ -79,8 +79,8 @@ def generate_results(tokenizer, model, dataset, task_prefix):
         
         out_numbers = get_numbers(out_sequence[0])
         
-        #if values_shared(doc_numbers, out_numbers) == False:
-        results.append((doc, out_sequence))
+        if values_shared and values_shared_check(doc_numbers, out_numbers) == False:
+            results.append((doc, out_sequence))
             
     return results
 
@@ -97,6 +97,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
     parser.add_argument('--task_prefix', type=bool, default=False)
+    parser.add_argument('--values_shared', type=bool, default=False)
     args = parser.parse_args()
     
     model_name = get_model_name(args.embedding_model)
@@ -105,5 +106,5 @@ if __name__ == '__main__':
     
     dataset = load_dataset('xsum', cache_dir='./models')
 
-    results = generate_results(tokenizer, model, dataset, args.task_prefix)
+    results = generate_results(tokenizer, model, dataset, args.task_prefix, args.values_shared)
     record_results(results)
