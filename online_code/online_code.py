@@ -9,7 +9,6 @@ class OnlineCode:
         self.update_with_uniform_codelength()
 
     def update_with_uniform_codelength(self):
-        # confirm whether this should be _t_1 or n outright
         self._log_sum += self._t_1 * np.log2(self._K)
 
     def update_with_results(self, outputs, labels):
