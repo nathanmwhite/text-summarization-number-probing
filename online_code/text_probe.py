@@ -90,6 +90,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # TODO: update and structure for all tasks, not just addition
     # TODO: add task as argparse argument
+    parser.add_argument('--task', type=str, default='Addition')
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
     parser.add_argument('--training_examples', type=int, default=1000)
     parser.add_argument('--test_examples', type=int, default=100)
@@ -99,6 +100,7 @@ if __name__ == '__main__':
     parser.add_argument('--sample_max_float', type=int, default=99)
     parser.add_argument('--float', type=bool, default=False)
     parser.add_argument('--use_words', type=bool, default=False)
+    parser.add_argument('--num_partitions', type=int, default=10)
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.5)
     parser.add_argument('--epochs', type=int, default=10)
@@ -131,16 +133,23 @@ if __name__ == '__main__':
         sample_min = args.sample_min_int
         sample_max = args.sample_max_int
     
+    # TODO: revisit whether a test component is even relevant
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
+    
+    n_partitions = args.num_partitions
+    partition_size = math.floor(n_training_examples / n_partitions)
+    
+    if n_training_examples % n_partitions != 0:
+        n_last_portion = partition_size + (n_training_examples % n_partitions)
     
 #     phase_message = 'Begin generating dataset.'
 #     report_phase(phase_message)
     
-    # TODO: substitute appropriate task as arg from above
+    # TODO: substitute appropriate task as arg from above -- done
     training_dataset, test_dataset = generate_data(
         tokenizer, device, sample_min, sample_max,
-        n_training_examples, n_test_examples, 'Addition',
+        n_training_examples, n_test_examples, args.task,
         use_word_format=args.use_words, float_=args.float)
     
     if args.embedding_model in ('Pegasus', 'Pegasus-CDM', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
@@ -163,6 +172,7 @@ if __name__ == '__main__':
     
     # TODO: split DataLoader into n dataloaders,
     #  one for each chunk in the online code calculation
+    #  for length of each, use partition_size and n_last_portion
     training_dataloader = DataLoader(training_dataset, 
                                      batch_size=training_batch_size, 
                                      shuffle=True)
