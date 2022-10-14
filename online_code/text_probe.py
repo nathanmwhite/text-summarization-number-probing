@@ -216,6 +216,8 @@ if __name__ == '__main__':
     
     epoch_number = 0
     
+    # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
+    #  then codelength and compression need to be called in eval cycle
     for epoch in range(EPOCHS):
 #         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
 #         report_phase(epoch_message)
@@ -254,10 +256,13 @@ if __name__ == '__main__':
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
+    # TODO: determine whether a separate evaluate function on a test dataset is even necessary
     am.eval()
     with torch.no_grad():
         mse = evaluate(am, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
+    
+    # TODO: redo print of results based on codelength and compression as metrics
     hyperparam_set = ('Addition trial',
                       args.embedding_model,
                       args.training_examples,
