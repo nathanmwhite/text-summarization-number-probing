@@ -207,6 +207,7 @@ if __name__ == '__main__':
     
     loss_fn = torch.nn.MSELoss()
     
+    # likely obsolete:
     # hyperparameters per Wallace et al. (2019) code
     # TODO: learning rate is too big after epoch 35 or so
     # need to implement a LR scheduler
@@ -225,35 +226,42 @@ if __name__ == '__main__':
     early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
+    codelength = 0.0 # TODO: integrate correctly into Online_Code
+    compression = 0.0
     
     # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
     #  then codelength and compression need to be called in eval cycle
-    for epoch in range(EPOCHS):
-#         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
-#         report_phase(epoch_message)
-
-        # Make sure gradient tracking is on, and do a pass over the data
-        am.train(True)
-        avg_loss, continuing_loss, total_loss = train_epoch(
-            epoch_number, training_dataloader, am, loss_fn, optimizer, args.clip_norm
-        )
+    for loader in training_dataloaders:
+        am.eval()
+        with torch.no_grad():
+            step_codelength, step_compression = evaluate(am, loss_fn, loader)
         
-#         phase_message = f"End of epoch average batch loss: {avg_loss}"
-#         report_phase(phase_message)
-#         phase_message = f"End of epoch last loss: {continuing_loss}"
-#         report_phase(phase_message)
-#         phase_message = f"Epoch total loss: {total_loss}"
-#         report_phase(phase_message)
+        for epoch in range(EPOCHS):
+    #         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
+    #         report_phase(epoch_message)
 
-        if args.early_stopping:
-            early_stopping(total_loss)
-            if early_stopping.early_stopping == True:
-                message = f'Early stopping of training at epoch {epoch_number}.'
-                report_phase(message)
-                break
-                
-        
-        epoch_number += 1
+            # Make sure gradient tracking is on, and do a pass over the data
+            am.train(True)
+            avg_loss, continuing_loss, total_loss = train_epoch(
+                epoch_number, loader, am, loss_fn, optimizer, args.clip_norm
+            )
+
+    #         phase_message = f"End of epoch average batch loss: {avg_loss}"
+    #         report_phase(phase_message)
+    #         phase_message = f"End of epoch last loss: {continuing_loss}"
+    #         report_phase(phase_message)
+    #         phase_message = f"Epoch total loss: {total_loss}"
+    #         report_phase(phase_message)
+
+            if args.early_stopping:
+                early_stopping(total_loss)
+                if early_stopping.early_stopping == True:
+                    message = f'Early stopping of training at epoch {epoch_number}.'
+                    report_phase(message)
+                    break
+
+
+            epoch_number += 1
         
     # temporary: save last version of model
     # TODO: reimplement to save best version
@@ -273,7 +281,7 @@ if __name__ == '__main__':
     rmse = math.sqrt(mse)
     
     # TODO: redo print of results based on codelength and compression as metrics
-    hyperparam_set = ('Addition trial',
+    hyperparam_set = (f'{args.task} trial',
                       args.embedding_model,
                       args.training_examples,
                       args.lr,
