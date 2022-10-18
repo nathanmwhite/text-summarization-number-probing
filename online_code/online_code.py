@@ -22,5 +22,5 @@ class OnlineCode:
         # confirm expected value for joint just q(x, y) is
         #  the prequential codelength, or something further
         e_q = get_prequential_codelength()
-        uniform_encoding = self.n * np.log2(self._K)
+        uniform_encoding = n * np.log2(self._K)
         return uniform_encoding - codelength
