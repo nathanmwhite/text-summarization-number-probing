@@ -21,11 +21,11 @@ import torch
 from torch.utils.data import DataLoader
 from torch.nn.utils import clip_grad_norm_
 
-# TODO: update relative imports
-from .generate_data import generate_data
-from .model import AdditionModel, report_phase, freeze_module
-from .util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
-from .early_stopping import Early_Stopping
+# TODO: update relative imports -- done
+from ..pegasus.generate_data import generate_data
+from ..pegasus.model import AdditionModel, report_phase, freeze_module
+from ..pegasus.util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
+from ..pegasus.early_stopping import Early_Stopping
 
 from .online_code import Online_Code
 
@@ -173,15 +173,22 @@ if __name__ == '__main__':
     # temporary testing purposes
 #     print(training_batch_size)
     
-    # TODO: split DataLoader into n dataloaders,
+    # TODO: split DataLoader into n dataloaders, -- done
     #  one for each chunk in the online code calculation
     #  for length of each, use partition_size and n_last_portion
-    training_dataloader = DataLoader(training_dataset, 
-                                     batch_size=training_batch_size, 
+    training_dataloaders = []
+    for s in range(0, n_partitions - 1): # up to non-final
+        training_dataloader = DataLoader(training_dataset[partition_size*s:partition_size*(s+1)], 
+                                         batch_size=training_batch_size, 
+                                         shuffle=True)
+        training_dataloaders.append(training_dataloader)
+    training_dataloader = DataLoader(training_dataset[partition_size*(n_partitions-1):],
+                                     batch_size=training_batch_size,
                                      shuffle=True)
-    test_dataloader = DataLoader(test_dataset, 
-                                 batch_size=1, 
-                                 shuffle=True)
+    training_dataloaders.append(training_dataloader)
+    #test_dataloader = DataLoader(test_dataset, 
+    #                             batch_size=1, 
+    #                             shuffle=True)
     
 #     phase_message = 'Completed generating dataset.'
 #     report_phase(phase_message)
