@@ -72,7 +72,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
   
 
 # This will likely be obsolete when finished
-def evaluate(model, loss_function, eval_dataloader):
+def evaluate(model, metric, eval_dataloader):
     model.eval()
     
     total_loss = 0.0
@@ -82,11 +82,11 @@ def evaluate(model, loss_function, eval_dataloader):
         
         output = model(inputs)
         
-        loss = loss_function(output, labels)
+        metric.update_with_results(output, labels)
         
-        total_loss += loss.item()
+        codelength = get_prequential_codelength()
         
-    return total_loss
+    return codelength
   
 
 if __name__ == '__main__':
@@ -226,16 +226,11 @@ if __name__ == '__main__':
     early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
-    codelength = 0.0 # TODO: integrate correctly into Online_Code
-    compression = 0.0
+    online_code = OnlineCode(partition_size, n_partitions)
     
     # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
     #  then codelength and compression need to be called in eval cycle
     for loader in training_dataloaders:
-        am.eval()
-        with torch.no_grad():
-            step_codelength, step_compression = evaluate(am, loss_fn, loader)
-        
         for epoch in range(EPOCHS):
     #         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
     #         report_phase(epoch_message)
@@ -264,7 +259,7 @@ if __name__ == '__main__':
             epoch_number += 1
         
     # temporary: save last version of model
-    # TODO: reimplement to save best version
+    # TODO: reimplement to save best version -- obsolete
 #     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 #     model_path = f"model_{timestamp}_{epoch_number}"
 #     torch.save(am.state_dict(), model_path)
@@ -274,13 +269,15 @@ if __name__ == '__main__':
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
-    # TODO: determine whether a separate evaluate function on a test dataset is even necessary
-    am.eval()
-    with torch.no_grad():
-        mse = evaluate(am, loss_fn, test_dataloader)
-    rmse = math.sqrt(mse)
+    # TODO: determine whether a separate evaluate function on a test dataset is even necessary -- done
+        am.eval()
+        with torch.no_grad():
+            codelength = evaluate(am, online_code, test_dataloader)
+            
+    codelength = get_prequential_codelength()
+    compression = get_compression(n_training_examples)
     
-    # TODO: redo print of results based on codelength and compression as metrics
+    # TODO: redo print of results based on codelength and compression as metrics -- done
     hyperparam_set = (f'{args.task} trial',
                       args.embedding_model,
                       args.training_examples,
@@ -291,5 +288,7 @@ if __name__ == '__main__':
                       
     message = f"Model hyperparameters: " + ' | '.join(str(w) for w in hyperparam_set)
     report_phase(message)
-    message = f"Test RMSE: {rmse}"
+    message = f"Test Codelength: {codelength}"
+    report_phase(message)
+    message = f"Test Compression: {compression}"
     report_phase(message)
