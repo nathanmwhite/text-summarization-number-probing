@@ -46,19 +46,11 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, num_
         
         outputs = model(inputs)
         
-        # testing only
-        #print('Outputs size:', outputs.size())
-        #print('Labels size:', labels.size())
-        
         loss = loss_function(outputs, labels)
         
         loss.backward()
         
         label_int_tensor = torch.argmax(labels, axis=-1)
-        
-        # testing only
-        #print(label_int_tensor.device)
-        #print(outputs.device)
         
         # torchmetrics implementation requires transfer to CPU
         labels_cpu = label_int_tensor.to("cpu")
@@ -177,6 +169,7 @@ if __name__ == '__main__':
     
 #     phase_message = 'Begin generating dataset.'
 #     report_phase(phase_message)
+
     if args.context_units:
         units_path = "text-summarization-number-probing/units_processing/context_units.txt"
         data_path = "text-summarization-number-probing/units_processing/context_units_complete_"
@@ -195,8 +188,8 @@ if __name__ == '__main__':
         start_token_length = 0
     elif args.embedding_model in ('Bert', 'Bart', 'Bart-L', 'Bart-XSum', 'Bart-CDM', 'DistilBart', 'DistilBart-CDM', 'UniLM', 'Random'):
         start_token_length = 1
-#     else:
-#         raise ValueError('Error: --embedding_model must be a valid model type.')
+    else:
+        raise ValueError('Error: --embedding_model must be a valid model type.')
     
     padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1 \
         - start_token_length
@@ -240,7 +233,6 @@ if __name__ == '__main__':
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
     
-    # TODO: review whether to provide weights for CrossEntropyLoss
     loss_fn = torch.nn.CrossEntropyLoss()
     
     # hyperparameters per Wallace et al. (2019) code
@@ -290,14 +282,8 @@ if __name__ == '__main__':
                 break
         
         epoch_number += 1
-        
-    # temporary: save last version of model
-    # TODO: reimplement to save best version
-#     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-#     model_path = f"model_{timestamp}_{epoch_number}"
-#     torch.save(dm.state_dict(), model_path)
     
-    # testing and metrics
+# testing and metrics
 #     message = 'Training finished.'
 #     report_phase(message)
 #     message = 'Begin evaluation.'
