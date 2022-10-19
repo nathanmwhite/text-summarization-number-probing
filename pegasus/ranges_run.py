@@ -55,13 +55,6 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
         
         output_y1, output_y2 = model(inputs)
         
-        # testing only
-        #print('Outputs size:', outputs.size())
-        #print('Labels size:', labels.size())
-        
-        # TODO: troubleshoot here
-        # Using a target size (torch.Size([64])) that is different
-        #     to the input size (torch.Size([64, 2])).
         loss = loss_function(output_y1, output_y2, labels_y1, labels_y2)
         
         loss.backward()
@@ -84,7 +77,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
     return batch_loss, continuing_loss, total_loss
   
 
-#Unlike the decoding task, the model needs to capture number magnitude internally without direct label supervision.
+# Unlike the decoding task, the model needs to capture number magnitude internally without direct label supervision.
 def evaluate(model, loss_function, eval_dataloader):
     model.eval()
     
@@ -162,8 +155,8 @@ if __name__ == '__main__':
         start_token_length = 0
     elif args.embedding_model in ('Bert', 'Bart', 'Bart-L', 'Bart-XSum', 'Bart-CDM', 'DistilBart', 'DistilBart-CDM', 'UniLM', 'Random'):
         start_token_length = 1
-#     else:
-#         raise ValueError('Error: --embedding_model must be a valid model type.')
+    else:
+        raise ValueError('Error: --embedding_model must be a valid model type.')
     
     padded_seq_len = training_dataset[0][0]['input_ids'].size()[-1] - 1 \
         - start_token_length
@@ -199,8 +192,6 @@ if __name__ == '__main__':
     loss_fn = SiameseMSELoss()
     
     # hyperparameters per Wallace et al. (2019) code
-    # TODO: learning rate is too big after epoch 35 or so
-    # need to implement a LR scheduler
     if args.freeze_embedder:
         optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, am.parameters()),
                                     lr=args.lr,
@@ -243,21 +234,17 @@ if __name__ == '__main__':
         
         epoch_number += 1
         
-    # temporary: save last version of model
-    # TODO: reimplement to save best version
-#     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-#     model_path = f"model_{timestamp}_{epoch_number}"
-#     torch.save(am.state_dict(), model_path)
-        
-    # testing and metrics
+# testing and metrics
 #     message = 'Training finished.'
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
+
     am.eval()
     with torch.no_grad():
         mse = evaluate(am, loss_fn, test_dataloader)
     rmse = math.sqrt(mse)
+    
     hyperparam_set = ('Ranges trial',
                       args.embedding_model,
                       args.training_examples,
