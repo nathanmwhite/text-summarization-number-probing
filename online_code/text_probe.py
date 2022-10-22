@@ -27,7 +27,7 @@ from ..pegasus.model import AdditionModel, report_phase, freeze_module
 from ..pegasus.util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 from ..pegasus.early_stopping import Early_Stopping
 
-from .online_code import Online_Code
+from .online_code import OnlineCode
 
 # assumption: train on portion of data for x epochs, then introduce next group
 #  under this assumption, do nothing here
