@@ -178,10 +178,14 @@ if __name__ == '__main__':
     #  for length of each, use partition_size and n_last_portion
     training_dataloaders = []
     for s in range(0, n_partitions - 1): # up to non-final
+        phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*s, b=partition_size*(s+1))
+        report_phase(phase_message)
         training_dataloader = DataLoader(training_dataset[partition_size*s:partition_size*(s+1)], 
                                          batch_size=training_batch_size, 
                                          shuffle=True)
         training_dataloaders.append(training_dataloader)
+    phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(n_partitions-1), b=training_dataset.shape(0))
+    report_phase(phase_message)
     training_dataloader = DataLoader(training_dataset[partition_size*(n_partitions-1):],
                                      batch_size=training_batch_size,
                                      shuffle=True)
