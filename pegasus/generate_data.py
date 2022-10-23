@@ -26,7 +26,7 @@ from transformers import PreTrainedTokenizer
 from .util import obtain_units
 from ..units_processing.retrieve_units import is_a_number as isnumeric
 
-# TODO: enclose references to separate test dataset within n_partitions > 1 scope
+# TODO: enclose references to separate test dataset within num_partitions > 1 scope
 
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
@@ -684,7 +684,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  one for each chunk in the online code calculation
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
-            for s in range(0, n_partitions - 1): # up to non-final
+            for s in range(0, num_partitions - 1): # up to non-final
                 phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*s, b=partition_size*(s+1))
                 report_phase(phase_message)
                 start = partition_size * s
@@ -695,9 +695,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                          training_targets_y2[start:end])                                    
                 training_datasets.append(training_dataset_i)
 
-            phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(n_partitions-1), b=args.training_examples)
+            phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(num_partitions-1), b=args.training_examples)
             report_phase(phase_message)
-            start = partition_size * (n_partitions - 1)
+            start = partition_size * (num_partitions - 1)
             training_dataset_final = RangeProbingDataset(training_data_tokenized[start:],
                                                          training_decoder_inputs[start:],
                                                          training_targets_y1[start:],
@@ -721,7 +721,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  one for each chunk in the online code calculation
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
-            for s in range(0, n_partitions - 1): # up to non-final
+            for s in range(0, num_partitions - 1): # up to non-final
                 phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*s, b=partition_size*(s+1))
                 report_phase(phase_message)
                 start = partition_size * s
@@ -731,9 +731,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                     training_targets[start:end])                                    
                 training_datasets.append(training_dataset_i)
 
-            phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(n_partitions-1), b=args.training_examples)
+            phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(num_partitions-1), b=args.training_examples)
             report_phase(phase_message)
-            start = partition_size * (n_partitions - 1)
+            start = partition_size * (num_partitions - 1)
             training_dataset_final = ProbingDataset(training_data_tokenized[start:],
                                                     training_decoder_inputs[start:],
                                                     training_targets[start:])
