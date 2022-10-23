@@ -675,7 +675,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         partition_size = math.floor(num_training_examples / num_partitions)
     
         # TODO: check whether obsolete
-        if n_training_examples % n_partitions != 0:
+        if num_training_examples % num_partitions != 0:
             n_last_portion = partition_size + (num_training_examples % num_partitions)
     
     # Store in a Dataset object
