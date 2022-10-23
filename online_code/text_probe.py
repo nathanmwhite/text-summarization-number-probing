@@ -139,21 +139,16 @@ if __name__ == '__main__':
     # TODO: revisit whether a test component is even relevant
     n_training_examples = args.training_examples
     n_test_examples = args.test_examples
-    
-    n_partitions = args.num_partitions
-    partition_size = math.floor(n_training_examples / n_partitions)
-    
-    if n_training_examples % n_partitions != 0:
-        n_last_portion = partition_size + (n_training_examples % n_partitions)
-    
+        
 #     phase_message = 'Begin generating dataset.'
 #     report_phase(phase_message)
     
     # TODO: substitute appropriate task as arg from above -- done
-    training_dataset, test_dataset = generate_data(
+    training_datasets = generate_data(
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, args.task,
-        use_word_format=args.use_words, float_=args.float)
+        use_word_format=args.use_words, float_=args.float,
+        num_partitions=args.num_partitions)
     
     if args.embedding_model in ('Pegasus', 'Pegasus-CDM', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
         start_token_length = 0
@@ -177,19 +172,12 @@ if __name__ == '__main__':
     #  one for each chunk in the online code calculation
     #  for length of each, use partition_size and n_last_portion
     training_dataloaders = []
-    for s in range(0, n_partitions - 1): # up to non-final
-        phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*s, b=partition_size*(s+1))
-        report_phase(phase_message)
-        training_dataloader = DataLoader(training_dataset[partition_size*s:partition_size*(s+1)], 
+    for dataset in training_datasets:
+        training_dataloader = DataLoader(dataset, 
                                          batch_size=training_batch_size, 
                                          shuffle=True)
         training_dataloaders.append(training_dataloader)
-    phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(n_partitions-1), b=args.training_examples)
-    report_phase(phase_message)
-    training_dataloader = DataLoader(training_dataset[partition_size*(n_partitions-1):],
-                                     batch_size=training_batch_size,
-                                     shuffle=True)
-    training_dataloaders.append(training_dataloader)
+
     #test_dataloader = DataLoader(test_dataset, 
     #                             batch_size=1, 
     #                             shuffle=True)
