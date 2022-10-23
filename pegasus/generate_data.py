@@ -672,11 +672,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
     test_decoder_inputs = test_decoder_inputs.to(device)
     
     if num_partitions > 1:
-        n_partitions = args.num_partitions
-        partition_size = math.floor(n_training_examples / n_partitions)
+        partition_size = math.floor(num_training_examples / num_partitions)
     
+        # TODO: check whether obsolete
         if n_training_examples % n_partitions != 0:
-            n_last_portion = partition_size + (n_training_examples % n_partitions)
+            n_last_portion = partition_size + (num_training_examples % num_partitions)
     
     # Store in a Dataset object
     if task == 'Ranges':
