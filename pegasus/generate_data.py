@@ -685,8 +685,6 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
             for s in range(0, num_partitions - 1): # up to non-final
-                phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*s, b=partition_size*(s+1))
-                report_phase(phase_message)
                 start = partition_size * s
                 end = partition_size * (s + 1)
                 training_dataset_i = RangeProbingDataset(training_data_tokenized[start:end],
@@ -695,8 +693,6 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                          training_targets_y2[start:end])                                    
                 training_datasets.append(training_dataset_i)
 
-            phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(num_partitions-1), b=args.training_examples)
-            report_phase(phase_message)
             start = partition_size * (num_partitions - 1)
             training_dataset_final = RangeProbingDataset(training_data_tokenized[start:],
                                                          training_decoder_inputs[start:],
@@ -722,8 +718,6 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
             for s in range(0, num_partitions - 1): # up to non-final
-                phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*s, b=partition_size*(s+1))
-                report_phase(phase_message)
                 start = partition_size * s
                 end = partition_size * (s + 1)
                 training_dataset_i = ProbingDataset(training_data_tokenized[start:end],
@@ -731,8 +725,6 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                                                     training_targets[start:end])                                    
                 training_datasets.append(training_dataset_i)
 
-            phase_message = 'Processing partition size from {a} to {b}'.format(a=partition_size*(num_partitions-1), b=args.training_examples)
-            report_phase(phase_message)
             start = partition_size * (num_partitions - 1)
             training_dataset_final = ProbingDataset(training_data_tokenized[start:],
                                                     training_decoder_inputs[start:],
