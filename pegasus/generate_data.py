@@ -27,6 +27,8 @@ from .util import obtain_units
 from ..units_processing.retrieve_units import is_a_number as isnumeric
 
 # TODO: enclose references to separate test dataset within num_partitions > 1 scope
+# TODO: fix current approach for partitions of the dataset:
+#    tokenized data cannot be accessed via index slices
 
 # TODO: Methodology from Wallace et al. (2019) for their probes:
 # "Each list consists of values of similar magnitude in order to evaluate fine-grained comparisons"
