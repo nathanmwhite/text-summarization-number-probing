@@ -157,7 +157,7 @@ if __name__ == '__main__':
 #     else:
 #         raise ValueError('Error: --embedding_model must be a valid model type.')
     
-    padded_seq_len = training_datasets[0][0]['input_ids'].size()[-1] - 1 \
+    padded_seq_len = training_datasets[0][0][0]['input_ids'].size()[-1] - 1 \
         - start_token_length
     
     if args.embedding_model == 'UniLM':
