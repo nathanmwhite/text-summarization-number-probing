@@ -250,22 +250,17 @@ if __name__ == '__main__':
 
 
             epoch_number += 1
-        
-    # temporary: save last version of model
-    # TODO: reimplement to save best version -- obsolete
-#     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-#     model_path = f"model_{timestamp}_{epoch_number}"
-#     torch.save(am.state_dict(), model_path)
-        
+          
     # testing and metrics
 #     message = 'Training finished.'
 #     report_phase(message)
 #     message = 'Begin evaluation.'
 #     report_phase(message)
     # TODO: determine whether a separate evaluate function on a test dataset is even necessary -- done
+    # TODO: need to revisit logic here; for now, give current dataloader as a placeholder
         am.eval()
         with torch.no_grad():
-            codelength = evaluate(am, online_code, test_dataloader)
+            codelength = evaluate(am, online_code, loader)
             
     codelength = get_prequential_codelength()
     compression = get_compression(n_training_examples)
