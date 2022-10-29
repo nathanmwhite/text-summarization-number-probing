@@ -218,7 +218,8 @@ if __name__ == '__main__':
     early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
-    online_code = OnlineCode(partition_size, n_partitions)
+    online_code = OnlineCode(math.floor(n_training_examples / args.num_partitions), 
+                             args.num_partitions)
     
     # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
     #  then codelength and compression need to be called in eval cycle
