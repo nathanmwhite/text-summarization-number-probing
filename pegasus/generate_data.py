@@ -733,7 +733,6 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             for s in range(0, num_partitions - 1): # up to non-final
                 start = partition_size * s
                 end = partition_size * (s + 1)
-                print(training_data_tokenized.size())
                 training_dataset_i = ProbingDataset(extract_slice(training_data_tokenized, start, end),
                                                     training_decoder_inputs[start:end],
                                                     training_targets[start:end])                                    
