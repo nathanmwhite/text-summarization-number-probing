@@ -680,6 +680,17 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         if num_training_examples % num_partitions != 0:
             n_last_portion = partition_size + (num_training_examples % num_partitions)
     
+    def extract_slice(tokenized_data, start, end=None):
+        """Workaround for the lack of slice supports in 
+           transformers.tokenization_utils_base.BatchEncoding;
+           simply extracts slice and returns dictionary required for Datasets"""
+        if end == None: # no end specified
+            end = len(tokenized_data['input_ids'])
+        input_ids = tokenized_data['input_ids'][start:end]
+        attention_mask = tokenized_data['attention_mask'][start:end]
+        return {'input_ids': input_ids,
+                'attention_mask': attention_mask}
+    
     # Store in a Dataset object
     if task == 'Ranges':
         if num_partitions > 1:
@@ -689,14 +700,14 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             for s in range(0, num_partitions - 1): # up to non-final
                 start = partition_size * s
                 end = partition_size * (s + 1)
-                training_dataset_i = RangeProbingDataset(training_data_tokenized[start:end],
+                training_dataset_i = RangeProbingDataset(extract_slice(training_data_tokenized, start, end),
                                                          training_decoder_inputs[start:end],
                                                          training_targets_y1[start:end],
                                                          training_targets_y2[start:end])                                    
                 training_datasets.append(training_dataset_i)
 
             start = partition_size * (num_partitions - 1)
-            training_dataset_final = RangeProbingDataset(training_data_tokenized[start:],
+            training_dataset_final = RangeProbingDataset(extract_slice(training_data_tokenized, start),
                                                          training_decoder_inputs[start:],
                                                          training_targets_y1[start:],
                                                          training_targets_y2[start:])
@@ -723,13 +734,13 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                 start = partition_size * s
                 end = partition_size * (s + 1)
                 print(training_data_tokenized.size())
-                training_dataset_i = ProbingDataset(training_data_tokenized[start:end],
+                training_dataset_i = ProbingDataset(extract_slice(training_data_tokenized, start, end),
                                                     training_decoder_inputs[start:end],
                                                     training_targets[start:end])                                    
                 training_datasets.append(training_dataset_i)
 
             start = partition_size * (num_partitions - 1)
-            training_dataset_final = ProbingDataset(training_data_tokenized[start:],
+            training_dataset_final = ProbingDataset(extract_slice(training_data_tokenized, start),
                                                     training_decoder_inputs[start:],
                                                     training_targets[start:])
 
