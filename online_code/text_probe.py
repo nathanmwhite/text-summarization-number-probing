@@ -218,18 +218,37 @@ if __name__ == '__main__':
     early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
+    
+    # OnlineCode as metric
+    # OnlineCode automatically calculates for the first step using a uniform encoding as
+    #  specified by Voita & Titov (2020: 3)
     online_code = OnlineCode(math.floor(n_training_examples / args.num_partitions), 
                              args.num_partitions)
     
     # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
     #  then codelength and compression need to be called in eval cycle
-    for loader in training_dataloaders:
+    for i, loader in enumerate(training_dataloaders):
+        # Calculate online codelength
+        # Skip online code calculation for first step, as it is done using the uniform code
+        #  specified by Voita & Titov (2020: 3)
+        # Then calculate online code using trained model as p_theta for the current step
+        if i > 0:
+            am.eval()
+            with torch.no_grad():
+                codelength = evaluate(am, online_code, loader)
+        
+        # Once online codelength is calculated for the last data step, there is no further need
+        #  for training a model, so break
+        if i == len(training_dataloaders) - 1:
+            break
+        
+        # Make sure gradient tracking is on, and do a pass over the data
+        am.train(True)
         for epoch in range(EPOCHS):
     #         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
     #         report_phase(epoch_message)
 
-            # Make sure gradient tracking is on, and do a pass over the data
-            am.train(True)
+
             avg_loss, continuing_loss, total_loss = train_epoch(
                 epoch_number, loader, am, loss_fn, optimizer, args.clip_norm
             )
@@ -258,9 +277,7 @@ if __name__ == '__main__':
 #     report_phase(message)
     # TODO: determine whether a separate evaluate function on a test dataset is even necessary -- done
     # TODO: need to revisit logic here; for now, give current dataloader as a placeholder
-        am.eval()
-        with torch.no_grad():
-            codelength = evaluate(am, online_code, loader)
+        
             
     codelength = get_prequential_codelength()
     compression = get_compression(n_training_examples)
