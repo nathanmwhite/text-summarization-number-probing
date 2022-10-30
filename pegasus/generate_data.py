@@ -165,8 +165,9 @@ def generate_data(tokenizer: PreTrainedTokenizer,
         if > 1, then return a tuple of datasets, one for each partition
     returns : if num_partitions=1, then two ProbingDatasets: training, test datasets, or
         for task 'Ranges', two RangeProbingDatasets: training, test;
-        if num_partitions>1, then a tuple of ProbingDatasets, one for each partition,
-        or if for task 'Ranges', a tuple of RangeProbingDatasets
+        if num_partitions>1, then a tuple of two lists of ProbingDatasets, one for each partition,
+        where the first list is for training, and the second for calculating codelength;
+        or if for task 'Ranges', a tuple of two lists of RangeProbingDatasets
     """
     def generate_pools():
         # the definition from Wallace et al. could mean:
@@ -697,22 +698,29 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  one for each chunk in the online code calculation
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
+            eval_datasets = []
             for s in range(0, num_partitions - 1): # up to non-final
+                training_start = 0
                 start = partition_size * s
                 end = partition_size * (s + 1)
-                training_dataset_i = RangeProbingDataset(extract_slice(training_data_tokenized, start, end),
+                training_dataset_i = RangeProbingDataset(extract_slice(training_data_tokenized, training_start, end),
+                                                         training_decoder_inputs[training_start:end],
+                                                         training_targets_y1[training_start:end],
+                                                         training_targets_y2[training_start:end])
+                training_datasets.append(training_dataset_i)
+                eval_dataset_i = RangeProbingDataset(extract_slice(training_data_tokenized, start, end),
                                                          training_decoder_inputs[start:end],
                                                          training_targets_y1[start:end],
-                                                         training_targets_y2[start:end])                                    
-                training_datasets.append(training_dataset_i)
+                                                         training_targets_y2[start:end])                              
+                eval_datasets.append(eval_dataset_i)
 
             start = partition_size * (num_partitions - 1)
-            training_dataset_final = RangeProbingDataset(extract_slice(training_data_tokenized, start),
+            eval_dataset_final = RangeProbingDataset(extract_slice(training_data_tokenized, start),
                                                          training_decoder_inputs[start:],
                                                          training_targets_y1[start:],
                                                          training_targets_y2[start:])
-            training_datasets.append(training_dataset_final)
-            data = training_datasets
+            eval_datasets.append(eval_dataset_final)
+            data = (training_datasets, eval_datasets)
             
         else:
             training_dataset = RangeProbingDataset(training_data_tokenized,
@@ -731,20 +739,25 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
             for s in range(0, num_partitions - 1): # up to non-final
+                training_start = 0
                 start = partition_size * s
                 end = partition_size * (s + 1)
-                training_dataset_i = ProbingDataset(extract_slice(training_data_tokenized, start, end),
+                training_dataset_i = ProbingDataset(extract_slice(training_data_tokenized, training_start, end),
+                                                    training_decoder_inputs[training_start:end],
+                                                    training_targets[training_start:end])
+                training_datasets.append(training_dataset_i)            
+                eval_dataset_i = ProbingDataset(extract_slice(training_data_tokenized, start, end),
                                                     training_decoder_inputs[start:end],
                                                     training_targets[start:end])                                    
-                training_datasets.append(training_dataset_i)
+                eval_datasets.append(eval_dataset_i)
 
             start = partition_size * (num_partitions - 1)
-            training_dataset_final = ProbingDataset(extract_slice(training_data_tokenized, start),
+            eval_dataset_final = ProbingDataset(extract_slice(training_data_tokenized, start),
                                                     training_decoder_inputs[start:],
                                                     training_targets[start:])
 
-            training_datasets.append(training_dataset_final)
-            data = training_datasets
+            eval_datasets.append(eval_dataset_final)
+            data = (training_datasets, eval_datasets)
             
         else:
             training_dataset = ProbingDataset(training_data_tokenized, 
