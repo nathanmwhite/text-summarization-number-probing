@@ -171,12 +171,20 @@ if __name__ == '__main__':
     # TODO: split DataLoader into n dataloaders, -- done
     #  one for each chunk in the online code calculation
     #  for length of each, use partition_size and n_last_portion
+    # TODO: convert to utility function with two calls here,
+    #  one for each of training and eval types
     training_dataloaders = []
     for dataset in training_datasets:
         training_dataloader = DataLoader(dataset, 
                                          batch_size=training_batch_size, 
                                          shuffle=True)
         training_dataloaders.append(training_dataloader)
+    eval_dataloaders = []
+    for dataset in eval_dataloaders:
+        training_dataloader = DataLoader(dataset, 
+                                         batch_size=training_batch_size, 
+                                         shuffle=True)
+        eval_dataloaders.append(training_dataloader)        
 
     #test_dataloader = DataLoader(test_dataset, 
     #                             batch_size=1, 
@@ -227,7 +235,10 @@ if __name__ == '__main__':
     
     # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
     #  then codelength and compression need to be called in eval cycle
-    for i, loader in enumerate(training_dataloaders):
+    # Note: There is no training_dataloader for the full dataset:
+    #  this loop passes over the data from t_0 == 1 to t_S-1,
+    #  since only transmission of the last data block ever occurs (cf. Voita & Titov, 2020: 4)
+    for i in range(len(training_dataloaders)):
         # Calculate online codelength
         # Skip online code calculation for first step, as it is done using the uniform code
         #  specified by Voita & Titov (2020: 3)
@@ -235,12 +246,7 @@ if __name__ == '__main__':
         if i > 0:
             am.eval()
             with torch.no_grad():
-                codelength = evaluate(am, online_code, loader)
-        
-        # Once online codelength is calculated for the last data step, there is no further need
-        #  for training a model, so break
-        if i == len(training_dataloaders) - 1:
-            break
+                codelength = evaluate(am, online_code, eval_dataloaders[i])
         
         # Make sure gradient tracking is on, and do a pass over the data
         am.train(True)
@@ -250,7 +256,7 @@ if __name__ == '__main__':
 
 
             avg_loss, continuing_loss, total_loss = train_epoch(
-                epoch_number, loader, am, loss_fn, optimizer, args.clip_norm
+                epoch_number, training_dataloaders[i], am, loss_fn, optimizer, args.clip_norm
             )
 
     #         phase_message = f"End of epoch average batch loss: {avg_loss}"
@@ -269,16 +275,13 @@ if __name__ == '__main__':
 
 
             epoch_number += 1
-          
-    # testing and metrics
-#     message = 'Training finished.'
-#     report_phase(message)
-#     message = 'Begin evaluation.'
-#     report_phase(message)
-    # TODO: determine whether a separate evaluate function on a test dataset is even necessary -- done
-    # TODO: need to revisit logic here; for now, give current dataloader as a placeholder
         
-            
+        # transmit last data block for codelength
+        am.eval()
+        with torch.no_grad():
+            codelength = evaluate(am, online_code, eval_dataloaders[-1])
+
+    # calculate final metric results
     codelength = get_prequential_codelength()
     compression = get_compression(n_training_examples)
     
