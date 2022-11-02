@@ -12,11 +12,24 @@ class OnlineCode:
         self._log_sum += self._t_1 * np.log2(self._K)
 
     def update_with_results(self, outputs, labels):
-        # TODO: fix next line
-        # np.prod, not np.product
+        """
+        update_with_results takes the labels and outputs as inputs and
+            finds the product of the probability distribution values
+            of each output, selects out the output value corresponding
+            to the correct label, takes the product of these output values,
+            and takes the log_2 of the product and applies it to the log_sum
+        @param outputs (Tensor) : tensor containing the output distribution values
+        @param labels (Tensor) : tensor containing one-hot values for the correct
+            label for each data point
+        """
         # TODO: review approach here
-        prod = np.product(outputs[labels.astype(bool)])
-        self._log_sum += (-1 * np.log2(prod))
+        # TODO: explore how to support non-probability dist values
+        # currently supports only probability distributions
+        #  so applicable to units
+        label_indices = torch.argmax(labels, axis=1)[:, None]
+        values = outputs.gather(1, label_indices)
+        product = torch.prod(values)
+        self._log_sum += (-1 * torch.log2(product))
 
     def get_prequential_codelength(self):
         return self._t_1 * np.log2(self._K) + self._log_sum
