@@ -23,7 +23,8 @@ from torch.nn.utils import clip_grad_norm_
 
 # TODO: update relative imports -- done
 from ..pegasus.generate_data import generate_data
-from ..pegasus.model import AdditionModel, report_phase, freeze_module
+from ..pegasus.model import AdditionModel, DecodingModel, RangeModel, UnitsModel, ContextUnitsModel
+from ..pegasus.model import report_phase, freeze_module
 from ..pegasus.util import check_arguments, get_model_name, get_tokenizer, get_embedding_model
 from ..pegasus.early_stopping import Early_Stopping
 
@@ -143,15 +144,27 @@ if __name__ == '__main__':
 #     phase_message = 'Begin generating dataset.'
 #     report_phase(phase_message)
 
+    # TODO: add support for RandomEmbeddingModel, MaxProbingModel
     if args.task == 'Units':
         units_path = "text-summarization-number-probing/units_processing/units.txt"
         data_path = None
+        model_class = UnitsModel
     elif args.task == 'Context Units':
         units_path = "text-summarization-number-probing/units_processing/context_units.txt"
         data_path = "text-summarization-number-probing/units_processing/context_units_complete_"
+        model_class = ContextUnitsModel
+    elif args.task == 'Addition':
+        units_path = None
+        data_path = None
+        model_class = AdditionModel
+    elif args.task == 'Ranges':
+        units_path = None
+        data_path = None
+        model_class = RangeModel
     else:
         units_path = None
         data_path = None
+        model_class = DecodingModel
     
     # TODO: substitute appropriate task as arg from above -- done
     training_datasets, eval_datasets = generate_data(
@@ -211,7 +224,7 @@ if __name__ == '__main__':
         freeze_module(embedding_model, args.embedding_model)
     embedding_model = embedding_model.to(device)
     
-    am = AdditionModel(embedding_model, padded_seq_len).to(device)
+    am = model_class(embedding_model, padded_seq_len).to(device)
 
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
