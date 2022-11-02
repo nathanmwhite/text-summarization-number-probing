@@ -142,12 +142,23 @@ if __name__ == '__main__':
         
 #     phase_message = 'Begin generating dataset.'
 #     report_phase(phase_message)
+
+    if args.task == 'Units':
+        units_path = "text-summarization-number-probing/units_processing/units.txt"
+        data_path = None
+    elif args.task == 'Context Units':
+        units_path = "text-summarization-number-probing/units_processing/context_units.txt"
+        data_path = "text-summarization-number-probing/units_processing/context_units_complete_"
+    else:
+        units_path = None
+        data_path = None
     
     # TODO: substitute appropriate task as arg from above -- done
     training_datasets = generate_data(
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, args.task,
         use_word_format=args.use_words, float_=args.float,
+        units_loc=units_path, data_loc=data_path,
         num_partitions=args.num_partitions)
     
     if args.embedding_model in ('Pegasus', 'Pegasus-CDM', 'T5', 'T5-CDM', 'SSR', 'ProphetNet', 'ProphetNet-CDM'):
