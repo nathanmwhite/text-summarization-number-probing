@@ -154,7 +154,7 @@ if __name__ == '__main__':
         data_path = None
     
     # TODO: substitute appropriate task as arg from above -- done
-    training_datasets = generate_data(
+    training_datasets, eval_datasets = generate_data(
         tokenizer, device, sample_min, sample_max,
         n_training_examples, n_test_examples, args.task,
         use_word_format=args.use_words, float_=args.float,
@@ -191,7 +191,7 @@ if __name__ == '__main__':
                                          shuffle=True)
         training_dataloaders.append(training_dataloader)
     eval_dataloaders = []
-    for dataset in eval_dataloaders:
+    for dataset in eval_datasets:
         training_dataloader = DataLoader(dataset, 
                                          batch_size=training_batch_size, 
                                          shuffle=True)
