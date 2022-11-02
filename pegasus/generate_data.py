@@ -738,6 +738,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             #  one for each chunk in the online code calculation
             #  for length of each, use partition_size and n_last_portion
             training_datasets = []
+            eval_datasets = []
             for s in range(0, num_partitions - 1): # up to non-final
                 training_start = 0
                 start = partition_size * s
