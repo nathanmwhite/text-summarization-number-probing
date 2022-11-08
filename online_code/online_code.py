@@ -1,5 +1,7 @@
 import numpy as np
 
+import torch
+
 class OnlineCode:
     def __init__(self, chunk_size, num_classes):
         self._t_1 = chunk_size
