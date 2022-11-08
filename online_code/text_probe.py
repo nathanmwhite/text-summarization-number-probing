@@ -283,7 +283,6 @@ if __name__ == '__main__':
     #         epoch_message = 'Begin epoch {n}'.format(n=epoch_number + 1)
     #         report_phase(epoch_message)
 
-
             avg_loss, continuing_loss, total_loss = train_epoch(
                 epoch_number, training_dataloaders[i], am, loss_fn, optimizer, args.clip_norm
             )
@@ -311,8 +310,8 @@ if __name__ == '__main__':
             codelength = evaluate(am, online_code, eval_dataloaders[-1])
 
     # calculate final metric results
-    codelength = get_prequential_codelength()
-    compression = get_compression(n_training_examples)
+    codelength = online_code.get_prequential_codelength()
+    compression = online_code.get_compression(n_training_examples)
     
     # TODO: redo print of results based on codelength and compression as metrics -- done
     hyperparam_set = (f'{args.task} trial',
