@@ -225,7 +225,7 @@ if __name__ == '__main__':
     embedding_model = embedding_model.to(device)
     
     if args.task == 'Units':
-        output_dim = training_dataset[0][0][1].size()[-1]
+        output_dim = training_datasets[0][0][1].size()[-1]
         print('Output_dim:', output_dim)
         am = model_class(embedding_model, output_dim, padded_seq_len=padded_seq_len).to(device)
     else:
