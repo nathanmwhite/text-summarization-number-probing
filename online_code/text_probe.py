@@ -224,7 +224,12 @@ if __name__ == '__main__':
         freeze_module(embedding_model, args.embedding_model)
     embedding_model = embedding_model.to(device)
     
-    am = model_class(embedding_model, padded_seq_len=padded_seq_len).to(device)
+    if args.task == 'Units':
+        output_dim = training_dataset[0][0][1].size()[-1]
+        print('Output_dim:', output_dim)
+        am = model_class(embedding_model, output_dim, padded_seq_len=padded_seq_len).to(device)
+    else:
+        am = model_class(embedding_model, padded_seq_len=padded_seq_len).to(device)
 
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
