@@ -85,7 +85,7 @@ def evaluate(model, metric, eval_dataloader):
         
         metric.update_with_results(output, labels)
         
-        codelength = get_prequential_codelength()
+        codelength = metric.get_prequential_codelength()
         
     return codelength
   
