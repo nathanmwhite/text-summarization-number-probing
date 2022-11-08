@@ -39,7 +39,7 @@ class OnlineCode:
     def get_compression(self, n):
         # confirm expected value for joint just q(x, y) is
         #  the prequential codelength, or something further
-        e_q = get_prequential_codelength()
+        e_q = self.get_prequential_codelength()
         # TODO: Blier and Ollivier (2018: 6) on Online Code:
         #  "a model with default values is used to encode the first few data"
         #  "such a model may learn from the first k data samples"
