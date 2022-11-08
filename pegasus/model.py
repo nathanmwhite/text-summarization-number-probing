@@ -667,6 +667,8 @@ class UnitsModel(torch.nn.Module):
                                     batch_first=True)
         
         # hidden_dim*2 because input is from a bidirectional LSTM
+        # debug:
+        print('dimension: {dim}'.format(dim=hidden_dim*2*padded_seq_len))
         self.linear = torch.nn.Linear(in_features=hidden_dim*2*padded_seq_len, 
                                       out_features=output_dim)
 
@@ -710,6 +712,8 @@ class UnitsModel(torch.nn.Module):
 
         hidden_vectors = self.bilstm(embeddings)
         embeddings_concat = torch.flatten(hidden_vectors[0], start_dim=1)
+        # debug:
+        print(embeddings_concat.size())
         logits = self.linear(embeddings_concat).squeeze(-1)
         
         y_pred = torch.nn.functional.log_softmax(logits, dim=1)
