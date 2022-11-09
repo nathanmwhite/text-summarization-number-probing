@@ -51,4 +51,4 @@ class OnlineCode:
         #     any learning from data. It assumes p(y|x) = p_unif(y|x) = 1/K, and yields
         #     codelength L_unif(y_1:n|x_1:n) = n log_2 K bits"
         uniform_encoding = n * np.log2(self._K)
-        return uniform_encoding - codelength
+        return uniform_encoding - e_q
