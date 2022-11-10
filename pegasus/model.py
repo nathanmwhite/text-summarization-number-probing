@@ -232,6 +232,20 @@ def freeze_module(module, module_type):
 #         return y_pred
 
 
+class BaseModel(torch.nn.Module):
+    def __init__(self):
+        super(BaseModel, self).__init__()
+        
+        self._weights_file = 'temp.pt'
+        
+    def set_model_start(self):
+        torch.save(self.state_dict(), self._weights_file)
+        
+    def reset_to_model_start(self):
+        start_state_dict = torch.load(self._weights_file)
+        self.load_state_dict(start_state_dict)
+
+        
 class RandomEmbeddingModel(torch.nn.Module):
     def __init__(self, vocab_size=30522, embedding_size=768):
         super(RandomEmbeddingModel, self).__init__()
