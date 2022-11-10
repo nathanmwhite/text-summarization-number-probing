@@ -619,7 +619,7 @@ class AdditionModel(torch.nn.Module):
 # TODO: Does UnitsModel need a BiLSTM? My original implementation
 #  used an MLP, but it lacked a classifier at the last step,
 #  which should have been present.
-class UnitsModel(torch.nn.Module):
+class UnitsModel(BaseModel):
     def __init__(self, embedding_model, output_dim, padded_seq_len=2, hidden_dim=5):
         super(UnitsModel, self).__init__()
 
