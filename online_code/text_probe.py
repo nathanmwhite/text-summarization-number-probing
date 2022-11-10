@@ -47,8 +47,8 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
         outputs = model(inputs)
         
         # testing only
-        print('Outputs size:', outputs.size())
-        print('Labels size:', labels.size())
+        #print('Outputs size:', outputs.size())
+        #print('Labels size:', labels.size())
         
         loss = loss_function(outputs, labels)
         
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     
     if args.task == 'Units':
         output_dim = training_datasets[0][0][1].size()[-1]
-        print('Output_dim:', output_dim)
+        #print('Output_dim:', output_dim)
         am = model_class(embedding_model, output_dim, padded_seq_len=padded_seq_len).to(device)
     else:
         am = model_class(embedding_model, padded_seq_len=padded_seq_len).to(device)
