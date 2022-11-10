@@ -34,7 +34,7 @@ def report_phase(message):
     logging.info(formatted_message)
 
     
-# TODO : run testing to make sure this actually freezes everything intended
+# TODO : revisit and determine whether torch.nn.Module().apply(func) would be more appropriate
 def freeze_module(module, module_type):
     def freeze_component(component):
         for (name, module_) in component.named_children():
