@@ -233,6 +233,8 @@ if __name__ == '__main__':
 
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
+
+    am.set_model_start()
     
     loss_fn = torch.nn.MSELoss()
     
@@ -276,6 +278,8 @@ if __name__ == '__main__':
             am.eval()
             with torch.no_grad():
                 codelength = evaluate(am, online_code, eval_dataloaders[i])
+                print(f'Codelength on portion {i}: {codelength}')
+            am.reset_to_model_start()
         
         # Make sure gradient tracking is on, and do a pass over the data
         am.train(True)
