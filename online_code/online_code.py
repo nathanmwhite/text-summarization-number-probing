@@ -12,6 +12,7 @@ class OnlineCode:
 
     def update_with_uniform_codelength(self):
         self._log_sum += self._t_1 * np.log2(self._K)
+        print(f'uniform_codelength calculation: {self._log_sum}')
 
     def update_with_results(self, outputs, labels):
         """
@@ -31,6 +32,9 @@ class OnlineCode:
         label_indices = torch.argmax(labels, axis=1)[:, None]
         values = outputs.gather(1, label_indices)
         product = torch.prod(values)
+        print('Values average: {n}'.format(n=torch.mean(values)))
+        print('Values product: {n}'.format(n=product))
+        print('Values product log2: {n}'.format(n=torch.log2(product)))
         self._log_sum += (-1 * torch.log2(product))
 
     def get_prequential_codelength(self):
