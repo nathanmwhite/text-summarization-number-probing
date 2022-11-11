@@ -33,6 +33,7 @@ class OnlineCode:
         normalized_outputs = torch.nn.Softmax(dim=1)(outputs)
         values = normalized_outputs.gather(1, label_indices)
         product = torch.prod(values)
+        print('Values:', values)
         print('Values average: {n}'.format(n=torch.mean(values)))
         print('Values product: {n}'.format(n=product))
         print('Values product log2: {n}'.format(n=torch.log2(product)))
