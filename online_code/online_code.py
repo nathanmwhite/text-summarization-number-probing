@@ -30,7 +30,8 @@ class OnlineCode:
         # currently supports only probability distributions
         #  so applicable to units
         label_indices = torch.argmax(labels, axis=1)[:, None]
-        values = outputs.gather(1, label_indices)
+        normalized_outputs = torch.nn.Softmax(dim=1)(outputs)
+        values = normalized_outputs.gather(1, label_indices)
         product = torch.prod(values)
         print('Values average: {n}'.format(n=torch.mean(values)))
         print('Values product: {n}'.format(n=product))
