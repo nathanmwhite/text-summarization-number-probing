@@ -95,6 +95,7 @@ if __name__ == '__main__':
     # TODO: update and structure for all tasks, not just addition
     # TODO: add task as argparse argument
     parser.add_argument('--task', type=str, default='Addition')
+    parser.add_argument('--basis_points', type=bool, default=False)
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
     parser.add_argument('--training_examples', type=int, default=1000)
     parser.add_argument('--test_examples', type=int, default=100)
@@ -149,22 +150,32 @@ if __name__ == '__main__':
         units_path = "text-summarization-number-probing/units_processing/units.txt"
         data_path = None
         model_class = UnitsModel
+        online_code_mode = 'acc'
     elif args.task == 'Context Units':
         units_path = "text-summarization-number-probing/units_processing/context_units.txt"
         data_path = "text-summarization-number-probing/units_processing/context_units_complete_"
         model_class = ContextUnitsModel
+        online_code_mode = 'acc'
     elif args.task == 'Addition':
         units_path = None
         data_path = None
         model_class = AdditionModel
+        online_code_mode = 'rmse'
     elif args.task == 'Ranges':
         units_path = None
         data_path = None
         model_class = RangeModel
+        online_code_mode = 'rmse'
+    elif args.task == 'Percents' and args.basis_points == True:
+        units_path = None
+        data_path = None
+        model_class = DecodingModel
+        online_code_mode = 'log_rmse'
     else:
         units_path = None
         data_path = None
         model_class = DecodingModel
+        online_code_mode = 'rmse'
     
     # TODO: substitute appropriate task as arg from above -- done
     training_datasets, eval_datasets = generate_data(
@@ -261,8 +272,15 @@ if __name__ == '__main__':
     # OnlineCode as metric
     # OnlineCode automatically calculates for the first step using a uniform encoding as
     #  specified by Voita & Titov (2020: 3)
+    # float_decimal_interval provides the differential for the specified input argument
+    #  and the highest possible float value based on this
+    # TODO: revisit and provide better logic
+    float_decimal_interval = 0.9
     online_code = OnlineCode(math.floor(n_training_examples / args.num_partitions), 
-                             args.num_partitions)
+                             args.num_partitions,
+                             mode=online_code_mode,
+                             x_min=float(args.sample_min_int),
+                             x_max=args.sample_max_int+float_decimal_interval)
     
     # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
     #  then codelength and compression need to be called in eval cycle
