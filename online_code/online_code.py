@@ -3,16 +3,23 @@ import numpy as np
 import torch
 
 # TODO: redefine self._K for rmse mode
+# TODO: implement proper logic for 'log_rmse' with orders, and
+#    'rmse' with ranges, percents, and basis points
 class OnlineCode:
     def __init__(self, chunk_size, num_classes, mode='acc', x_min=None, x_max=None):
         self._t_1 = chunk_size
         self._K = num_classes
         self._log_sum = 0.0
+        if mode not in ['acc', 'rmse', 'log_rmse']:
+            raise ValueError("Specified mode for OnlineCode must be one of ['acc', 'rmse', 'log_rmse']")
         self._mode = mode
-        if self.mode == 'rmse':
-            if x_min == None or x_max == None:
-                raise ValueError("When mode == 'rmse', x_min and x_max must be defined")
-            self._r = x_max - x_min
+        if self.mode in ['rmse', 'log_rmse']:
+            if (x_min == None or x_max == None) and (type(x_min) not in [int, float] or type(x_max) not in [int, float]):
+                raise TypeError("When mode is 'rmse' or 'log_rmse', x_min and x_max must be type int or float")
+            if self.mode == 'rmse':
+                self._r = x_max - x_min
+#             elif self.mode == 'log_rmse':
+#                 self._r = np.log(x_max) - np.log(x_min)
         # runs as first step
         self.update_with_uniform_codelength()
 
