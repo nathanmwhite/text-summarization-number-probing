@@ -2,11 +2,17 @@ import numpy as np
 
 import torch
 
+# TODO: redefine self._K for rmse mode
 class OnlineCode:
-    def __init__(self, chunk_size, num_classes):
+    def __init__(self, chunk_size, num_classes, mode='acc', x_min=None, x_max=None):
         self._t_1 = chunk_size
         self._K = num_classes
         self._log_sum = 0.0
+        self._mode = mode
+        if self.mode == 'rmse':
+            if x_min == None or x_max == None:
+                raise ValueError("When mode == 'rmse', x_min and x_max must be defined")
+            self._r = x_max - x_min
         # runs as first step
         self.update_with_uniform_codelength()
 
