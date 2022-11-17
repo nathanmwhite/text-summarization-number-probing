@@ -42,9 +42,14 @@ class OnlineCode:
         # TODO: explore how to support non-probability dist values
         # currently supports only probability distributions
         #  so applicable to units
-        label_indices = torch.argmax(labels, axis=1)[:, None]
-        normalized_outputs = torch.nn.Softmax(dim=1)(outputs)
-        values = normalized_outputs.gather(1, label_indices)
+        if self._mode == 'acc':
+            label_indices = torch.argmax(labels, axis=1)[:, None]
+            normalized_outputs = torch.nn.Softmax(dim=1)(outputs)
+            values = normalized_outputs.gather(1, label_indices)
+        elif self._mode == 'rmse':
+            raise NotImplementedError('Updates with rmse approach are not yet supported.')
+        elif self._mode == 'log_rmse':
+            raise NotImplementedError('Updates with log_rmse approach are not yet supported.')
         product = torch.prod(values)
         print('Values:', values)
         print('Values average: {n}'.format(n=torch.mean(values)))
