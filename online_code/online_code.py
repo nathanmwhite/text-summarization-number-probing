@@ -47,7 +47,8 @@ class OnlineCode:
             normalized_outputs = torch.nn.Softmax(dim=1)(outputs)
             values = normalized_outputs.gather(1, label_indices)
         elif self._mode == 'rmse':
-            raise NotImplementedError('Updates with rmse approach are not yet supported.')
+            errors = torch.abs(outputs - labels)
+            values = 1 - errors / self._r
         elif self._mode == 'log_rmse':
             raise NotImplementedError('Updates with log_rmse approach are not yet supported.')
         product = torch.prod(values)
