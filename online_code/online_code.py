@@ -5,6 +5,9 @@ import torch
 # TODO: redefine self._K for rmse mode
 # TODO: implement proper logic for 'log_rmse' with orders, and
 #    'rmse' with ranges, percents, and basis points
+# TODO: accuracy approach needs to be able to handle 194 classes
+#  as it is, this is subject to the exploding gradient problem (note Raiyan's comments, which are correct)
+# TODO: test RMSE approaches
 class OnlineCode:
     def __init__(self, chunk_size, num_classes, mode='acc', x_min=None, x_max=None):
         self._t_1 = chunk_size
