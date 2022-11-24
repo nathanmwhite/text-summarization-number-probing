@@ -7,6 +7,11 @@ import torch
 #    'rmse' with ranges, percents, and basis points
 # TODO: accuracy approach needs to be able to handle 194 classes
 #  as it is, this is subject to the exploding gradient problem (note Raiyan's comments, which are correct)
+#  potential solutions:
+#   1. apply transformation to results to emphasize correct output; only works if correct label most of the time (would have expected so)
+#   2. if not, then test whether longer training cycle would improve results
+#   3. could design and implement a gradient clipping mechanism
+#       Raiyan's comment: should add instead of multiply; my response: taking the product is the standard case for OnlineCode
 # TODO: test RMSE approaches
 class OnlineCode:
     def __init__(self, chunk_size, num_classes, mode='acc', x_min=None, x_max=None):
