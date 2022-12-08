@@ -12,6 +12,12 @@ import torch
 #   2. if not, then test whether longer training cycle would improve results
 #   3. could design and implement a gradient clipping mechanism
 #       Raiyan's comment: should add instead of multiply; my response: taking the product is the standard case for OnlineCode
+#  Note similar issue for Corander and Marttinen 2006:
+#   "Notice that, under typical improper reference priors, dimension d_j would be too extensive with respect to n,
+#    the corresponding posterior expectation of (7) would tend to minus infinity, thus automatically preventing the use of models
+#    for which there is not enough data to estimate the parameters."
+#  --> This suggests that radically ramping up the number of training set datapoints may prove beneficial, but only if num_classes
+#   is still held to a very low value.
 # TODO: test RMSE approaches
 class OnlineCode:
     def __init__(self, chunk_size, num_classes, mode='acc', x_min=None, x_max=None):
