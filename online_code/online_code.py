@@ -28,10 +28,10 @@ class OnlineCode:
         if mode not in ['acc', 'rmse', 'log_rmse']:
             raise ValueError("Specified mode for OnlineCode must be one of ['acc', 'rmse', 'log_rmse']")
         self._mode = mode
-        if self.mode in ['rmse', 'log_rmse']:
+        if self._mode in ['rmse', 'log_rmse']:
             if (x_min == None or x_max == None) and (type(x_min) not in [int, float] or type(x_max) not in [int, float]):
                 raise TypeError("When mode is 'rmse' or 'log_rmse', x_min and x_max must be type int or float")
-            if self.mode == 'rmse':
+            if self._mode == 'rmse':
                 self._r = x_max - x_min
 #             elif self.mode == 'log_rmse':
 #                 self._r = np.log(x_max) - np.log(x_min)
