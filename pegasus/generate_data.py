@@ -249,7 +249,7 @@ def generate_data(tokenizer: PreTrainedTokenizer,
                     #  [15.3, 15.6, 15.1, 15.8, 15.2] at 50%
                     #  [11.7, 16.4, 9.3, 7.9, 13.3] at 50%
                     # per Wallace et al. (2019), appendix D3
-                    # TODO: need to confirm this is shuffled somewhere
+                    # This is shuffled under "if float_" block below
                     if i < num_examples/2:
                         if j == 0:
                             base_value = sample_gaussian(pool)
@@ -271,10 +271,11 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             if units:
                 assembled_units.append(datapoint_units)
                 assembled_targets.append(datapoint_targets)
-        if float_: 
-            # TODO: currently does not overlap with units; will need to revise
+        if float_:
+            # currently does not overlap with units; not necessary as units are
+            #  already generated randomly
             # compatible with ranges and orders as these do not depend on which
-            # floats appear where
+            #  floats appear where
             # this step needs to happen to ensure that longer datapoints (len > 1)
             #  that represent variation only in tenths vs. variation throughout
             #  the numerals are dispersed throughout the dataset
