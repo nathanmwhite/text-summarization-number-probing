@@ -13,6 +13,8 @@ import torch
 #   3. could design and implement a gradient clipping mechanism
 #       Raiyan's comment: should add instead of multiply; my response: taking the product is the standard case for OnlineCode
 #   4. could normalize by the inverse of the number of classes, given that the number of classes influences overall metric values
+#   5. use a larger dataset for each chunk_size: justified by Corander and Marttinen's observation below
+#      --test started 12 Dec 2022
 #  Note similar issue for Corander and Marttinen 2006:
 #   "Notice that, under typical improper reference priors, dimension d_j would be too extensive with respect to n,
 #    the corresponding posterior expectation of (7) would tend to minus infinity, thus automatically preventing the use of models
