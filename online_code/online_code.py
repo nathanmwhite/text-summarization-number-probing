@@ -15,6 +15,7 @@ import torch
 #   4. could normalize by the inverse of the number of classes, given that the number of classes influences overall metric values
 #   5. use a larger dataset for each chunk_size: justified by Corander and Marttinen's observation below
 #      --test started 12 Dec 2022
+#      --test finalized: a larger dataset of 100,000 vs 10,000 does not resolve the issue
 #  Note similar issue for Corander and Marttinen 2006:
 #   "Notice that, under typical improper reference priors, dimension d_j would be too extensive with respect to n,
 #    the corresponding posterior expectation of (7) would tend to minus infinity, thus automatically preventing the use of models
