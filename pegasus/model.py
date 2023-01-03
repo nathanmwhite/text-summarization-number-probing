@@ -246,7 +246,7 @@ class BaseModel(torch.nn.Module):
         self.load_state_dict(start_state_dict)
 
         
-class RandomEmbeddingModel(torch.nn.Module):
+class RandomEmbeddingModel(BaseModel):
     def __init__(self, vocab_size=30522, embedding_size=768):
         super(RandomEmbeddingModel, self).__init__()
         
@@ -263,7 +263,7 @@ class RandomEmbeddingModel(torch.nn.Module):
         return self.embedding_matrix(input_text)
 
 
-class MaxProbingModel(torch.nn.Module):
+class MaxProbingModel(BaseModel):
     def __init__(self, embedding_model, padded_seq_len=5, hidden_dim=5):
         super(MaxProbingModel, self).__init__()
         
@@ -401,7 +401,7 @@ class MaxProbingModel(torch.nn.Module):
         return y_pred
 
     
-class DecodingModel(torch.nn.Module):
+class DecodingModel(BaseModel):
     def __init__(self, embedding_model, padded_seq_len=1, hidden_dim=100):
         super(DecodingModel, self).__init__()
 
@@ -512,7 +512,7 @@ class DecodingModel(torch.nn.Module):
         return y_pred
     
     
-class AdditionModel(torch.nn.Module):
+class AdditionModel(BaseModel):
     def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=100):
         super(AdditionModel, self).__init__()
 
@@ -736,7 +736,7 @@ class UnitsModel(BaseModel):
     
 
 # TODO : determine more appropriate default hidden_dim value    
-class ContextUnitsModel(torch.nn.Module):
+class ContextUnitsModel(BaseModel):
     def __init__(self, embedding_model, output_dim, padded_seq_len=1, hidden_dim=5):
         super(ContextUnitsModel, self).__init__()
 
@@ -834,7 +834,7 @@ class ContextUnitsModel(torch.nn.Module):
 
     
 # TODO: revisit: BiLSTM may be more appropriate
-class RangeModel(torch.nn.Module):
+class RangeModel(BaseModel):
     def __init__(self, embedding_model, padded_seq_len=2, hidden_dim=50):
         super(RangeModel, self).__init__()
         
