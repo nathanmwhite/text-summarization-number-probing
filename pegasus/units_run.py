@@ -107,6 +107,14 @@ def evaluate(model, eval_dataloader, num_classes=None, context_units=False):
             _ = f1weighted(outputs_cpu, labels_cpu)
         else:  
             _ = accuracy(outputs_cpu, labels_cpu)
+            
+            # test for how outputs behave
+            normalized_outputs = torch.nn.Softmax(dim=1)(output)
+            values = normalized_outputs.gather(1, label_int_tensor)
+            print('Values:', values)
+            print('Values average: {n}'.format(n=torch.mean(values)))
+            print('Values product: {n}'.format(n=product))
+            # end test
         
     if context_units:
         return f1macro.compute(), f1weighted.compute()
