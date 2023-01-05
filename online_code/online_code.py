@@ -64,6 +64,8 @@ class OnlineCode:
             label_indices = torch.argmax(labels, axis=1)[:, None]
             normalized_outputs = torch.nn.Softmax(dim=1)(outputs)
             values = normalized_outputs.gather(1, label_indices)
+            print('Label indices:', label_indices)
+            print('Normalized outputs:', normalized_outputs)
         elif self._mode == 'rmse':
             errors = torch.abs(outputs - labels)
             values = 1 - errors / self._r
