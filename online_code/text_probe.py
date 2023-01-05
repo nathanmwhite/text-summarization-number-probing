@@ -309,12 +309,12 @@ if __name__ == '__main__':
                 epoch_number, training_dataloaders[i], am, loss_fn, optimizer, args.clip_norm
             )
 
-             phase_message = f"End of epoch average batch loss: {avg_loss}"
-             report_phase(phase_message)
-             phase_message = f"End of epoch last loss: {continuing_loss}"
-             report_phase(phase_message)
-             phase_message = f"Epoch total loss: {total_loss}"
-             report_phase(phase_message)
+            phase_message = f"End of epoch average batch loss: {avg_loss}"
+            report_phase(phase_message)
+            phase_message = f"End of epoch last loss: {continuing_loss}"
+            report_phase(phase_message)
+            phase_message = f"Epoch total loss: {total_loss}"
+            report_phase(phase_message)
 
             if args.early_stopping:
                 early_stopping(total_loss)
