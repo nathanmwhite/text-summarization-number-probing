@@ -264,6 +264,8 @@ if __name__ == '__main__':
     
 #     phase_message = 'Begin training.'
 #     report_phase(phase_message)
+
+    early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
     
     epoch_number = 0
     
@@ -290,10 +292,6 @@ if __name__ == '__main__':
         # Skip online code calculation for first step, as it is done using the uniform code
         #  specified by Voita & Titov (2020: 3)
         # Then calculate online code using trained model as p_theta for the current step
-        
-        # use a new Early_Stopping for each cycle
-        # TODO: implement reset option
-        early_stopping = Early_Stopping(min_delta=0.0, patience=args.patience)
         
         if i > 0:
             am.eval()
@@ -333,6 +331,8 @@ if __name__ == '__main__':
         am.eval()
         with torch.no_grad():
             codelength = evaluate(am, online_code, eval_dataloaders[-1])
+            
+        early_stopping.reset()
 
     # calculate final metric results
     codelength = online_code.get_prequential_codelength()
