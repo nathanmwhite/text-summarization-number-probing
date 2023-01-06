@@ -11,11 +11,9 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 class Early_Stopping():
   
     def __init__(self, min_delta=0.0, patience=10):
-        self.num_iterations_elapsed = 0
         self.min_delta = min_delta
         self.patience = patience
-        self.early_stopping = False
-        self.last_best = None
+        self._set_start()
         
     def __call__(self, current_loss):
         if self.last_best == None:
@@ -27,3 +25,11 @@ class Early_Stopping():
             self.num_iterations_elapsed += 1
             if self.num_iterations_elapsed >= self.patience:
                 self.early_stopping = True
+
+    def reset(self):
+        self._set_start()
+        
+    def _set_start(self):
+        self.num_iterations_elapsed = 0
+        self.early_stopping = False
+        self.last_best = None        
