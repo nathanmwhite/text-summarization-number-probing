@@ -326,14 +326,14 @@ if __name__ == '__main__':
 
 
             epoch_number += 1
-        
-        # transmit last data block for codelength
-        am.eval()
-        with torch.no_grad():
-            codelength = evaluate(am, online_code, eval_dataloaders[-1])
             
         early_stopping.reset()
-
+        
+    # transmit last data block for codelength
+    am.eval()
+    with torch.no_grad():
+        codelength = evaluate(am, online_code, eval_dataloaders[-1])
+            
     # calculate final metric results
     codelength = online_code.get_prequential_codelength()
     compression = online_code.get_compression(n_training_examples)
