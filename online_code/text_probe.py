@@ -282,11 +282,13 @@ if __name__ == '__main__':
                              x_min=float(args.sample_min_int),
                              x_max=args.sample_max_int+float_decimal_interval)
     
-    # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data
-    #  then codelength and compression need to be called in eval cycle
+    # TODO: epoch loop needs to be reorganized into n cycles, one for each segment of the full data--done
+    #  then codelength and compression need to be called in eval cycle--done
     # Note: There is no training_dataloader for the full dataset:
     #  this loop passes over the data from t_0 == 1 to t_S-1,
     #  since only transmission of the last data block ever occurs (cf. Voita & Titov, 2020: 4)
+    # Reviewed 9 Jan 2023: implementation sequence of training and evaluation dataloaders here and 
+    #  in dataset generation module is fully correct
     for i in range(len(training_dataloaders)):
         # Calculate online codelength
         # Skip online code calculation for first step, as it is done using the uniform code
