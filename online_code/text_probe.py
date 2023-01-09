@@ -239,15 +239,15 @@ if __name__ == '__main__':
         output_dim = training_datasets[0][0][1].size()[-1]
         #print('Output_dim:', output_dim)
         am = model_class(embedding_model, output_dim, padded_seq_len=padded_seq_len).to(device)
+        loss_fn = torch.nn.CrossEntropyLoss()
     else:
         am = model_class(embedding_model, padded_seq_len=padded_seq_len).to(device)
+        loss_fn = torch.nn.MSELoss()
 
 #     phase_message = 'Model set up.'
 #     report_phase(phase_message)
 
     am.set_model_start()
-    
-    loss_fn = torch.nn.MSELoss()
     
     # likely obsolete:
     # hyperparameters per Wallace et al. (2019) code
