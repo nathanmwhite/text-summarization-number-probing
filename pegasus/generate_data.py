@@ -667,6 +667,8 @@ def generate_data(tokenizer: PreTrainedTokenizer,
 #     print(test_data_tokenized.input_ids.size())
     
     # decoder_inputs: 0 is the start symbol for the decoder, 1 end of sequence; used as a placeholder
+    # when conducting decoder probing, this approach won't work: 0 and 1 differ in meaning 
+    #    based on tokenizer type
     training_decoder_inputs = torch.tensor([0,1]).repeat(num_training_examples, 
                                                          1)
     training_decoder_inputs = training_decoder_inputs.to(device)
