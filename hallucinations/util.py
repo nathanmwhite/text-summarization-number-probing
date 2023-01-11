@@ -87,9 +87,9 @@ def check_numerical(input_strings, output_strings):
         input_numbers = get_numbers(input_strings[i])
         output_numbers = get_numbers(output_strings[i])
         
-        a = input_only(input_numbers, output_numbers)
-        b = output_only(input_numbers, output_numbers)
-        c = shared(input_numbers, output_numbers)
+        a = _found_input_only(input_numbers, output_numbers)
+        b = _found_output_only(input_numbers, output_numbers)
+        c = _found_shared(input_numbers, output_numbers)
         results.append((a, b, c))
         
     np.asarray(results)
