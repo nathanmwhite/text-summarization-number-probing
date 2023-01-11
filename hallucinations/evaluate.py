@@ -38,3 +38,10 @@ class GenerationDataset(Dataset):
     def to(self, device):
         self._input_ids.to(device)
         self._attention_mask.to(device)
+
+        
+def create_eval_dataloader(data_in, batch_size, device):
+    tokenized = tokenizer(data_in, return_tensors='pt', padding=True)
+    dataset = GenerationDataset(tokenized).to(device)
+    dataloader = DataLoader(dataset, batch_size=batch_size)
+    return dataloader
