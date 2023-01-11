@@ -59,3 +59,11 @@ def _found_input_only(input_numbers, output_numbers):
         if item not in output_numbers:
             input_only_items.append(item)
     return len(input_only_items)
+
+
+def _found_output_only(input_numbers, output_numbers):
+    output_only_items = []
+    for item in output_numbers:
+        if item not in input_numbers:
+            output_only_items.append(item)
+    return len(output_only_items)
