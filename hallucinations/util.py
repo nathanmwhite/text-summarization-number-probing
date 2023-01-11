@@ -8,6 +8,7 @@ __copyright__ = "Copyright © 2023 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+
 def is_a_number(sequence, include_hyphen=False):
     """
     is_a_number : checks if a character sequence is a number, possibly containing
