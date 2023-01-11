@@ -13,11 +13,12 @@ from transformers import T5ForConditionalGeneration
 from transformers import BartForConditionalGeneration
 from transformers import ProphetNetForConditionalGeneration
 
+from torch.utils.data import Dataset, DataLoader
+
 from ..pegasus.util import get_tokenizer, get_embedding_model
+from .util import get_numbers, check_numerical
 
 # TODO: create support for evaluating on the final version of malo_cleaned
-
-from torch.utils.data import Dataset, DataLoader
 
 
 class GenerationDataset(Dataset):
@@ -45,3 +46,23 @@ def create_eval_dataloader(data_in, batch_size, device):
     dataset = GenerationDataset(tokenized).to(device)
     dataloader = DataLoader(dataset, batch_size=batch_size)
     return dataloader
+
+
+def evaluate(model, dataloader, input_data):
+    model.eval()
+    
+    outputs = []
+    for i, data_point in enumerate(dataloader):
+        print(f'Processing batch {i}')
+        inputs = data_point
+        
+        output = model.generate(**inputs)
+        
+        for item in output:
+            string_ = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(item))
+            outputs.append(string_)
+            
+        # next step is to implement metric for matching numerical values
+        metrics = check_numerical(input_data, outputs)
+                
+    return metrics
