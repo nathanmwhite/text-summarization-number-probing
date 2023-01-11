@@ -22,6 +22,11 @@ from .util import get_numbers, check_numerical
 
 
 class GenerationDataset(Dataset):
+    """
+    GenerationDataset : dataset to serve in evaluation containing
+        tokenized input_ids and attention_mask elements for generating
+        summarization text to evaluate hallucination.
+    """
     def __init__(self, input_data):
         self._input_ids = input_data['input_ids']
         self._attention_mask = input_data['attention_mask']
