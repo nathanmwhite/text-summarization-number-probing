@@ -51,3 +51,11 @@ def get_numbers(text):
     tokens = text.split(' ')
     numbers = [w for w in tokens if is_a_number(w)]
     return numbers
+
+
+def _found_input_only(input_numbers, output_numbers):
+    input_only_items = []
+    for item in input_numbers:
+        if item not in output_numbers:
+            input_only_items.append(item)
+    return len(input_only_items)
