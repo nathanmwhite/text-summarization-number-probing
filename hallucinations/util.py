@@ -67,3 +67,11 @@ def _found_output_only(input_numbers, output_numbers):
         if item not in input_numbers:
             output_only_items.append(item)
     return len(output_only_items)
+
+
+def _found_shared(input_numbers, output_numbers):
+    shared_items = []
+    for item in input_numbers:
+        if item in output_numbers:
+            shared_items.append(item)
+    return len(shared_items)
