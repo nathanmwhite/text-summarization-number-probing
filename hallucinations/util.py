@@ -40,3 +40,7 @@ def is_a_number(sequence, include_hyphen=False):
         return False
       
       
+def get_numbers(text):
+    tokens = text.split(' ')
+    numbers = [w for w in tokens if is_a_number(w)]
+    return numbers
