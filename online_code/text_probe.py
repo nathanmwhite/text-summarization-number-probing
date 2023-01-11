@@ -72,13 +72,12 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
     return batch_loss, continuing_loss, total_loss
   
 
-# This will likely be obsolete when finished
 def evaluate(model, metric, eval_dataloader):
     model.eval()
     
     total_loss = 0.0
     
-    for i, data_point in enumerate(eval_dataloader):
+    for data_point in eval_dataloader:
         inputs, labels = data_point
         
         output = model(inputs)
