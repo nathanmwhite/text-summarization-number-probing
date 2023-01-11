@@ -75,3 +75,23 @@ def _found_shared(input_numbers, output_numbers):
         if item in output_numbers:
             shared_items.append(item)
     return len(shared_items)
+
+
+def check_numerical(input_strings, output_strings):
+    assert(len(input_strings) == len(output_strings))
+    
+    results = []
+    
+    for i in range(len(input_strings)):
+        
+        input_numbers = get_numbers(input_strings[i])
+        output_numbers = get_numbers(output_strings[i])
+        
+        a = input_only(input_numbers, output_numbers)
+        b = output_only(input_numbers, output_numbers)
+        c = shared(input_numbers, output_numbers)
+        results.append((a, b, c))
+        
+    np.asarray(results)
+    
+    return results
