@@ -18,7 +18,7 @@ def is_a_number(sequence, include_hyphen=False):
     @param include_hyphen (bool) : whether to allow hyphens when recognizing a
          number, such as with negative numbers or ranges.
     returns : boolean representing whether the sequence is a number given the
-        definition here
+        definition here.
     """
     if include_hyphen:
         symbols = (',', '-', '.')
@@ -41,6 +41,12 @@ def is_a_number(sequence, include_hyphen=False):
       
       
 def get_numbers(text):
+    """
+    get_numbers : takes a string and returns tokens that are numbers.
+    @param text (str) : the string in which to find the number tokens.
+    returns : List[str] containing the strings that represent the numbers
+        found.
+    """
     tokens = text.split(' ')
     numbers = [w for w in tokens if is_a_number(w)]
     return numbers
