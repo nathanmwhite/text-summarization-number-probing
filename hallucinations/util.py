@@ -78,6 +78,24 @@ def _found_shared(input_numbers, output_numbers):
 
 
 def check_numerical(input_strings, output_strings):
+    """
+    check_numerical : checks lists of input and output strings with the same
+        number of string elements to determine how many numerical items
+        are found in each and shared. This function supports numbers represented
+        as digits as well as their text representation from one to ten. However,
+        it does not check for the following:
+        1) matching pairs where one has a digit representation and the other the
+            text representation for the same number; and
+        2) matching pairs where one has a representation in one kind of unit and
+            the other in another kind of unit, such as "first quarter" versus
+            "first three months."
+    @param input_strings (List[str]) : the input strings to check
+    @param output_strings (List[str]) : the output strings to check
+    returns : List[tuple], where each 3-tuple contains the following:
+        1) the number of numerical items found only in the input string
+        2) the number of numerical items found only in the output string
+        3) the number of numerical items shared between the two.
+    """
     assert(len(input_strings) == len(output_strings))
     
     results = []
