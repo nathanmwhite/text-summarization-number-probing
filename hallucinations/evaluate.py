@@ -68,6 +68,19 @@ def create_eval_dataloader(data_in, batch_size, device):
 
 
 def evaluate(model, dataloader, input_data):
+    """
+    evaluate : function that evaluates models for numerical hallucination.
+    @param model (torch.nn.Module) : model to evaluate
+    @param dataloader (torch.utils.data.DataLoader) : dataloader containing
+        the batched input data
+    @param input_data (List[str]) : list containing the input data as raw text
+        to evaluate outputs against
+    returns : List[tuple] containing 3-tuples with results for each input item,
+        where the tuple contains the following values:
+        1) the number of numerical items found only in the input string
+        2) the number of numerical items found only in the generated output summary
+        3) the number of numerical items shared between the two.
+    """
     model.eval()
     
     outputs = []
