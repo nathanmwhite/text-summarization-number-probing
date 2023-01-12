@@ -10,6 +10,8 @@ __author_email__ = "nathan.white1@jcu.edu.au"
 
 import re
 
+import numpy as np
+
 
 def is_a_number(sequence, include_hyphen=False):
     """
