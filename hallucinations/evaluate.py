@@ -8,6 +8,8 @@ __copyright__ = "Copyright © 2023 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+import logging
+
 from transformers import PegasusForConditionalGeneration 
 from transformers import T5ForConditionalGeneration
 from transformers import BartForConditionalGeneration
@@ -100,3 +102,6 @@ def evaluate(model, dataloader, input_data):
         metrics = check_numerical(input_data, retokenized_outputs)
                 
     return metrics
+
+
+
