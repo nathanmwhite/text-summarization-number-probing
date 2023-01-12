@@ -47,6 +47,20 @@ class GenerationDataset(Dataset):
 
         
 def create_eval_dataloader(data_in, batch_size, device):
+    """
+    create_eval_dataloader : creates dataloader for use in evaluating
+        hallucination in the context of generating summaries.
+    @param data_in (List[str]) : list of data points to serve as input
+        to generate summaries; note: should not be List[List[str]],
+        as this will cause the torch-based tokenizer to treat all the data
+        as a single document to embed
+    @param batch_size (int) : integer indicating batch size
+    @param device (torch.device) : the device to use in summary generation
+    returns : torch DataLoader containing the batched data to use in
+        generating summaries to evaluate hallucinations.
+    """
+    # assert(type(data_in) == List)
+    # assert(type(data_in[0]) == str)
     tokenized = tokenizer(data_in, return_tensors='pt', padding=True)
     dataset = GenerationDataset(tokenized).to(device)
     dataloader = DataLoader(dataset, batch_size=batch_size)
