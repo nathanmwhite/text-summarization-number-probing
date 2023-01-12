@@ -1,4 +1,4 @@
-#Probing of Quantitative Values in Abstractive Summarization Models
+# Probing of Quantitative Values in Abstractive Summarization Models
 ## text-summarization-number-probing/hallucinations
 
 This folder contains the code to evaluate models for hallucinations of quantitative values, with Pegasus defined as the default model type.
