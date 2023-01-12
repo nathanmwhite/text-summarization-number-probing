@@ -153,3 +153,13 @@ def retokenize(text_sequences):
         out_sequences.append(sequence)
         
     return out_sequences
+
+
+# TODO: implement
+def load_malo_data():
+    """
+    load_malo_data : loads a filtered version of the Financial Phrasebank
+        dataset of Malo et al. (2014).
+    returns : List[str], where each string is one input line from the dataset.
+    """
+    pass
