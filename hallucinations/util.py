@@ -120,6 +120,12 @@ def check_numerical(input_strings, output_strings):
 
 
 def retokenize(text_sequences):
+    """
+    retokenize : retokenizes model output strings to follow the spacing patterns of the input,
+        to ensure recognition of matching digit-based numerical values where they appear.
+    @param text_sequences (List[str]): text sequences to retokenize
+    returns : List[str] containing the retokenized sequences
+    """
     multiplier_abbrevs = ['mn', 'm', 'mln', 'bln', 'bn', 'b', 'k', 'K', 'tn']
     currency_symbols = ['\$', 'USD', 'CAD', 'C\$', 'AUD', 'A\$', 'skr', 'SEK', 'HK\$', 'Rmb', \
                         'RMB', '£', '¥', 'Y', '₩', '₽', 'CHF', '€', 'EUR', 'eur']
