@@ -16,7 +16,7 @@ from transformers import ProphetNetForConditionalGeneration
 from torch.utils.data import Dataset, DataLoader
 
 from ..pegasus.util import get_tokenizer, get_embedding_model
-from .util import get_numbers, check_numerical
+from .util import get_numbers, check_numerical, retokenize
 
 # TODO: create support for evaluating on the final version of malo_cleaned
 
@@ -94,7 +94,9 @@ def evaluate(model, dataloader, input_data):
             string_ = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(item))
             outputs.append(string_)
             
+        retokenized_outputs = retokenize(outputs)
+            
         # next step is to implement metric for matching numerical values
-        metrics = check_numerical(input_data, outputs)
+        metrics = check_numerical(input_data, retokenized_outputs)
                 
     return metrics
