@@ -17,8 +17,9 @@ from transformers import ProphetNetForConditionalGeneration
 
 from torch.utils.data import Dataset, DataLoader
 
-from ..pegasus.util import get_tokenizer, get_embedding_model
-from .util import get_numbers, check_numerical, retokenize
+from ..pegasus.model import report_phase
+from ..pegasus.util import get_model_name, get_tokenizer, get_embedding_model
+from .util import check_numerical, get_numbers, load_malo_data, retokenize
 
 # TODO: create support for evaluating on the final version of malo_cleaned
 
@@ -48,7 +49,7 @@ class GenerationDataset(Dataset):
         self._attention_mask.to(device)
 
         
-def create_eval_dataloader(data_in, batch_size, device):
+def create_eval_dataloader(data_in, batch_size, tokenizer, device):
     """
     create_eval_dataloader : creates dataloader for use in evaluating
         hallucination in the context of generating summaries.
@@ -57,6 +58,7 @@ def create_eval_dataloader(data_in, batch_size, device):
         as this will cause the torch-based tokenizer to treat all the data
         as a single document to embed
     @param batch_size (int) : integer indicating batch size
+    @param tokenizer (Tokenizer) : tokenizer to use for tokenization of data
     @param device (torch.device) : the device to use in summary generation
     returns : torch DataLoader containing the batched data to use in
         generating summaries to evaluate hallucinations.
@@ -104,4 +106,36 @@ def evaluate(model, dataloader, input_data):
     return metrics
 
 
-
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--embedding_model', type=str, default='Pegasus')
+    parser.add_argument('--log_filename', type=str, default='evaluate.log')
+    args = parser.parse_args()
+    
+    logging.basicConfig(filename=args.log_filename, level=logging.INFO)
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    
+    model_name = get_model_name(args.embedding_model)
+    
+    tokenizer = get_tokenizer(model_name)
+    
+    model = get_embedding_model(model_name, trained=True).to(device)
+    
+    # TODO: implement
+    data_in = load_malo_data()
+    
+    dataloader = create_eval_dataloader(data_in, batch_size, tokenizer, device)
+    
+    results = evaluate(model, dataloader, data_in)
+    
+    summed_results = np.sum(results, axis=0)
+                      
+    message = f"Generating model: {args.embedding_model}"
+    report_phase(message)
+    message = f"Found only in input: {summed_results[0]}"
+    report_phase(message)
+    message = f"Hallucinated only in output: {summed_results[1]}"
+    report_phase(message)
+    message = f"Matched in both input and output: {summed_results[2]}"
+    report_phase(message)
