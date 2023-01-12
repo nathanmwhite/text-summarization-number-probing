@@ -8,6 +8,8 @@ __copyright__ = "Copyright © 2023 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+import re
+
 
 def is_a_number(sequence, include_hyphen=False):
     """
@@ -113,3 +115,33 @@ def check_numerical(input_strings, output_strings):
     np.asarray(results)
     
     return results
+
+
+def retokenize(text_sequences):
+    multiplier_abbrevs = ['mn', 'm', 'mln', 'bln', 'bn', 'b', 'k', 'K', 'tn']
+    currency_symbols = ['\$', 'USD', 'CAD', 'C\$', 'AUD', 'A\$', 'skr', 'SEK', 'HK\$', 'Rmb', \
+                        'RMB', '£', '¥', 'Y', '₩', '₽', 'CHF', '€', 'EUR', 'eur']
+    
+    out_sequences = []
+    for item in text_sequences:
+        sequence = item.rstrip('\n')
+        sequence = re.sub(', ', ' , ', sequence)
+        # separate for abbreviations; the final product only has the original
+        #  sequence plus codes
+        sequence = re.sub('\. ', ' . ', sequence) # cannot believe I did this! again!
+        sequence = re.sub('\.$', ' .', sequence)
+        sequence = re.sub(' \(', ' ( ', sequence)
+        sequence = re.sub('\) ', ' ) ', sequence)
+        sequence = re.sub('%', ' %', sequence)
+        sequence = re.sub('([0-9]+)-([0-9]+)', '\g<1> - \g<2>', sequence)
+        sequence = re.sub('-([0-9]+)', '- \g<1>', sequence)
+        
+        # provides support for the messy "$26bn" type sequences
+        multiplier_re = '|'.join(multiplier_abbrevs)
+        currency_re = '|'.join(currency_symbols)
+        sequence = re.sub('(^| )('+currency_re+')([0-9,.\-]+)('+multiplier_re+'|)', '\g<1> \g<2> \g<3> \g<4>', sequence)
+        sequence = re.sub('([0-9,.\-]+)('+multiplier_re+'|) ', '\g<1> \g<2> ', sequence)
+        sequence = re.sub(' +', ' ', sequence)
+        out_sequences.append(sequence)
+        
+    return out_sequences
