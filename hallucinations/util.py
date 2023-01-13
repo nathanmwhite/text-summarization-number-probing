@@ -162,4 +162,10 @@ def load_malo_data():
         dataset of Malo et al. (2014).
     returns : List[str], where each string is one input line from the dataset.
     """
-    pass
+    path = None # TODO
+    
+    with open(path, 'r') as f:
+        data = f.readlines()
+    data = [line.rstrip('\n') for line in data]
+    
+    return data
