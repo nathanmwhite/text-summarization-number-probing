@@ -72,7 +72,7 @@ def train_epoch(idx, training_data_loader, model, loss_function, optimizer, clip
     return batch_loss, continuing_loss, total_loss
   
 
-def evaluate(model, metric, eval_dataloader):
+def evaluate(model, metric, eval_dataloader, use_numpy=False):
     model.eval()
     
     total_loss = 0.0
@@ -82,7 +82,7 @@ def evaluate(model, metric, eval_dataloader):
         
         output = model(inputs)
         
-        metric.update_with_results(output, labels)
+        metric.update_with_results(output, labels, use_numpy)
         
         codelength = metric.get_prequential_codelength()
         
@@ -115,6 +115,7 @@ if __name__ == '__main__':
     parser.add_argument('--early_stopping', type=bool, default=False)
     parser.add_argument('--patience', type=int, default=10)
     parser.add_argument('--clip_norm', type=int, default=5)
+    parser.add_argument('--use_numpy', type=bool, default=False)
     parser.add_argument('--trained', action='store_true')
     parser.add_argument('--untrained', dest='trained', action='store_false')
     parser.set_defaults(trained=True)
@@ -297,7 +298,7 @@ if __name__ == '__main__':
         if i > 0:
             am.eval()
             with torch.no_grad():
-                codelength = evaluate(am, online_code, eval_dataloaders[i])
+                codelength = evaluate(am, online_code, eval_dataloaders[i], args.use_numpy)
                 print(f'Codelength on portion {i}: {codelength}')
             am.reset_to_model_start()
         
@@ -333,7 +334,7 @@ if __name__ == '__main__':
     # transmit last data block for codelength
     am.eval()
     with torch.no_grad():
-        codelength = evaluate(am, online_code, eval_dataloaders[-1])
+        codelength = evaluate(am, online_code, eval_dataloaders[-1], args.use_numpy)
             
     # calculate final metric results
     codelength = online_code.get_prequential_codelength()
