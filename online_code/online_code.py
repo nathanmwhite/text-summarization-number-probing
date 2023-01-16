@@ -45,7 +45,7 @@ class OnlineCode:
         self._log_sum += self._t_1 * np.log2(self._K)
         print(f'uniform_codelength calculation: {self._log_sum}')
 
-    def update_with_results(self, outputs, labels):
+    def update_with_results(self, outputs, labels, use_numpy=False):
         """
         update_with_results takes the labels and outputs as inputs and
             finds the product of the probability distribution values
@@ -55,6 +55,9 @@ class OnlineCode:
         @param outputs (Tensor) : tensor containing the output distribution values
         @param labels (Tensor) : tensor containing one-hot values for the correct
             label for each data point
+        @param use_numpy (bool) : boolean indicating whether to use numpy arrays
+            with datatype np.float128 instead of tensors with datatype torch.float64
+            in cases where results are known to be extremely large
         """
         # TODO: review approach here
         # TODO: explore how to support non-probability dist values
@@ -71,12 +74,20 @@ class OnlineCode:
             values = 1 - errors / self._r
         elif self._mode == 'log_rmse':
             raise NotImplementedError('Updates with log_rmse approach are not yet supported.')
-        product = torch.prod(values)
         print('Values:', values)
         print('Values average: {n}'.format(n=torch.mean(values)))
-        print('Values product: {n}'.format(n=product))
-        print('Values product log2: {n}'.format(n=torch.log2(product)))
-        self._log_sum += (-1 * torch.log2(product))
+        if use_numpy:
+            values_np = values.cpu().detach().numpy()
+            product = np.prod(values_np, dtype=np.float128)
+            log_ = np.log2(product)
+            print('Values product: {n}'.format(n=product))
+            print('Values product log2: {n}'.format(n=log_))
+        else:
+            product = torch.prod(values)
+            log_ = torch.log2(product)
+            print('Values product: {n}'.format(n=product))
+            print('Values product log2: {n}'.format(n=log_))
+        self._log_sum += (-1 * log_)
 
     def get_prequential_codelength(self):
         return self._t_1 * np.log2(self._K) + self._log_sum
