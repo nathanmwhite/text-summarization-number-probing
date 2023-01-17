@@ -26,6 +26,8 @@ from transformers import PreTrainedTokenizer
 from .util import obtain_units
 from ..units_processing.retrieve_units import is_a_number as isnumeric
 
+# TODO (17 Jan 2023) : create support for decoder probing data
+
 # TODO: enclose references to separate test dataset within num_partitions > 1 scope
 # TODO: fix current approach for partitions of the dataset:
 #    tokenized data cannot be accessed via index slices
