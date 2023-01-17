@@ -33,7 +33,7 @@ def report_phase(message):
     print(formatted_message)
     logging.info(formatted_message)
 
-    
+# TODO : check for support with decoder layers    
 # TODO : revisit and determine whether torch.nn.Module().apply(func) would be more appropriate
 def freeze_module(module, module_type):
     def freeze_component(component):
