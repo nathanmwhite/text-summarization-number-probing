@@ -58,6 +58,7 @@ def freeze_module(module, module_type):
                                    'fc1',
                                    'fc2',
                                    'self_attn_layer_norm',
+                                   'encoder_attn_layer_norm',
                                    'final_layer_norm',
                                    'layer_norm'}
         expandable_layer_types = {'model',
@@ -116,17 +117,20 @@ def freeze_module(module, module_type):
     elif module_type in ('ProphetNet', 'ProphetNet-CDM'):
         operational_layer_types = {'word_embeddings',
                                    'position_embeddings',
+                                   'ngram_embeddings',
                                    'embeddings_layer_norm',
                                    'key_proj',
                                    'value_proj',
                                    'query_proj',
                                    'out_proj',
+                                   'relative_pos_embeddings',
                                    'self_attn_layer_norm',
                                    'intermediate',
                                    'output',
                                    'feed_forward_layer_norm',
                                    'relative_pos_embeddings',
                                    'cross_attn_layer_norm',
+                                   'embeddings_layer_norm',
                                    'lm_head'}
         expandable_layer_types = {'prophetnet',
                                   'encoder',
