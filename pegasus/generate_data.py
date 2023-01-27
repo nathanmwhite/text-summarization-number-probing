@@ -111,7 +111,12 @@ class RangeProbingDataset(Dataset):
                    'decoder_input_ids': decoder_input_ids}
         
         return _inputs, _output_y1, _output_y2
-    
+ 
+
+def sample_float(integer):
+    tenths = np.random.randint(0, 10) * 0.1
+    return integer + tenths
+
     
 # their description does not specify what happens to the obtained value via the Gaussian process
 # their code shows that the Gaussian is run five times per data point and appended
@@ -210,10 +215,6 @@ def generate_data(tokenizer: PreTrainedTokenizer,
             return singular_form, int(target_index)
         else:
             return plural_form, int(target_index)
-        
-    def sample_float(integer):
-        tenths = np.random.randint(0, 10) * 0.1
-        return integer + tenths
     
     # TODO: evaluate whether to tease out two version for the different tasks
     # TODO: current approach does not allow units to be used with float
