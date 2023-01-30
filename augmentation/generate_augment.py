@@ -22,7 +22,7 @@ def generate_number(min=0, max=99, use_floats=False):
 
 
 # need to generate numbers in relationships
-# first relationship type (start, increase_amount, end)
+# first relationship type (start, increase_amount, end) # and decrease!
 # second relationship type (start, increase_percent, end)
 # third relationship type (start, increase_basis_points, end)
 # fourth relationship type (currency 1, currency 2)
@@ -50,4 +50,32 @@ def generate_number(min=0, max=99, use_floats=False):
 
 # replace numerals with other numerals
 def generate_replacements():
+    amount_increase_examples = [
+        "In the third quarter, net sales increased by {amt} from {start} to {end}.",
+        "In the first half of the year, operating profit rose by {amt} from {start} to {end}.",
+        "Operating profit rose to {end} from {start} in the corresponding period from the prior year, representing an increase of {amt}.",
+        "The retail chain's sales increased by {amt} from {start} to {end}.",
+        "Net sales surged by {amt} from {start} to {end}.",
+        "Commission income increased by {amt} to {end}, up from {start} a year earlier.",
+        "The company's revenue increased by {amt} to {end} from {start}.,
+        "The company's order book stood at {end}, up by {amt} on the year from {start}.",
+        "In its financial report, it said its net profit soared by {amt} to {end} from a year-earlier {start}.",
+        "They raised sales by {amt}, to {end}, from {start} a year earlier."
+    ]
+    amount_decrease_examples = [
+        "In the third quarter, net sales decreased by {amt} from {start} to {end}.",
+        "In the first half of the year, operating profit fell by {amt} from {start} to {end}.",
+        "Operating profit fell to {end} from {start} in the corresponding period from the prior year, representing a decrease of {amt}.",
+        "The retail chain's sales decreased by {amt} from {start} to {end}.",
+        "Net sales declined by {amt} from {start} to {end}.",
+        "Commission income decreased by {amt} to {end}, down from {start} a year earlier.",
+        "The company's revenue decreased by {amt} to {end} from {start}.,
+        "The company's order book stood at {end}, down by {amt} on the year from {start}.",
+        "In its financial report, it said its net profit plummeted by {amt} to {end} from a year-earlier {start}.",
+        "They lowered sales by {amt}, to {end}, from {start} a year earlier."
+    ]
+    # need a source to create models from for basis points: Turenne?
+    bp_increase_examples = [
+    ]
+    
     pass
