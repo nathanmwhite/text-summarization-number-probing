@@ -48,8 +48,17 @@ def generate_number(min=0, max=99, use_floats=False):
 # "In its financial report , published on Friday , SEB said its net profit soared to SEK6 .745 bn in 2010 from a year-earlier SEK1 .114 bn and proposed a 50 % dividend increase to SEK1 .50 per share ."
 # "Rinkuskiai raised the sales by 18.1 percent , to 1.37 million liters , while the sales of Kauno Alus grew by 14.3 percent , to 960,000 liters ."
 
-# replace numerals with other numerals
-def generate_replacements():
+
+# TODO: determine whether `task` should be a list
+def generate_augmented_examples(task, num_examples=int(1e05)):
+    """
+    generate_augmented_examples creates additional training examples in order to
+        test whether additional training examples with better representation
+        of numerals results in improved performance on hallucination issues.
+    @param task (str) : The task for which improved training is sought.
+    @param num_examples (int) : The number of augmented examples to create.
+    returns List : augmented examples to add to dataset for model fine-tuning
+    """
     amount_increase_examples = [
         "In the third quarter, net sales increased by {amt} from {start} to {end}.",
         "In the first half of the year, operating profit rose by {amt} from {start} to {end}.",
@@ -77,5 +86,5 @@ def generate_replacements():
     # need a source to create models from for basis points: Turenne?
     bp_increase_examples = [
     ]
-    
-    pass
+    # TODO: implement remainder
+    return None
