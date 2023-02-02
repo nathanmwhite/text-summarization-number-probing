@@ -66,7 +66,7 @@ def generate_augmented_examples(task, num_examples=int(1e05)):
         "The retail chain's sales increased by {amt} from {start} to {end}.",
         "Net sales surged by {amt} from {start} to {end}.",
         "Commission income increased by {amt} to {end}, up from {start} a year earlier.",
-        "The company's revenue increased by {amt} to {end} from {start}.,
+        "The company's revenue increased by {amt} to {end} from {start}.",
         "The company's order book stood at {end}, up by {amt} on the year from {start}.",
         "In its financial report, it said its net profit soared by {amt} to {end} from a year-earlier {start}.",
         "They raised sales by {amt}, to {end}, from {start} a year earlier."
@@ -78,7 +78,7 @@ def generate_augmented_examples(task, num_examples=int(1e05)):
         "The retail chain's sales decreased by {amt} from {start} to {end}.",
         "Net sales declined by {amt} from {start} to {end}.",
         "Commission income decreased by {amt} to {end}, down from {start} a year earlier.",
-        "The company's revenue decreased by {amt} to {end} from {start}.,
+        "The company's revenue decreased by {amt} to {end} from {start}.",
         "The company's order book stood at {end}, down by {amt} on the year from {start}.",
         "In its financial report, it said its net profit plummeted by {amt} to {end} from a year-earlier {start}.",
         "They lowered sales by {amt}, to {end}, from {start} a year earlier."
