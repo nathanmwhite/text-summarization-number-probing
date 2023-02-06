@@ -155,17 +155,15 @@ def retokenize(text_sequences):
     return out_sequences
 
 
-# TODO: implement
-def load_malo_data():
+def load_malo_data(path):
     """
     load_malo_data : loads a filtered version of the Financial Phrasebank
         dataset of Malo et al. (2014).
+    @param path (str) : the path to the preprocessed Malo et al. dataset
     returns : List[str], where each string is one input line from the dataset.
     """
-    path = None # TODO
-    
     with open(path, 'r') as f:
         data = f.readlines()
-    data = [line.rstrip('\n') for line in data]
+    sequences = retokenize(data)
     
     return data
