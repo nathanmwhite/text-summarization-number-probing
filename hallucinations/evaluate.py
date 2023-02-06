@@ -109,6 +109,8 @@ def evaluate(model, dataloader, input_data):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
+    parser.add_argument('--malo_datapath', type=str, default='./text-summarization-number-probing/hallucinations/malo.txt')
+    parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--log_filename', type=str, default='evaluate.log')
     args = parser.parse_args()
     
@@ -122,10 +124,9 @@ if __name__ == '__main__':
     
     model = get_embedding_model(model_name, trained=True).to(device)
     
-    # TODO: implement
-    data_in = load_malo_data()
+    data_in = load_malo_data(args.malo_datapath)
     
-    dataloader = create_eval_dataloader(data_in, batch_size, tokenizer, device)
+    dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
     
     results = evaluate(model, dataloader, data_in)
     
