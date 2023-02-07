@@ -109,7 +109,7 @@ def evaluate(model, dataloader, input_data):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--embedding_model', type=str, default='Pegasus')
-    parser.add_argument('--malo_datapath', type=str, default='./text-summarization-number-probing/hallucinations/malo.txt')
+    parser.add_argument('--malo_datapath', type=str, default='./text-summarization-number-probing/hallucinations/malo_cleaned.txt')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--log_filename', type=str, default='evaluate.log')
     args = parser.parse_args()
