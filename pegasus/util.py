@@ -47,6 +47,7 @@ def obtain_units(source_loc):
 
 
 MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
+                  'Pegasus-XSum': 'google/pegasus-xsum",
                   'Pegasus-CDM': "google/pegasus-cnn_dailymail",
                   'T5': "t5-base",
                   'T5-CDM': "flax-community/t5-base-cnn-dm", # note also: sshleifer/t5-base-cnn
@@ -56,6 +57,7 @@ MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
                   'Bart-XSum': "facebook/bart-large-xsum",
                   'Bart-CDM': "facebook/bart-large-cnn",
                   'DistilBart': "sshleifer/distilbart-xsum-12-6",
+                  'DistilBart-XSum': "sshleifer/distilbart-xsum-12-6",
                   'DistilBart-CDM': "sshleifer/distilbart-cnn-12-6",
                   'ProphetNet': "microsoft/prophetnet-large-uncased",
                   'ProphetNet-CDM': "microsoft/prophetnet-large-uncased-cnndm",
