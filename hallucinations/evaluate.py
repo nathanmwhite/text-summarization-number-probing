@@ -72,6 +72,10 @@ def create_eval_dataloader(data_in, batch_size, tokenizer, device):
     # assert(type(data_in) == List)
     # assert(type(data_in[0]) == str)
     tokenized = tokenizer(data_in, return_tensors='pt', padding=True)
+    
+    # debug
+    report_phase(len(tokenized['input_ids']))
+        
     dataset = GenerationDataset(tokenized).to(device)
     
     # debug
@@ -142,7 +146,7 @@ if __name__ == '__main__':
     data_in = load_malo_data(args.malo_datapath)
     
     # debug
-    report_phase(data_in[0])
+    report_phase(len(data_in))
     
     dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
     
