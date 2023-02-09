@@ -118,6 +118,11 @@ def evaluate(model, dataloader, input_data):
             outputs.append(string_)
             
         retokenized_outputs += retokenize(outputs)
+        
+    # debug
+    report_phase(retokenized_outputs[0])
+    report_phase(retokenized_outputs[-1])
+    report_phase(len(retokenized_outputs))
             
     metrics = check_numerical(input_data, retokenized_outputs)
                 
