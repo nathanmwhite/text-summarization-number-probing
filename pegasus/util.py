@@ -47,7 +47,7 @@ def obtain_units(source_loc):
 
 
 MODEL_NAME_MAP = {'Pegasus': "google/pegasus-xsum",
-                  'Pegasus-XSum': 'google/pegasus-xsum",
+                  'Pegasus-XSum': "google/pegasus-xsum",
                   'Pegasus-CDM': "google/pegasus-cnn_dailymail",
                   'T5': "t5-base",
                   'T5-CDM': "flax-community/t5-base-cnn-dm", # note also: sshleifer/t5-base-cnn
