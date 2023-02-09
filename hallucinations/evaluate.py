@@ -27,8 +27,6 @@ from ..pegasus.model import report_phase
 from ..pegasus.util import get_model_name, get_tokenizer, get_embedding_model
 from .util import check_numerical, get_numbers, load_malo_data, retokenize
 
-# TODO: create support for evaluating on the final version of malo_cleaned
-
 
 class GenerationDataset(Dataset):
     """
