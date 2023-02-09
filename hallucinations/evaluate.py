@@ -109,6 +109,7 @@ def evaluate(model, dataloader, input_data):
         print(f'Processing batch {i}')
         if i == 0:
             batch_size = len(data_point)
+            report_phase(batch_size)
         
         inputs = data_point
         
