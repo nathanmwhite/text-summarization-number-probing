@@ -136,7 +136,13 @@ if __name__ == '__main__':
     
     model = get_embedding_model(model_name, trained=True).to(device)
     
+    # debug
+    report_phase(args.malo_datapath)
+    
     data_in = load_malo_data(args.malo_datapath)
+    
+    # debug
+    report_phase(data_in[0])
     
     dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
     
