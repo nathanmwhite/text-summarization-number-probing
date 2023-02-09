@@ -104,12 +104,10 @@ def evaluate(model, dataloader, input_data):
     
     outputs = []
     
-    # TODO: debug here
+    retokenized_outputs = []
+    
     for i, data_point in enumerate(dataloader):
         print(f'Processing batch {i}')
-        if i == 0:
-            batch_size = len(data_point)
-            report_phase(batch_size)
         
         inputs = data_point
         
@@ -119,10 +117,9 @@ def evaluate(model, dataloader, input_data):
             string_ = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(item))
             outputs.append(string_)
             
-        retokenized_outputs = retokenize(outputs)
+        retokenized_outputs += retokenize(outputs)
             
-        # next step is to implement metric for matching numerical values
-        metrics = check_numerical(input_data[i*batch_size:(i+1)*batch_size], retokenized_outputs)
+    metrics = check_numerical(input_data, retokenized_outputs)
                 
     return metrics
 
