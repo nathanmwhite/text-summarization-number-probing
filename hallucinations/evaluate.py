@@ -51,8 +51,11 @@ class GenerationDataset(Dataset):
         return datapoint
     
     def to(self, device):
-        self._input_ids.to(device)
-        self._attention_mask.to(device)
+        self._input_ids = self._input_ids.to(device)
+        self._attention_mask = self._attention_mask.to(device)
+        
+        # return self so that .to functionality of object is consistent with PyTorch pattern
+        return self
 
         
 def create_eval_dataloader(data_in, batch_size, tokenizer, device):
