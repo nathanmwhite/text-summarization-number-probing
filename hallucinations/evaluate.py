@@ -77,12 +77,12 @@ def create_eval_dataloader(data_in, batch_size, tokenizer, device):
     tokenized = tokenizer(data_in, return_tensors='pt', padding=True)
     
     # debug
-    report_phase(len(tokenized['input_ids']))
+    #report_phase(len(tokenized['input_ids']))
         
     dataset = GenerationDataset(tokenized).to(device)
     
     # debug
-    report_phase(dataset[0])
+    #report_phase(dataset[0])
     
     dataloader = DataLoader(dataset, batch_size=batch_size)
     return dataloader
@@ -144,12 +144,12 @@ if __name__ == '__main__':
     model = get_embedding_model(model_name, trained=True).to(device)
     
     # debug
-    report_phase(args.malo_datapath)
+    #report_phase(args.malo_datapath)
     
     data_in = load_malo_data(args.malo_datapath)
     
     # debug
-    report_phase(len(data_in))
+    #report_phase(len(data_in))
     
     dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
     
