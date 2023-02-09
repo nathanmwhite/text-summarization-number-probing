@@ -8,6 +8,8 @@ __copyright__ = "Copyright © 2023 Nathan M. White"
 __author__ = "Nathan M. White"
 __author_email__ = "nathan.white1@jcu.edu.au"
 
+import argparse
+
 import logging
 
 from transformers import PegasusForConditionalGeneration 
