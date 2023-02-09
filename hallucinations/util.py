@@ -100,6 +100,9 @@ def check_numerical(input_strings, output_strings):
         2) the number of numerical items found only in the output string
         3) the number of numerical items shared between the two.
     """
+    # debug
+    print(len(input_strings), ',', len(output_strings))
+    
     assert(len(input_strings) == len(output_strings))
     
     results = []
