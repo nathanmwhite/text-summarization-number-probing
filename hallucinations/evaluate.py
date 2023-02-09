@@ -73,6 +73,10 @@ def create_eval_dataloader(data_in, batch_size, tokenizer, device):
     # assert(type(data_in[0]) == str)
     tokenized = tokenizer(data_in, return_tensors='pt', padding=True)
     dataset = GenerationDataset(tokenized).to(device)
+    
+    # debug
+    report_phase(dataset[0])
+    
     dataloader = DataLoader(dataset, batch_size=batch_size)
     return dataloader
 
@@ -94,6 +98,8 @@ def evaluate(model, dataloader, input_data):
     model.eval()
     
     outputs = []
+    
+    # TODO: debug here
     for i, data_point in enumerate(dataloader):
         print(f'Processing batch {i}')
         inputs = data_point
