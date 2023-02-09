@@ -107,6 +107,9 @@ def evaluate(model, dataloader, input_data):
     # TODO: debug here
     for i, data_point in enumerate(dataloader):
         print(f'Processing batch {i}')
+        if i == 0:
+            batch_size = len(data_point)
+        
         inputs = data_point
         
         output = model.generate(**inputs)
@@ -118,7 +121,7 @@ def evaluate(model, dataloader, input_data):
         retokenized_outputs = retokenize(outputs)
             
         # next step is to implement metric for matching numerical values
-        metrics = check_numerical(input_data, retokenized_outputs)
+        metrics = check_numerical(input_data[i*batch_size:(i+1)*batch_size], retokenized_outputs)
                 
     return metrics
 
