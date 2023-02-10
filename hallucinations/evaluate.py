@@ -102,22 +102,21 @@ def evaluate(model, dataloader, input_data):
     """
     model.eval()
     
-    outputs = []
-    
     retokenized_outputs = []
     
     for i, data_point in enumerate(dataloader):
         print(f'Processing batch {i}')
-        
+
         inputs = data_point
         
         output = model.generate(**inputs)
         
+        output_strings = []
         for item in output:
             string_ = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(item))
-            outputs.append(string_)
+            output_strings.append(string_)
             
-        retokenized_outputs += retokenize(outputs)
+        retokenized_outputs += retokenize(output_strings)
         
     # debug
     report_phase(retokenized_outputs[0])
