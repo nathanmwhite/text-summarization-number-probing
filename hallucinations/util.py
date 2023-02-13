@@ -47,7 +47,8 @@ def is_a_number(sequence, include_hyphen=False):
     else:
         return False
       
-      
+
+# TODO: this approach fails to handle 'one' vs. 1, leading to false positives for hallucination
 def get_numbers(text):
     """
     get_numbers : takes a string and returns tokens that are numbers.
