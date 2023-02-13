@@ -13,6 +13,9 @@ import re
 import numpy as np
 
 
+# TODO:
+# 1) determine whether numbers with currencies or orders of magnitude are being rejected as numbers
+# 2) revisit whether ordinal numbers need to be supported
 def is_a_number(sequence, include_hyphen=False):
     """
     is_a_number : checks if a character sequence is a number, possibly containing
@@ -28,7 +31,7 @@ def is_a_number(sequence, include_hyphen=False):
     if include_hyphen:
         symbols = (',', '-', '.')
     else:
-        symbols = (',', '.')
+        symbols = (',', '.', '%')
         
     if sequence == '':
         return False
@@ -80,7 +83,10 @@ def _found_shared(input_numbers, output_numbers):
             shared_items.append(item)
     return len(shared_items)
 
-
+# TODO:
+# 1) add support to avoid differences between 'first half of the year' and 'six months'
+# Note: it may be best to ignore this issue, as these scenarios cannot exhaustively be
+#    considered, though supporting some may be demonstrative for peer review
 def check_numerical(input_strings, output_strings):
     """
     check_numerical : checks lists of input and output strings with the same
