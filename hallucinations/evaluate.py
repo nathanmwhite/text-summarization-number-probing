@@ -86,9 +86,10 @@ def create_eval_dataloader(data_in, batch_size, tokenizer, device):
     return dataloader
 
 
-def evaluate(model, dataloader, input_data):
+def evaluate_malo(model, dataloader, input_data):
     """
-    evaluate : function that evaluates models for numerical hallucination.
+    evaluate_malo : function that evaluates models for numerical hallucination using the
+        Malo et al. (2014) Financial Phrasebank dataset.
     @param model (torch.nn.Module) : model to evaluate
     @param dataloader (torch.utils.data.DataLoader) : dataloader containing
         the batched input data
@@ -118,7 +119,52 @@ def evaluate(model, dataloader, input_data):
             
         retokenized_outputs += retokenize(output_strings)
         
-    # debug
+    report_phase(retokenized_outputs[0])
+    report_phase(retokenized_outputs[-1])
+    report_phase(len(retokenized_outputs))
+            
+    metrics = check_numerical(input_data, retokenized_outputs)
+                
+    return metrics
+
+
+# TODO: test and debug
+def evaluate_datsets(model, dataset, dataset_name):
+    """
+    evaluate_datasets : documentation TODO
+    """
+    if dataset_name == 'xsum':
+        item_step = 'document'
+    elif dataset_name == 'cnn_dailymail':
+        item_step = 'article'
+    else:
+        raise ValueError('Unsupported dataset specified.')
+    
+    retokenized_outputs = []
+    input_data = []
+    for item in dataset['test']: # this runs with a batch size of 1 across the dataset
+        doc = item[item_step]
+        input_data += doc
+
+        if task_prefix and type(model) == T5ForConditionalGeneration:
+            batch_result = tokenizer.prepare_seq2seq_batch(src_texts='summarize: ' + doc, return_tensors='pt')
+        else:
+            batch_result = tokenizer.prepare_seq2seq_batch(src_texts=doc, return_tensors='pt')
+        #print(batch_result)
+        batch_result_out = {}
+        for k in batch_result.keys():
+            print(type(model))
+            if k == 'token_type_ids' and type(model) == ProphetNetForConditionalGeneration:
+                continue
+            else:
+                batch_result_out[k] = batch_result[k].to(device)
+
+        out = model.generate(**batch_result_out)
+        #print(out)
+        out_sequence = tokenizer.batch_decode(out)
+        
+        retokenized_outputs += out_sequence
+        
     report_phase(retokenized_outputs[0])
     report_phase(retokenized_outputs[-1])
     report_phase(len(retokenized_outputs))
@@ -134,6 +180,7 @@ if __name__ == '__main__':
     parser.add_argument('--malo_datapath', type=str, default='./text-summarization-number-probing/hallucinations/malo_cleaned.txt')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--log_filename', type=str, default='evaluate.log')
+    parser.add_argument('--dataset', type=str, default='Malo')
     args = parser.parse_args()
     
     logging.basicConfig(filename=args.log_filename, level=logging.INFO)
@@ -149,14 +196,28 @@ if __name__ == '__main__':
     # debug
     #report_phase(args.malo_datapath)
     
-    data_in = load_malo_data(args.malo_datapath)
+    # Malo is designed here to first be loaded into a dataset, then a dataloader
+    if args.dataset == 'Malo':
+        data_in = load_malo_data(args.malo_datapath)
     
-    # debug
-    #report_phase(len(data_in))
+        dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
+        
+        results = evaluate_malo(model, dataloader, data_in)
+        
+   
+    # xsum and cnn_dailymail are a dataset of strings that need to then be tokenized and run
+    elif args.dataset in ['xsum', "cnn_dailymail"]:
+        dataset = load_dataset(args.dataset, cache_dir='./models')
+        
+        results = evaluate_datasets(model, dataset, args.dataset)
+        
+        
+        
+                          
+    else:
+        raise ValueError('Specified dataset not supported. Please specify from among "Malo", "xsum", "cnn_dailymail".')
     
-    dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
-    
-    results = evaluate(model, dataloader, data_in)
+
     
     summed_results = np.sum(results, axis=0)
                       
