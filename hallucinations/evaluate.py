@@ -242,7 +242,6 @@ if __name__ == '__main__':
     h_mean_pct = np.mean(h_pct)
     # stdev percent hallucinated in terms of all nums in output per line
     h_std_pct = np.std(h_pct)
-    # deviation in terms of number of hallucinated values
     
                       
     message = f"Generating model: {args.embedding_model}"
@@ -252,4 +251,22 @@ if __name__ == '__main__':
     message = f"Hallucinated only in output: {hallucinated}"
     report_phase(message)
     message = f"Matched in both input and output: {matched}"
+    report_phase(message)
+    message = f"H-Precision: {h_precision}"
+    report_phase(message)
+    message = f"H-Recall: {h_recall}"
+    report_phase(message)
+    message = f"H-F1: {h_f1}"
+    report_phase(message)
+    message = f"H-Mean: {h_mean}"
+    report_phase(message)
+    message = f"H-sigma: {h_std}"
+    report_phase(message)
+    message = f"Number of datapoints with hallucinations: {num_dp_hallucinations} of {dataset_size}"
+    report_phase(message)
+    message = f"Percentage of datapoints with hallucinations: {pct_dp_hallucinations}"
+    report_phase(message)
+    message = f"Mean percentage of quant values in output that are hallucinations: {h_mean_pct}"
+    report_phase(message)
+    message = f"Stdev of percentage of quant values in output that are hallucinations: {h_std_pct}"
     report_phase(message)
