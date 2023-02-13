@@ -222,6 +222,7 @@ if __name__ == '__main__':
     input_only = summed_results[input_only_idx]
     hallucinated = summed_results[hallucinated_idx]
     matched = summed_results[matched_idx]
+    dataset_size = results.shape()[0]
     # h_precision
     h_precision = matched / (matched + hallucinated)
     # h_recall
@@ -229,13 +230,18 @@ if __name__ == '__main__':
     # h_F1
     h_f1 = 2 * h_precision * h_recall / (h_precision + h_recall)
     # mean hallucinations per datapoint
-    h_mean = hallucinated / results.shape()[0]
+    h_mean = hallucinated / dataset_size
     # stdev hallucinations per datapoint
-    h_stdev = np.std(results, axis=0)[hallucinated_idx]
+    h_std = np.std(results, axis=0)[hallucinated_idx]
+    # num datapoints with hallucinations in output
+    num_dp_hallucinations = np.count_nonzero(results, axis=0)[hallucinated_idx]
+    # pct datapoints with hallucinations in output
+    pct_dp_hallucinations = num_dp_hallucinations / dataset_size
     # mean percent hallucinated in terms of all nums in output per line
-    
+    h_pct = results[:, hallucinated] / np.sum(results[:, hallucinated:], axis=1)
+    h_mean_pct = np.mean(h_pct)
     # stdev percent hallucinated in terms of all nums in output per line
-    
+    h_std_pct = np.std(h_pct)
     # deviation in terms of number of hallucinated values
     
                       
