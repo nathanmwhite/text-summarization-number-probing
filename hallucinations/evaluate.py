@@ -214,13 +214,36 @@ if __name__ == '__main__':
     else:
         raise ValueError('Specified dataset not supported. Please specify from among "Malo", "xsum", "cnn_dailymail".')
         
+    # numerical results
     summed_results = np.sum(results, axis=0)
+    input_only_idx = 0
+    hallucinated_idx = 1
+    matched_idx = 2
+    input_only = summed_results[input_only_idx]
+    hallucinated = summed_results[hallucinated_idx]
+    matched = summed_results[matched_idx]
+    # h_precision
+    h_precision = matched / (matched + hallucinated)
+    # h_recall
+    h_recall = matched / (matched + input_only)
+    # h_F1
+    h_f1 = 2 * h_precision * h_recall / (h_precision + h_recall)
+    # mean hallucinations per datapoint
+    h_mean = hallucinated / results.shape()[0]
+    # stdev hallucinations per datapoint
+    h_stdev = np.std(results, axis=0)[hallucinated_idx]
+    # mean percent hallucinated in terms of all nums in output per line
+    
+    # stdev percent hallucinated in terms of all nums in output per line
+    
+    # deviation in terms of number of hallucinated values
+    
                       
     message = f"Generating model: {args.embedding_model}"
     report_phase(message)
-    message = f"Found only in input: {summed_results[0]}"
+    message = f"Found only in input: {input_only}"
     report_phase(message)
-    message = f"Hallucinated only in output: {summed_results[1]}"
+    message = f"Hallucinated only in output: {hallucinated}"
     report_phase(message)
-    message = f"Matched in both input and output: {summed_results[2]}"
+    message = f"Matched in both input and output: {matched}"
     report_phase(message)
