@@ -210,15 +210,10 @@ if __name__ == '__main__':
         dataset = load_dataset(args.dataset, cache_dir='./models')
         
         results = evaluate_datasets(model, dataset, args.dataset)
-        
-        
-        
-                          
+                        
     else:
         raise ValueError('Specified dataset not supported. Please specify from among "Malo", "xsum", "cnn_dailymail".')
-    
-
-    
+        
     summed_results = np.sum(results, axis=0)
                       
     message = f"Generating model: {args.embedding_model}"
