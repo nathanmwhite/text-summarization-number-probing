@@ -12,6 +12,18 @@ import re
 
 import numpy as np
 
+STRING_TO_NUM = {'one': 1,
+                 'two': 2,
+                 'three': 3,
+                 'four': 4,
+                 'five': 5,
+                 'six': 6,
+                 'seven': 7,
+                 'eight': 8,
+                 'nine': 9,
+                 'ten': 10,
+                 'zero': 0}
+
 
 # TODO:
 # 1) determine whether numbers with currencies or orders of magnitude are being rejected as numbers
@@ -42,13 +54,13 @@ def is_a_number(sequence, include_hyphen=False):
             else:
                 return False
         return True
-    elif sequence in ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']:
+    elif sequence in STRING_TO_NUM.keys():
         return True
     else:
         return False
       
 
-# TODO: this approach fails to handle 'one' vs. 1, leading to false positives for hallucination
+
 def get_numbers(text):
     """
     get_numbers : takes a string and returns tokens that are numbers.
@@ -58,6 +70,7 @@ def get_numbers(text):
     """
     tokens = text.split(' ')
     numbers = [w for w in tokens if is_a_number(w)]
+    numbers = [STRING_TO_NUM[n] if n in STRING_TO_NUM.keys() else n for n in numbers]
     return numbers
 
 
