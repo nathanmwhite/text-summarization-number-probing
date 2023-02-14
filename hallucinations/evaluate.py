@@ -86,7 +86,7 @@ def create_eval_dataloader(data_in, batch_size, tokenizer, device):
     return dataloader
 
 
-def evaluate_malo(model, dataloader, input_data):
+def evaluate_malo(model, dataloader, input_data, log_results=False):
     """
     evaluate_malo : function that evaluates models for numerical hallucination using the
         Malo et al. (2014) Financial Phrasebank dataset.
@@ -95,6 +95,7 @@ def evaluate_malo(model, dataloader, input_data):
         the batched input data
     @param input_data (List[str]) : list containing the input data as raw text
         to evaluate outputs against
+    @param log_results (bool) : log inputs and outputs if True else False
     returns : List[tuple] containing 3-tuples with results for each input item,
         where the tuple contains the following values:
         1) the number of numerical items found only in the input string
@@ -119,9 +120,13 @@ def evaluate_malo(model, dataloader, input_data):
             
         retokenized_outputs += retokenize(output_strings)
         
-    report_phase(retokenized_outputs[0])
-    report_phase(retokenized_outputs[-1])
-    report_phase(len(retokenized_outputs))
+        if log_results:
+            logging.INFO(inputs)
+            logging.INFO(retokenized_outputs[-1])
+        
+    #report_phase(retokenized_outputs[0])
+    #report_phase(retokenized_outputs[-1])
+    #report_phase(len(retokenized_outputs))
             
     metrics = check_numerical(input_data, retokenized_outputs)
                 
@@ -181,6 +186,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--log_filename', type=str, default='evaluate.log')
     parser.add_argument('--dataset', type=str, default='Malo')
+    parser.add_argument('--log_results', type=bool, default=False)
     args = parser.parse_args()
     
     logging.basicConfig(filename=args.log_filename, level=logging.INFO)
@@ -202,7 +208,7 @@ if __name__ == '__main__':
     
         dataloader = create_eval_dataloader(data_in, args.batch_size, tokenizer, device)
         
-        results = evaluate_malo(model, dataloader, data_in)
+        results = evaluate_malo(model, dataloader, data_in, args.log_results)
         
    
     # xsum and cnn_dailymail are a dataset of strings that need to then be tokenized and run
