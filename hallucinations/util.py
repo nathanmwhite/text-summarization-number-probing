@@ -137,7 +137,7 @@ def check_numerical(input_strings, output_strings):
         c = _found_shared(input_numbers, output_numbers)
         results.append((a, b, c))
         
-    np.asarray(results)
+    results = np.asarray(results)
     
     return results
 
