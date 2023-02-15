@@ -228,7 +228,7 @@ if __name__ == '__main__':
     input_only = summed_results[input_only_idx]
     hallucinated = summed_results[hallucinated_idx]
     matched = summed_results[matched_idx]
-    dataset_size = results.shape()[0]
+    dataset_size = results.shape[0]
     # h_precision
     h_precision = matched / (matched + hallucinated)
     # h_recall
