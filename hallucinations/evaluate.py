@@ -244,7 +244,7 @@ if __name__ == '__main__':
     # pct datapoints with hallucinations in output
     pct_dp_hallucinations = num_dp_hallucinations / dataset_size
     # mean percent hallucinated in terms of all nums in output per line
-    h_pct = results[:, hallucinated] / np.sum(results[:, hallucinated:], axis=1)
+    h_pct = results[:, hallucinated_idx] / np.sum(results[:, hallucinated_idx:], axis=1)
     h_mean_pct = np.mean(h_pct)
     # stdev percent hallucinated in terms of all nums in output per line
     h_std_pct = np.std(h_pct)
