@@ -245,10 +245,10 @@ if __name__ == '__main__':
     pct_dp_hallucinations = num_dp_hallucinations / dataset_size
     # number of datapoints with quantitative values in output
     non_zero = np.nonzero(results[:, hallucinated_idx] + results[:, matched_idx])
-    num_in_output = non_zero.shape[0]
+    num_in_output = non_zero[0].shape[0]
     # mean percent hallucinated in terms of all nums in output per line
     # requires a conditional: only include values where hallucinated or matched values are present
-    h_pct = results[non_zero, hallucinated_idx][0] / np.sum(results[non_zero, hallucinated_idx:][0], axis=1)
+    h_pct = results[non_zero[0], hallucinated_idx] / np.sum(results[non_zero[0], hallucinated_idx:], axis=1)
     h_mean_pct = np.mean(h_pct)
     # stdev percent hallucinated in terms of all nums in output per line
     h_std_pct = np.std(h_pct)
