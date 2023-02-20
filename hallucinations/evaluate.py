@@ -188,6 +188,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--log_filename', type=str, default='evaluate.log')
     parser.add_argument('--dataset', type=str, default='Malo')
+    parser.add_argument('--cache_datapath', type=str, default='./models')
     parser.add_argument('--log_results', type=bool, default=False)
     args = parser.parse_args()
     
@@ -215,7 +216,7 @@ if __name__ == '__main__':
    
     # xsum and cnn_dailymail are a dataset of strings that need to then be tokenized and run
     elif args.dataset in ['xsum', "cnn_dailymail"]:
-        dataset = load_dataset(args.dataset, cache_dir='./models')
+        dataset = load_dataset(args.dataset, cache_dir=args.cache_datapath)
         
         results = evaluate_datasets(model, dataset, args.dataset)
                         
