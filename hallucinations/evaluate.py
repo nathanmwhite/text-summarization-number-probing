@@ -160,7 +160,7 @@ def evaluate_datasets(model, dataset, dataset_name, task_prefix=False):
         #print(batch_result)
         batch_result_out = {}
         for k in batch_result.keys():
-            print(type(model))
+            #print(type(model))
             if k == 'token_type_ids' and type(model) == ProphetNetForConditionalGeneration:
                 continue
             else:
