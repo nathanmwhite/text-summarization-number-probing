@@ -136,7 +136,7 @@ def evaluate_malo(model, dataloader, input_data, log_results=False):
 
 
 # TODO: test and debug
-def evaluate_datsets(model, dataset, dataset_name):
+def evaluate_datasets(model, dataset, dataset_name):
     """
     evaluate_datasets : documentation TODO
     """
