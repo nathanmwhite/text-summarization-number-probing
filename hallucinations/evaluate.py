@@ -151,6 +151,8 @@ def evaluate_datasets(model, dataset, dataset_name, task_prefix=False):
     input_data = []
     for item in dataset['test']: # this runs with a batch size of 1 across the dataset
         doc = item[item_step]
+        print('len input data:', len(input_data))
+        print('document:', doc)
         input_data += doc
 
         if task_prefix and type(model) == T5ForConditionalGeneration:
