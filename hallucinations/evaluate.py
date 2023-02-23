@@ -151,9 +151,9 @@ def evaluate_datasets(model, dataset, dataset_name, task_prefix=False):
     input_data = []
     for item in dataset['test']: # this runs with a batch size of 1 across the dataset
         doc = item[item_step]
-        print('len input data:', len(input_data))
-        print('document:', doc)
-        input_data += doc
+        #print('len input data:', len(input_data))
+        #print('document:', doc)
+        input_data.append(doc)
 
         if task_prefix and type(model) == T5ForConditionalGeneration:
             batch_result = tokenizer.prepare_seq2seq_batch(src_texts='summarize: ' + doc, return_tensors='pt')
