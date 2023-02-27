@@ -74,23 +74,26 @@ def get_numbers(text):
     return numbers
 
 
-def _found_input_only(input_numbers, output_numbers):
+# TODO: refactor these three functions to use numpy set theory instead of loop
+# TODO: also support cases where rounding is to tens, hundreds, thousands as appropriate
+def _found_input_only(input_numbers, output_numbers, support_round=False):
     input_only_items = []
     for item in input_numbers:
         if item not in output_numbers:
-            input_only_items.append(item)
+                input_only_items.append(item)
     return len(input_only_items)
 
 
-def _found_output_only(input_numbers, output_numbers):
+def _found_output_only(input_numbers, output_numbers, support_round=False):
     output_only_items = []
+    rounded_hundreds = np.around(input_numbers, -2)
     for item in output_numbers:
-        if item not in input_numbers:
+        if item not in input_numbers and item not in rounded_hundreds:
             output_only_items.append(item)
     return len(output_only_items)
 
 
-def _found_shared(input_numbers, output_numbers):
+def _found_shared(input_numbers, output_numbers, support_round=False):
     shared_items = []
     for item in input_numbers:
         if item in output_numbers:
