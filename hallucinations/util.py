@@ -76,6 +76,7 @@ def get_numbers(text):
 
 # TODO: refactor these three functions to use numpy set theory instead of loop
 # TODO: also support cases where rounding is to tens, hundreds, thousands as appropriate
+# TODO: the changes here will fail as these numbers are represented as strings, not int/float/etc.
 def _found_input_only(input_numbers, output_numbers, support_round=False):
     input_only_items = []
     for item in input_numbers:
